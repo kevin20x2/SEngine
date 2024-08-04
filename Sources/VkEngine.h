@@ -4,6 +4,7 @@
 #include <vector>
 
 
+class FWindow;
 
 class KzVkEngine
 {
@@ -28,7 +29,7 @@ public:
 		std::vector <VkPresentModeKHR> PresentModes;
 	};
 
-	//explicit KzVkEngine(KzPlatform * InPlatform );
+	explicit KzVkEngine(FWindow * InWindow);
 
 	void InitVulkan();
 
@@ -144,5 +145,5 @@ protected:
 
 	bool bEnableValidationLayer = false;
 
-
+	FWindow * Window = nullptr;
 };

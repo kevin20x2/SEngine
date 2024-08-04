@@ -10,7 +10,9 @@ add_subdirectory(ThirdParty)
 
 add_executable(SEngine Sources/Application.cpp 
 					Sources/VkEngine.cpp 
-					Sources/VkEngine.h)
+					Sources/VkEngine.h
+        Sources/Platform/Window.cpp
+        Sources/Platform/Window.h)
 
 target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES)
 

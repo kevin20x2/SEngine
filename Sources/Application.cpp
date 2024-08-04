@@ -2,27 +2,26 @@
 #include <GLFW/glfw3.h>
 #include <cstdio>
 #include "VkEngine.h"
+#include "Platform/Window.h"
 
 int main()
 {
-    printf("hello world");
-    glfwInit();
 
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    GLFWwindow* Window = glfwCreateWindow(800, 600, "Vulkan WIndow", nullptr, nullptr);
+    //GLFWwindow* Window = glfwCreateWindow(800, 600, "Vulkan WIndow", nullptr, nullptr);
+    FWindow * Window = new FWindow(800,600);
+    Window->Init();
 
-    uint32_t ExtensionCnt = 0;
+    KzVkEngine * Engine = new KzVkEngine(Window);
+    Engine->InitVulkan();
 
 
-
-    while (!glfwWindowShouldClose(Window))
+    while (!Window->ShouldClose())
     {
-        glfwPollEvents();
+        Window->LoopFrame();
+        Engine->Render();
     }
 
-    glfwDestroyWindow(Window);
-
-    glfwTerminate();
+    delete Window;
 
     return 0;
 }

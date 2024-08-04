@@ -10,6 +10,9 @@
 
 #include <fstream>
 
+#include "GLFW/glfw3.h"
+#include "Platform/Window.h"
+
 const std::vector <const char* > ValidationLayers = {
 	"VK_LAYER_KHRONOS_validation"
 };
@@ -135,10 +138,14 @@ static VkShaderModule LoadHlslShader(const std::string & filePath, VkShaderStage
 }
 
 
-
+KzVkEngine::KzVkEngine(FWindow* InWindow) :
+Window(InWindow)
+{
+}
 
 void KzVkEngine::InitVulkan()
 {
+	VK_CHECK(volkInitialize());
 	CreateInstance();
 	CreateSurface();
 	CreateDevice();
@@ -191,7 +198,9 @@ void KzVkEngine::CreateInstance()
 
 	assert(!bEnableValidationLayer || CheckValidationLayerSupport());
 
-	//auto RequiredExtensions =  Platform->GetRequiredExtension();//GetRequiredExtensions(bEnableValidationLayer);
+	uint32_t Count = 0;
+	auto RequiredExtensions =  glfwGetRequiredInstanceExtensions(&Count); // Platform->GetRequiredExtension();//GetRequiredExtensions(bEnableValidationLayer);
+
 
 	VkApplicationInfo AppInfo{  };
 	AppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -205,8 +214,8 @@ void KzVkEngine::CreateInstance()
 
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	createInfo.pApplicationInfo = &AppInfo;
-	createInfo.enabledExtensionCount = 0;// RequiredExtensions.size();
-	createInfo.ppEnabledExtensionNames = nullptr;// RequiredExtensions.data();
+	createInfo.enabledExtensionCount = Count;// RequiredExtensions.size();
+	createInfo.ppEnabledExtensionNames = RequiredExtensions;// RequiredExtensions.data();
 	createInfo.pApplicationInfo = &AppInfo;
 	#ifdef VK_USE_PLATFORM_METAL_EXT
 	createInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
@@ -229,6 +238,7 @@ void KzVkEngine::CreateInstance()
 
 void KzVkEngine::CreateSurface()
 {
+	Surface = Window->CreateSurface(&Instance);
 }
 
 bool KzVkEngine::CheckValidationLayerSupport()
@@ -525,8 +535,8 @@ void KzVkEngine::CreateDescriptorSetLayout()
 void KzVkEngine::CreateGraphicsPipeline()
 {
 
-	VkShaderModule VertShaderModule = LoadHlslShader("../shaders/test.vert", VK_SHADER_STAGE_VERTEX_BIT, Device);
-	VkShaderModule FragShaderModule = LoadHlslShader("../shaders/test.frag", VK_SHADER_STAGE_FRAGMENT_BIT, Device);
+	VkShaderModule VertShaderModule = LoadHlslShader("../../shaders/test.vert", VK_SHADER_STAGE_VERTEX_BIT, Device);
+	VkShaderModule FragShaderModule = LoadHlslShader("../../shaders/test.frag", VK_SHADER_STAGE_FRAGMENT_BIT, Device);
 
 	VkPipelineShaderStageCreateInfo VertShaderStageInfo{};
 	VertShaderStageInfo.sType =
