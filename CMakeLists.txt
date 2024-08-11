@@ -20,7 +20,23 @@ add_executable(SEngine Sources/Application.cpp
         Sources/RHI/RHI.cpp
         Sources/RHI/RHI.h
         Sources/RHI/RHIUtils.cpp
-        Sources/RHI/RHIUtils.h)
+        Sources/RHI/RHIUtils.h
+        Sources/RHI/SwapChain.cpp
+        Sources/RHI/SwapChain.h
+        Sources/RHI/DescriptorSetLayout.cpp
+        Sources/RHI/DescriptorSetLayout.h
+        Sources/RHI/UniformBuffer.cpp
+        Sources/RHI/UniformBuffer.h
+        Sources/RHI/DescriptorPool.cpp
+        Sources/RHI/DescriptorPool.h
+        Sources/RHI/DescriptorSet.cpp
+        Sources/RHI/DescriptorSet.h
+        Sources/RHI/RenderPass.cpp
+        Sources/RHI/RenderPass.h
+        Sources/RHI/Shader.cpp
+        Sources/RHI/Shader.h
+        Sources/RHI/GraphicsPipeline.cpp
+        Sources/RHI/GraphicsPipeline.h)
 
 target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES)
 

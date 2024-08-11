@@ -7,13 +7,30 @@
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
+#include "Core/BaseTypes.h"
+
+
+#define VK_CHECK(x) \
+	do {			\
+VkResult  error = x;\
+	if (error)\
+	{				\
+				abort();\
+	}				\
+				\
+	}while(0)\
+
 
 class FRHI
 {
 public:
     virtual VkDevice * GetDevice() = 0;
-
     virtual VkInstance * GetInstance() = 0 ;
+    virtual VkPhysicalDevice * GetPhysicalDevice() = 0;
+    virtual VkSurfaceKHR * GetCurSurface() = 0;
+
+    virtual uint32 GetMaxFrameInFlight() = 0;
+
 };
 
 
@@ -38,6 +55,6 @@ struct FSwapChainSupportDetails
 };
 
 
-bool InitRHI();
+bool InitRHI(class FWindow * InWindow);
 
 extern FRHI * GRHI ;

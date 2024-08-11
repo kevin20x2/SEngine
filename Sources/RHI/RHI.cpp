@@ -13,6 +13,7 @@
 #include "GLFW/glfw3.h"
 
 #include "RHIUtils.h"
+#include "Platform/Window.h"
 
 FRHI * GRHI = nullptr;
 
@@ -29,14 +30,31 @@ public:
         return & Instance;
     }
 
+	virtual VkPhysicalDevice * GetPhysicalDevice() override
+    {
+    	return & PhysicalDevice;
+    }
+	virtual VkSurfaceKHR * GetCurSurface() override
+    {
+    	return & Surface;
+    }
 
-    void Initialize();
+	virtual uint32 GetMaxFrameInFlight() override
+    {
+    	return 2;
+    }
+
+
+
+    void Initialize(FWindow * InWindow);
 
 
 protected:
     void CreateInstance();
 	void CreatePhysicalDeivce();
 	void CreateDevice();
+
+	void EstablishDisplaySize();
 
 #pragma region Defines
 private:
@@ -47,30 +65,24 @@ private:
 
 	VkSurfaceKHR Surface;
 
-
 	VkQueue GraphicsQueue;
 	VkQueue PresentQueue;
+
+	VkExtent2D DisplaySize;
 
 #pragma endregion
 };
 
 
-#define VK_CHECK(x) \
-	do {			\
-VkResult  error = x;\
-	if (error)\
-	{				\
-				abort();\
-	}				\
-				\
-	}while(0)\
 
-
-void FRHIImp::Initialize()
+void FRHIImp::Initialize(FWindow * InWindow)
 {
 	VK_CHECK(volkInitialize());
 	CreateInstance();
+	Surface = InWindow->CreateSurface(&Instance);
 	CreatePhysicalDeivce();
+	EstablishDisplaySize();
+
 }
 
 void FRHIImp::CreateInstance()
@@ -114,7 +126,6 @@ void FRHIImp::CreatePhysicalDeivce()
 {
 	uint32_t DeviceCount = 0;
 	vkEnumeratePhysicalDevices(Instance, &DeviceCount, nullptr);
-
 
 	std::vector<VkPhysicalDevice> Devices(DeviceCount);
 
@@ -176,10 +187,24 @@ void FRHIImp::CreateDevice()
 	vkGetDeviceQueue(Device, Indices.PresentFamily.value(),0,&PresentQueue);
 }
 
-bool InitRHI()
+void FRHIImp::EstablishDisplaySize()
+{
+	VkSurfaceCapabilitiesKHR Capabilities;
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(PhysicalDevice,Surface,&Capabilities);
+
+	if(Capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR ||
+		Capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR
+		)
+	{
+		std::swap(Capabilities.currentExtent.height,Capabilities.currentExtent.width );
+	}
+	DisplaySize = Capabilities.currentExtent;
+}
+
+bool InitRHI(FWindow * InWindow)
 {
     auto RHI = new FRHIImp();
-    RHI->Initialize();
+    RHI->Initialize(InWindow);
     GRHI = RHI ;
 	return true;
 }

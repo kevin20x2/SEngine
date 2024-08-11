@@ -7,13 +7,19 @@
 #include <vulkan/vulkan_core.h>
 #include "Core/Core.h"
 
+struct FVertexBufferCreateInfo
+{
+    uint32 Size;
+    float * Data;
+};
+
 
 class FVertexBuffer
 {
-    FVertexBuffer(int32 Size);
+    FVertexBuffer(const FVertexBufferCreateInfo & Info);
 
-    VkBuffer Buffer;
-    VkDeviceMemory DeviceMemory;
+    VkBuffer Buffer{};
+    VkDeviceMemory DeviceMemory{};
 };
 
 #endif //VERTEXBUFFER_H
