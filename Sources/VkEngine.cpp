@@ -963,11 +963,9 @@ void KzVkEngine::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32_t Ima
 	viewport.height = (float)SwapChainExtent.height;
 	viewport.minDepth = 0.0f;
 	viewport.maxDepth = 1.0f;
-	vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
 
 	VkRect2D scissor{};
 	scissor.extent = SwapChainExtent;
-	vkCmdSetScissor(CommandBuffer, 0, 1, &scissor);
 
 	static float grey;
 	grey += 0.005f;
@@ -980,13 +978,15 @@ void KzVkEngine::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32_t Ima
 	renderPassInfo.pClearValues = &clearColor;
 	vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo,
 	                     VK_SUBPASS_CONTENTS_INLINE);
-	//vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-	 //                 graphicsPipeline);
-	//vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-	 //                       pipelineLayout, 0, 1, &descriptorSets[currentFrame],
-	   //                     0, nullptr);
+	vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+	                  GraphicPipeline);
+	vkCmdSetScissor(CommandBuffer, 0, 1, &scissor);
+	vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
+	//vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+	  //                      PipelineLayout, 0, 1, &DescriptorSets[CurrentFrame],
+	    //                    0, nullptr);
 
-	//vkCmdDraw(CommandBuffer, 3, 1, 0, 0);
+	vkCmdDraw(CommandBuffer, 3, 1, 0, 0);
 	vkCmdEndRenderPass(CommandBuffer);
 	VK_CHECK(vkEndCommandBuffer(CommandBuffer));
 
