@@ -6,11 +6,29 @@
 #define GRAPHICSPIPELINE_H
 #include <vulkan/vulkan_core.h>
 
+#include "DescriptorSetLayout.h"
+#include "RenderPass.h"
+#include "Shader.h"
+
+
+struct FGrpahicsPipelineCreateInfo
+{
+    FVertexShaderProgram * VertexShader;
+    FPixelShaderProgram * PixelShader;
+    FDescriptorSetLayout * DescriptorSetLayout;
+    FRenderPass * RenderPass;
+};
 
 class FGraphicsPipeline
 {
 public:
 
+    VkPipeline GetHandle()
+    {
+        return Pipeline;
+    }
+
+    FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info);
 protected:
     VkPipeline Pipeline;
     VkPipelineLayout Layout;

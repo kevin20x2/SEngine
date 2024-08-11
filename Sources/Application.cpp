@@ -3,6 +3,8 @@
 #include <cstdio>
 #include "VkEngine.h"
 #include "Platform/Window.h"
+#include "Rendering/Renderer.h"
+#include "RHI/RHI.h"
 
 int main()
 {
@@ -11,14 +13,19 @@ int main()
     FWindow * Window = new FWindow(800,600);
     Window->Init();
 
-    KzVkEngine * Engine = new KzVkEngine(Window);
-    Engine->InitVulkan();
+    InitRHI(Window);
+
+    FRenderer * Renderer = new FRenderer();
+    Renderer->Initailize();
+    //KzVkEngine * Engine = new KzVkEngine(Window);
+    //Engine->InitVulkan();
 
 
     while (!Window->ShouldClose())
     {
         Window->LoopFrame();
-        Engine->Render();
+        //Engine->Render();
+        Renderer->Render();
     }
 
     delete Window;

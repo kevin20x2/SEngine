@@ -44,7 +44,18 @@ public:
     	return 2;
     }
 
-
+	virtual VkExtent2D GetDisplaySize() override
+    {
+    	return DisplaySize;
+    }
+	virtual VkQueue * GetGraphicsQueue() override
+    {
+    	return &GraphicsQueue;
+    }
+	virtual VkQueue * GetPresentQueue() override
+    {
+    	return &PresentQueue;
+    }
 
     void Initialize(FWindow * InWindow);
 
@@ -82,6 +93,7 @@ void FRHIImp::Initialize(FWindow * InWindow)
 	Surface = InWindow->CreateSurface(&Instance);
 	CreatePhysicalDeivce();
 	EstablishDisplaySize();
+	CreateDevice();
 
 }
 

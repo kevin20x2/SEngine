@@ -36,7 +36,13 @@ add_executable(SEngine Sources/Application.cpp
         Sources/RHI/Shader.cpp
         Sources/RHI/Shader.h
         Sources/RHI/GraphicsPipeline.cpp
-        Sources/RHI/GraphicsPipeline.h)
+        Sources/RHI/GraphicsPipeline.h
+        Sources/Rendering/Renderer.cpp
+        Sources/Rendering/Renderer.h
+        Sources/RHI/CommandBuffer.cpp
+        Sources/RHI/CommandBuffer.h
+        Sources/RHI/FrameBuffer.cpp
+        Sources/RHI/FrameBuffer.h)
 
 target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES)
 

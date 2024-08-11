@@ -14,7 +14,14 @@ class FSwapChain
 public:
     static FSwapChain * CreateSwapChain(VkExtent2D DisplaySize);
 
+
+    virtual VkSwapchainKHR * GetSwapChain() = 0;
+
     virtual VkFormat GetFormat() = 0;
+
+    virtual VkImageView * GetView(int32 Idx) = 0 ;
+
+    virtual VkExtent2D GetExtent() = 0;
 };
 
 

@@ -31,6 +31,11 @@ public:
 
     virtual uint32 GetMaxFrameInFlight() = 0;
 
+    virtual VkExtent2D GetDisplaySize() = 0 ;
+
+    virtual VkQueue * GetGraphicsQueue() = 0 ;
+    virtual VkQueue * GetPresentQueue() = 0 ;
+
 };
 
 

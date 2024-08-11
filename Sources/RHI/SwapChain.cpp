@@ -20,13 +20,22 @@ public:
 	{
 		return ImageFormat;
 	};
+	virtual VkImageView * GetView(int32 Idx) override;
+	virtual VkExtent2D GetExtent() override
+	{
+		return Extent;
+	}
+
+    virtual VkSwapchainKHR * GetSwapChain() override
+	{
+		return  &SwapChain;
+	}
 private:
     VkSwapchainKHR SwapChain;
     VkExtent2D Extent;
     VkFormat ImageFormat;
     TArray<VkImage> Images;
     TArray <VkImageView> ImageViews;
-    TArray  <VkFramebuffer> FrameBuffers;
 };
 
 void FSwapChainImp::CreateSwapChain(VkExtent2D DisplaySize)
@@ -54,7 +63,7 @@ void FSwapChainImp::CreateSwapChain(VkExtent2D DisplaySize)
 
 	VkPresentModeKHR PresentMode = VK_PRESENT_MODE_FIFO_KHR;
 
-	uint32_t ImageCount = SwapChainSupport.Capabilites.minImageCount + 1;
+	uint32_t ImageCount = SwapChainSupport.Capabilites.minImageCount ;
 	if(SwapChainSupport.Capabilites.maxImageCount > 0 &&
 	ImageCount > SwapChainSupport.Capabilites.maxImageCount )
 	{
@@ -131,6 +140,11 @@ void FSwapChainImp::CreateImageViews()
 		VK_CHECK(vkCreateImageView(*GRHI->GetDevice(), &createInfo, nullptr,
 		                           &ImageViews[i]));
 	}
+}
+
+VkImageView* FSwapChainImp::GetView(int32 Idx)
+{
+	return &ImageViews[Idx];
 }
 
 FSwapChain* FSwapChain::CreateSwapChain(VkExtent2D DisplaySize)

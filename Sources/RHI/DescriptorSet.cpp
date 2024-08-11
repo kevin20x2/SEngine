@@ -7,15 +7,15 @@
 #include "RHI.h"
 #include "volk.h"
 
-FDescriptorSets* FDescriptorSets::Create(const TArray<FDescriptorSetLayout>& Layouts,
-                                         const FDescriptorPool& Pool, const TArray<FUniformBuffer>& Buffers)
+FDescriptorSets* FDescriptorSets::Create(const TArray<FDescriptorSetLayout*>& Layouts,
+                                         const FDescriptorPool& Pool, const TArray<FUniformBuffer*>& Buffers)
 {
     FDescriptorSets * Result = new FDescriptorSets();
 
     TArray <VkDescriptorSetLayout > VkLayouts;
     for(auto & Layout : Layouts )
     {
-        VkLayouts.push_back(Layout.Layout);
+        VkLayouts.push_back(Layout->Layout);
     }
 	uint32 Count = Layouts.size();
 
@@ -32,7 +32,7 @@ FDescriptorSets* FDescriptorSets::Create(const TArray<FDescriptorSetLayout>& Lay
 	for (size_t i = 0; i < Count; ++i)
 	{
 		VkDescriptorBufferInfo BufferInfo{};
-		BufferInfo.buffer = Buffers[i].Buffer;
+		BufferInfo.buffer = Buffers[i]->Buffer;
 		BufferInfo.offset = 0;
 		BufferInfo.range = 16 * sizeof(float);
 

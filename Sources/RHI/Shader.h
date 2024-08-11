@@ -9,6 +9,12 @@
 
 class FShaderProgram
 {
+public:
+    VkShaderModule GetShaderModule() const
+    {
+        return ShaderModule;
+    }
+
 protected:
     VkShaderModule ShaderModule;
 };
