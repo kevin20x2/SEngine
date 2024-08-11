@@ -42,7 +42,9 @@ add_executable(SEngine Sources/Application.cpp
         Sources/RHI/CommandBuffer.cpp
         Sources/RHI/CommandBuffer.h
         Sources/RHI/FrameBuffer.cpp
-        Sources/RHI/FrameBuffer.h)
+        Sources/RHI/FrameBuffer.h
+        Sources/Maths/Vector2.cpp
+        Sources/Maths/Vector2.h)
 
 target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES)
 

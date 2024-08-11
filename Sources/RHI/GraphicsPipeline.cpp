@@ -6,7 +6,7 @@
 
 #include "RHI.h"
 #include "volk.h"
-
+#include "Maths/Vector2.h"
 
 
 FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
@@ -29,12 +29,23 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
 
 	VkPipelineVertexInputStateCreateInfo VertexInputInfo{};
 
+	VkVertexInputBindingDescription VertexBindingDescription;
+	VertexBindingDescription.binding = 0;
+	VertexBindingDescription.stride = sizeof(FVector2);
+	VertexBindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+	VkVertexInputAttributeDescription VertexAttributeDescription;
+	VertexAttributeDescription.binding = 0;
+	VertexAttributeDescription.location = 0;
+	VertexAttributeDescription.format = VK_FORMAT_R32G32_SFLOAT;
+	VertexAttributeDescription.offset = 0;
+
 	VertexInputInfo.sType =
 		VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	VertexInputInfo.vertexBindingDescriptionCount = 0;
-	VertexInputInfo.pVertexAttributeDescriptions = nullptr;
-	VertexInputInfo.vertexAttributeDescriptionCount = 0;
-	VertexInputInfo.pVertexAttributeDescriptions = nullptr;
+	VertexInputInfo.vertexBindingDescriptionCount = 1;
+	VertexInputInfo.pVertexBindingDescriptions = &VertexBindingDescription;
+	VertexInputInfo.vertexAttributeDescriptionCount = 1;
+	VertexInputInfo.pVertexAttributeDescriptions = &VertexAttributeDescription;
 
 	VkPipelineInputAssemblyStateCreateInfo InputAssembly{};
 	InputAssembly.sType =

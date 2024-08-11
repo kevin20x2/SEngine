@@ -16,8 +16,10 @@ struct FVertexBufferCreateInfo
 
 class FVertexBuffer
 {
+public:
     FVertexBuffer(const FVertexBufferCreateInfo & Info);
-
+    VkBuffer GetHandle() {return Buffer;}
+protected:
     VkBuffer Buffer{};
     VkDeviceMemory DeviceMemory{};
 };

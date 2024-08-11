@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "volk.h"
+#include "Maths/Vector2.h"
 #include "RHI/RHI.h"
 
 void FRenderer::Initailize()
@@ -63,6 +64,11 @@ void FRenderer::Initailize()
             ));
         ViewIdx ++ ;
     }
+
+	TArray <FVector2> Vertices = {{0.1f,1.0f}, {-0.5f,0.5f} , { 1.0f,0.1f}};
+	BaseVertexBuffer = TSharedPtr<FVertexBuffer>(
+		new FVertexBuffer({(uint32)(Vertices.size()* sizeof(FVector2)), (float *)Vertices.data()})
+		);
 
     CreateSyncObjects();
 
@@ -186,6 +192,10 @@ void FRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 	                     VK_SUBPASS_CONTENTS_INLINE);
 	vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
 	                  Pipeline->GetHandle());
+
+	VkBuffer VertexBuffers[] = {BaseVertexBuffer->GetHandle()};
+	VkDeviceSize Offsets[] = {0};
+	vkCmdBindVertexBuffers(CommandBuffer,0,1,VertexBuffers,Offsets);
 	vkCmdSetScissor(CommandBuffer, 0, 1, &scissor);
 	vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
 	//vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,

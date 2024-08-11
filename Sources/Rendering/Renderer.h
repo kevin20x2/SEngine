@@ -43,6 +43,8 @@ protected:
     TSharedPtr<FVertexShaderProgram> VertexShader;
     TSharedPtr<FPixelShaderProgram> PixelShader;
 
+    TSharedPtr <FVertexBuffer> BaseVertexBuffer;
+
     TUniquePtr<FGraphicsPipeline> Pipeline;
 
     TUniquePtr<FCommandBufferPool> CommandBufferPool;
