@@ -9,6 +9,13 @@
 
 struct FVector
 {
+
+    static FVector ZeroVector;
+    static FVector OneVector;
+
+    static float DotProduct(const FVector & A , const FVector & B );
+    static FVector CrossProduct(const FVector & A ,const FVector & B);
+
     float X, Y, Z;
 };
 

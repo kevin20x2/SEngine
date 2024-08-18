@@ -62,7 +62,17 @@ add_executable(SEngine Sources/Application.cpp
         Sources/CoreObjects/PrimitiveComponent.cpp
         Sources/CoreObjects/PrimitiveComponent.h
         Sources/RHI/IndexBuffer.cpp
-        Sources/RHI/IndexBuffer.h)
+        Sources/RHI/IndexBuffer.h
+        Sources/Maths/Transform.cpp
+        Sources/Maths/Transform.h
+        Sources/Maths/Quat.cpp
+        Sources/Maths/Quat.h
+        Sources/Maths/Math.cpp
+        Sources/Maths/Math.h
+        Sources/Maths/Matrix4.cpp
+        Sources/Maths/Matrix4.h
+        Sources/Maths/Vector4.cpp
+        Sources/Maths/Vector4.h)
 
 target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES)
 

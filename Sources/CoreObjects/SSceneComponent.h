@@ -5,6 +5,7 @@
 #ifndef SSCENECOMPONENT_H
 #define SSCENECOMPONENT_H
 #include "SCoreComponentBase.h"
+#include "Maths/Transform.h"
 #include "Maths/Vector.h"
 
 
@@ -12,9 +13,9 @@ class SSceneComponent : public SCoreComponentBase
 {
 public:
 
-    FVector Location;
-    FVector Scale;
+    FTransform WorldTransform;
 
+    FTransform RelativeTransform;
 };
 
 
