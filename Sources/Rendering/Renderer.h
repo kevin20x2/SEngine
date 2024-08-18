@@ -13,6 +13,7 @@
 #include "RHI/DescriptorSet.h"
 #include "RHI/FrameBuffer.h"
 #include "RHI/GraphicsPipeline.h"
+#include "RHI/IndexBuffer.h"
 #include "RHI/RenderPass.h"
 #include "RHI/Shader.h"
 
@@ -44,6 +45,7 @@ protected:
     TSharedPtr<FPixelShaderProgram> PixelShader;
 
     TSharedPtr <FVertexBuffer> BaseVertexBuffer;
+    TSharedPtr <FIndexBuffer> IndexBuffer;
 
     TUniquePtr<FGraphicsPipeline> Pipeline;
 

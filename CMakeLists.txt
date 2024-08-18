@@ -44,7 +44,25 @@ add_executable(SEngine Sources/Application.cpp
         Sources/RHI/FrameBuffer.cpp
         Sources/RHI/FrameBuffer.h
         Sources/Maths/Vector2.cpp
-        Sources/Maths/Vector2.h)
+        Sources/Maths/Vector2.h
+        Sources/Rendering/Mesh.cpp
+        Sources/Rendering/Mesh.h
+        Sources/Maths/Vector.cpp
+        Sources/Maths/Vector.h
+        Sources/CoreObjects/SObject.cpp
+        Sources/CoreObjects/SObject.h
+        Sources/CoreObjects/SCoreComponentBase.cpp
+        Sources/CoreObjects/SCoreComponentBase.h
+        Sources/CoreObjects/SSceneComponent.cpp
+        Sources/CoreObjects/SSceneComponent.h
+        Sources/CoreObjects/Actor.cpp
+        Sources/CoreObjects/Actor.h
+        Sources/CoreObjects/CameraComponent.cpp
+        Sources/CoreObjects/CameraComponent.h
+        Sources/CoreObjects/PrimitiveComponent.cpp
+        Sources/CoreObjects/PrimitiveComponent.h
+        Sources/RHI/IndexBuffer.cpp
+        Sources/RHI/IndexBuffer.h)
 
 target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES)
 

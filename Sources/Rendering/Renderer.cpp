@@ -70,6 +70,10 @@ void FRenderer::Initailize()
 		new FVertexBuffer({(uint32)(Vertices.size()* sizeof(FVector2)), (float *)Vertices.data()})
 		);
 
+	TArray <uint16> Indexes = {0,1,2};
+	IndexBuffer = TSharedPtr<FIndexBuffer>(
+		new FIndexBuffer({(uint32)(Indexes.size()* sizeof(uint16)), (uint16 *)Indexes.data()}));
+
     CreateSyncObjects();
 
 }
@@ -194,15 +198,18 @@ void FRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 	                  Pipeline->GetHandle());
 
 	VkBuffer VertexBuffers[] = {BaseVertexBuffer->GetHandle()};
+
 	VkDeviceSize Offsets[] = {0};
 	vkCmdBindVertexBuffers(CommandBuffer,0,1,VertexBuffers,Offsets);
+	vkCmdBindIndexBuffer(CommandBuffer,IndexBuffer->GetHandle(),0,VK_INDEX_TYPE_UINT16);
 	vkCmdSetScissor(CommandBuffer, 0, 1, &scissor);
 	vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
 	//vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
 	  //                      PipelineLayout, 0, 1, &DescriptorSets[CurrentFrame],
 	    //                    0, nullptr);
 
-	vkCmdDraw(CommandBuffer, 3, 1, 0, 0);
+	//vkCmdDraw(CommandBuffer, 3, 1, 0, 0);
+	vkCmdDrawIndexed(CommandBuffer,3,1,0,0,0);
 	vkCmdEndRenderPass(CommandBuffer);
 	VK_CHECK(vkEndCommandBuffer(CommandBuffer));
 }

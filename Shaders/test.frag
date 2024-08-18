@@ -13,5 +13,5 @@ struct VSOutput
 float4 main(VSOutput input) :SV_TARGET
 {
     //float4 color = texColor.Sample(samplerColor,input.UV);
-    return float4(1,0,0,1);
+    return float4(1,1,0,1);
 }
