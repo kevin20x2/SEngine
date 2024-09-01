@@ -3,3 +3,8 @@
 //
 
 #include "SSceneComponent.h"
+
+FVector SSceneComponent::GetWorldLocation() const
+{
+    return WorldTransform.translation();
+}

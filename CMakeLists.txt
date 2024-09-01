@@ -85,6 +85,7 @@ target_include_directories(SEngine PUBLIC
  ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/vulkan/include
  ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glfw/include
  ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/volk
+        ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/eigen-3.4.0
  )
 
  target_link_libraries(SEngine PUBLIC volk glslang SPIRV glslang-default-resource-limits glfw)

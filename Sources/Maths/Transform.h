@@ -4,17 +4,18 @@
 
 #ifndef TRANSFORM_H
 #define TRANSFORM_H
-#include "Matrix4.h"
+#include "Math.h"
 #include "Quat.h"
 #include "Vector.h"
 
 
+/*
 struct FTransform
 {
     FTransform() :
-    Location(FVector::ZeroVector),
-    Rotation(FQuat::Identity),
-    Scale(FVector::OneVector)
+    Location(FVector(0,0,0)),
+    Rotation(FQuat()),
+    Scale(FVector(1,1,1))
     {}
 
 
@@ -24,6 +25,7 @@ struct FTransform
     FQuat Rotation;
     FVector Scale;
 };
+*/
 
 
 

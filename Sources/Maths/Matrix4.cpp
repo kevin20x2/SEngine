@@ -5,6 +5,7 @@
 #include "Matrix4.h"
 
 
+/*
 FMatrix4 FMatrix4::Mul(const FMatrix4& Rhs) const
 {
      FMatrix4 Result;
@@ -47,3 +48,4 @@ FMatrix4::FMatrix4()
 {
     memset(this, 0, sizeof(FMatrix4));
 }
+*/

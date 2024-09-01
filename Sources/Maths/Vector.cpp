@@ -4,7 +4,7 @@
 
 #include "Vector.h"
 
-FVector FVector::OneVector = {1,1,1};
+/*FVector FVector::OneVector = {1,1,1};
 FVector FVector::ZeroVector = {0,0,0};
 
 float FVector::DotProduct(const FVector& A, const FVector& B)
@@ -22,4 +22,4 @@ FVector FVector::CrossProduct(const FVector& A, const FVector& B)
         -A.X * B.Z + A.Z * B.X,
         A.X * B.Y - A.Y * B.X
     };
-}
+}*/

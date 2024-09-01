@@ -7,6 +7,7 @@
 #include "Vector.h"
 
 
+/*
 struct FQuat
 {
     static FQuat Identity ;
@@ -22,6 +23,7 @@ struct FQuat
 
     float W,X,Y,Z;
 };
+*/
 
 
 

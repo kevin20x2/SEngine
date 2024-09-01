@@ -7,6 +7,7 @@
 #include "Math.h"
 
 
+/*
 FQuat FQuat::Identity = FQuat();
 
 FQuat::FQuat(float InW,float InX, float InY, float InZ ) :
@@ -26,3 +27,4 @@ FQuat FQuat::Inverse() const
 {
     return FQuat(W,-X,-Y,-Z);
 }
+*/

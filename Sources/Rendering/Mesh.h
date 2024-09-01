@@ -5,7 +5,7 @@
 #ifndef MESH_H
 #define MESH_H
 #include "Core/BaseTypes.h"
-#include "Maths/Vector.h"
+#include "Maths/Math.h"
 
 
 class FStaticMesh

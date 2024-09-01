@@ -7,6 +7,7 @@
 
 
 
+/*
 struct FVector
 {
 
@@ -18,6 +19,7 @@ struct FVector
 
     float X, Y, Z;
 };
+*/
 
 
 

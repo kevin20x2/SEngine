@@ -4,6 +4,7 @@
 
 #include "Math.h"
 
+/*
 #include <cmath>
 
 float FMath::Sin(float InValue)
@@ -15,3 +16,4 @@ float FMath::Cos(float InValue)
 {
     return cos(InValue);
 }
+*/

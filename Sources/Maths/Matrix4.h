@@ -8,6 +8,7 @@
 #include "Core/BaseTypes.h"
 
 
+/*
 struct FMatrix4
 {
     FVector4 Col(int32 Index) const
@@ -30,6 +31,7 @@ struct FMatrix4
         float M[16];
     };
 };
+*/
 
 
 

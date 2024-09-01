@@ -8,6 +8,7 @@
 #include "Core/BaseTypes.h"
 
 
+/*
 struct FVector4
 {
 public:
@@ -34,6 +35,7 @@ public:
 
     float X,Y,Z,W;
 };
+*/
 
 
 

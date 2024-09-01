@@ -5,9 +5,10 @@
 #ifndef CAMERACOMPONENT_H
 #define CAMERACOMPONENT_H
 #include "SCoreComponentBase.h"
+#include "SSceneComponent.h"
 
 
-class SCameraComponent : public SCoreComponentBase
+class SCameraComponent : public SSceneComponent
 {
 public:
 

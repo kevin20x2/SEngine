@@ -13,6 +13,8 @@ class SSceneComponent : public SCoreComponentBase
 {
 public:
 
+    FVector GetWorldLocation() const;
+
     FTransform WorldTransform;
 
     FTransform RelativeTransform;
