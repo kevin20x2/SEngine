@@ -6,14 +6,28 @@
 #define SSCENECOMPONENT_H
 #include "SCoreComponentBase.h"
 #include "Maths/Transform.h"
-#include "Maths/Vector.h"
 
 
 class SSceneComponent : public SCoreComponentBase
 {
 public:
+    SSceneComponent():SCoreComponentBase(nullptr) {}
 
-    FVector GetWorldLocation() const;
+    FTransform GetWorldTransform() const
+    {
+        return WorldTransform;
+    }
+
+    void SetWorldLocation(const FVector & Location)
+    {
+        WorldTransform.Location = Location;
+    }
+    void SetRotation(const FQuat & Rotation)
+    {
+        WorldTransform.Rotation = Rotation;
+    }
+
+protected:
 
     FTransform WorldTransform;
 

@@ -6,6 +6,7 @@
 
 #include "RHI.h"
 #include "volk.h"
+#include "Maths/Math.h"
 #include "Maths/Vector2.h"
 
 
@@ -31,13 +32,13 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
 
 	VkVertexInputBindingDescription VertexBindingDescription;
 	VertexBindingDescription.binding = 0;
-	VertexBindingDescription.stride = sizeof(FVector2);
+	VertexBindingDescription.stride = sizeof(FVector);
 	VertexBindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
 	VkVertexInputAttributeDescription VertexAttributeDescription;
 	VertexAttributeDescription.binding = 0;
 	VertexAttributeDescription.location = 0;
-	VertexAttributeDescription.format = VK_FORMAT_R32G32_SFLOAT;
+	VertexAttributeDescription.format = VK_FORMAT_R32G32B32_SFLOAT;
 	VertexAttributeDescription.offset = 0;
 
 	VertexInputInfo.sType =

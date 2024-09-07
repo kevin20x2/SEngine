@@ -27,6 +27,10 @@ public:
     {
         return Pipeline;
     }
+    VkPipelineLayout GetLayout()
+    {
+        return Layout;
+    }
 
     FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info);
 protected:

@@ -44,3 +44,12 @@ void FUniformBuffer::Init()
 	vkBindBufferMemory(Device, Buffer, BufferMemory, 0);
 
 }
+
+void FUniformBuffer::UpdateData(void* InData)
+{
+	auto Device = *GRHI->GetDevice();
+	void * Data;
+	vkMapMemory(Device,BufferMemory,0,Size,0,&Data);
+	memcpy(Data,InData,Size);
+	vkUnmapMemory(Device,BufferMemory);
+}

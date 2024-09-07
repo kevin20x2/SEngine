@@ -2,7 +2,7 @@
 
 struct VSInput
 {
-    [[vk::location(0)]] float2 Pos : POSITION ;
+    [[vk::location(0)]] float3 Pos : POSITION ;
     //[[vk::location(1)]] float2 UV : TEXCOORD0;
     //[[vk::location(2)]] float3 Normal : NORMAL0;
 };
@@ -27,8 +27,8 @@ VSOutput main(VSInput input)
 {
     VSOutput output = (VSOutput)0;
     //output.UV = input.UV;
-    //output.Pos = mul(ubo.Mvp, float4(input.Pos.xyz,1.0f));
-    output.Pos = float4(input.Pos, 0.5f,1.0f);
+    output.Pos = mul(float4(input.Pos.xyz,1.0f),ubo.Mvp);
+    //output.Pos = float4(input.Pos.xy, 0.5f,1.0f);
 
     return output;
 }

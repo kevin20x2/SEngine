@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "volk.h"
+#include "Maths/Math.h"
 #include "Maths/Vector2.h"
 #include "RHI/RHI.h"
 
@@ -26,6 +27,7 @@ void FRenderer::Initailize()
        UniformBuffer  = TSharedPtr<FUniformBuffer>(
            FUniformBuffer::Create(sizeof(float) * 16)
         );
+
     }
 
     DescriptorPool = TUniquePtr<FDescriptorPool>(
@@ -65,17 +67,55 @@ void FRenderer::Initailize()
         ViewIdx ++ ;
     }
 
-	TArray <FVector2> Vertices = {{0.1f,1.0f}, {-0.5f,0.5f} , { 1.0f,0.1f}};
+	TArray <FVector> Vertices = {
+    	{-1.0f,-1.0f,-1.0f}, {-1.0f,-1.0f,1.0f} ,
+    	{-1.0f,1.0f,-1.0f}, {-1.0f,1.0f,1.0f} ,
+
+    	{1.0f,-1.0f,-1.0f}, {1.0f,-1.0f,1.0f} ,
+    	{1.0f,1.0f,-1.0f}, {1.0f,1.0f,1.0f} ,
+	};
+	//printf("sizeof %d\n",sizeof(FVector));
+	/*Vertices = {{0,0,0 }, {1,1,0.f}, {0,1.0f,0.0f } };
+	float * Array = (float * ) Vertices.data();
+	printf("\n");
+	for(int32 i = 0 ; i< 9  ;++i)
+	{
+		printf("%f ", Array[i]);
+	}*/
+	printf("\n");
 	BaseVertexBuffer = TSharedPtr<FVertexBuffer>(
-		new FVertexBuffer({(uint32)(Vertices.size()* sizeof(FVector2)), (float *)Vertices.data()})
+		new FVertexBuffer({(uint32)(Vertices.size()* sizeof(FVector)), (float *)Vertices.data()})
 		);
 
-	TArray <uint16> Indexes = {0,1,2};
+	TArray <uint16> Indexes = {
+		0,1,2 , // front
+		1,3,2 ,
+		4,1,0, // left
+		4,5,1,
+		2,3,6, // right
+		3,7,6 ,
+		0,4,2 , // bottom
+		2,4,6 ,
+		1,5,3, // top
+		3,5,7,
+		5,4,6, // back
+		7,5,6
+	};
+	/*Indexes = {0,1,2};*/
 	IndexBuffer = TSharedPtr<FIndexBuffer>(
 		new FIndexBuffer({(uint32)(Indexes.size()* sizeof(uint16)), (uint16 *)Indexes.data()}));
 
     CreateSyncObjects();
+	Camera = new SCameraComponent();
+	Camera->SetWorldLocation({-5,0,1});
+	Camera->SetRotation(FQuat(glm::radians(30.0f),FVector(0,1,0)));
 
+	for(auto V : Vertices)
+	{
+		auto VP = Camera->GetViewMatrix() * Camera->GetProjectinMatrix();
+		auto ClipP =  FVector4(V,1.0f)  *VP;
+		printf("%f %f %f %f\n",ClipP.x,ClipP.y,ClipP.z,ClipP.w);
+	}
 }
 
 void FRenderer::Render()
@@ -90,6 +130,16 @@ void FRenderer::Render()
 		VK_NULL_HANDLE,&ImageIndex );
 
 	vkResetFences(Device,1,&InFlightFences[CurrentFrame]);
+
+	FMatrix4 Data (1.0f) ;
+	auto ViewMatrix = Camera->GetViewMatrix();
+	auto TestView = FVector4(0,0,0,1) * ViewMatrix;
+	auto ProjecionMatrix = Camera->GetProjectinMatrix();
+	Data = ViewMatrix * ProjecionMatrix;
+	//Data = FMatrix4(1.0f);
+
+	//Data.setIdentity();
+	UniformBuffers[CurrentFrame]->UpdateData(&Data);
 
 	RecordCommandBuffer(CommandBuffers->Buffers[CurrentFrame],ImageIndex);
 	// Submit
@@ -204,12 +254,13 @@ void FRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 	vkCmdBindIndexBuffer(CommandBuffer,IndexBuffer->GetHandle(),0,VK_INDEX_TYPE_UINT16);
 	vkCmdSetScissor(CommandBuffer, 0, 1, &scissor);
 	vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
-	//vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-	  //                      PipelineLayout, 0, 1, &DescriptorSets[CurrentFrame],
-	    //                    0, nullptr);
+	vkCmdSetCullMode(CommandBuffer,VK_CULL_MODE_NONE);
+	vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+	                        Pipeline->GetLayout(), 0, 1, &DescriptorSets->GetHandle()[CurrentFrame],
+	                        0, nullptr);
 
 	//vkCmdDraw(CommandBuffer, 3, 1, 0, 0);
-	vkCmdDrawIndexed(CommandBuffer,3,1,0,0,0);
+	vkCmdDrawIndexed(CommandBuffer,36,1,0,0,0);
 	vkCmdEndRenderPass(CommandBuffer);
 	VK_CHECK(vkEndCommandBuffer(CommandBuffer));
 }

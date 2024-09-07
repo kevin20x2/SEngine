@@ -72,9 +72,13 @@ add_executable(SEngine Sources/Application.cpp
         Sources/Maths/Matrix4.cpp
         Sources/Maths/Matrix4.h
         Sources/Maths/Vector4.cpp
-        Sources/Maths/Vector4.h)
+        Sources/Maths/Vector4.h
+        Sources/CoreObjects/World.cpp
+        Sources/CoreObjects/World.h
+        Sources/CoreObjects/Engine.cpp
+        Sources/CoreObjects/Engine.h)
 
-target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES)
+target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES GLM_FORCE_LEFT_HANDED)
 
 set_property(TARGET SEngine PROPERTY CXX_STANDARD 17)
 set_property(TARGET SEngine PROPERTY CXX_STANDARD_REQUIRED ON)
@@ -85,7 +89,10 @@ target_include_directories(SEngine PUBLIC
  ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/vulkan/include
  ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glfw/include
  ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/volk
-        ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/eigen-3.4.0
+        ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glm
+        #${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/eigen-3.4.0
  )
+
+
 
  target_link_libraries(SEngine PUBLIC volk glslang SPIRV glslang-default-resource-limits glfw)

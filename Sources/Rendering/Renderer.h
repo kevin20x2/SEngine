@@ -5,6 +5,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 #include "Core/BaseTypes.h"
+#include "CoreObjects/CameraComponent.h"
 #include "RHI/CommandBuffer.h"
 #include "RHI/DescriptorPool.h"
 #include "RHI/DescriptorSetLayout.h"
@@ -27,6 +28,8 @@ public:
     void Render();
 
 protected:
+
+    SCameraComponent * Camera;
 
     TUniquePtr<FSwapChain> SwapChain;
 

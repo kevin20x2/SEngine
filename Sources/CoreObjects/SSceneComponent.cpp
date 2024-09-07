@@ -3,8 +3,5 @@
 //
 
 #include "SSceneComponent.h"
+#include "glm/ext.hpp"
 
-FVector SSceneComponent::GetWorldLocation() const
-{
-    return WorldTransform.translation();
-}

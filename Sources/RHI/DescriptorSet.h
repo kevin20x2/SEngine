@@ -18,6 +18,10 @@ public:
         const FDescriptorPool & Pool,
         const TArray<FUniformBuffer *> & Buffers
         );
+    const TArray <VkDescriptorSet> & GetHandle()
+    {
+        return DescriptorSets;
+    }
 private:
     TArray <VkDescriptorSet > DescriptorSets;
 };

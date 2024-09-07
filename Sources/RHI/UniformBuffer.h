@@ -13,6 +13,7 @@ public:
     static FUniformBuffer * Create(uint32 InSize);
 
     void Init();
+    void UpdateData(void * InData);
 private:
     uint32 Size;
     VkBuffer Buffer;

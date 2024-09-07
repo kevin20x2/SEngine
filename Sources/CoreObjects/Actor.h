@@ -13,7 +13,6 @@ class SActor
 public:
     using FComponentArray =  TArray <TSharedPtr<SCoreComponentBase>>;
 
-
     FComponentArray Components;
 
 };
