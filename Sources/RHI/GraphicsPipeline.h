@@ -32,6 +32,8 @@ public:
         return Layout;
     }
 
+    virtual ~FGraphicsPipeline();
+
     FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info);
 protected:
     VkPipeline Pipeline;

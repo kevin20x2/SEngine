@@ -18,6 +18,9 @@ public:
 
     FFrameBuffer(int32 ViewIdx ,FRenderPass * InRenderPass,FSwapChain * InSwapChain);
 
+    virtual ~FFrameBuffer();
+    void Destroy();
+
     VkFramebuffer FrameBuffer;
 };
 

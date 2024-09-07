@@ -6,6 +6,7 @@
 #define RENDERER_H
 #include "Core/BaseTypes.h"
 #include "CoreObjects/CameraComponent.h"
+#include "GLFW/glfw3.h"
 #include "RHI/CommandBuffer.h"
 #include "RHI/DescriptorPool.h"
 #include "RHI/DescriptorSetLayout.h"
@@ -19,6 +20,8 @@
 #include "RHI/Shader.h"
 
 
+void OnRawWindowResize(GLFWwindow * Window, int Width, int Height);
+
 class FRenderer
 {
 public:
@@ -27,9 +30,11 @@ public:
 
     void Render();
 
+    void OnResize(GLFWwindow * Window,int32 Width, int32 Height);
+
 protected:
 
-    SCameraComponent * Camera;
+    TSharedPtr< SCameraComponent > Camera;
 
     TUniquePtr<FSwapChain> SwapChain;
 
@@ -50,11 +55,14 @@ protected:
     TSharedPtr <FVertexBuffer> BaseVertexBuffer;
     TSharedPtr <FIndexBuffer> IndexBuffer;
 
+    void RecreatePipeline();
+
     TUniquePtr<FGraphicsPipeline> Pipeline;
 
     TUniquePtr<FCommandBufferPool> CommandBufferPool;
 
     TUniquePtr<FCommandBuffers> CommandBuffers;
+    void RecreateFrameBuffers();
 
     TArray <
         TSharedPtr <FFrameBuffer >

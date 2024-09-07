@@ -22,6 +22,8 @@ public:
     virtual VkImageView * GetView(int32 Idx) = 0 ;
 
     virtual VkExtent2D GetExtent() = 0;
+
+    virtual void CleanUp() = 0;
 };
 
 

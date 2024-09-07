@@ -4,6 +4,20 @@
 
 #include "Engine.h"
 
+FEngine * GEngine = nullptr;
+
+FEngine::FEngine()
+{
+    GEngine = this;
+}
+
+void FEngine::Initialize()
+{
+    Input = new FInput;
+    Renderer = new FRenderer;
+    Renderer->Initailize();
+}
+
 void FEngine::Tick(float DeltaTime)
 {
 }

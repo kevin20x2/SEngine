@@ -10,6 +10,13 @@
 #include "Maths/Vector2.h"
 
 
+FGraphicsPipeline::~FGraphicsPipeline()
+{
+	auto Device = *GRHI->GetDevice();
+	vkDestroyPipeline(Device,Pipeline,nullptr);
+	vkDestroyPipelineLayout(Device,Layout,nullptr);
+}
+
 FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
 {
 	VkPipelineShaderStageCreateInfo VertShaderStageInfo{};

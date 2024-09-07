@@ -30,6 +30,8 @@ public:
 	{
 		return  &SwapChain;
 	}
+
+	virtual void CleanUp() override;
 private:
     VkSwapchainKHR SwapChain;
     VkExtent2D Extent;
@@ -145,6 +147,16 @@ void FSwapChainImp::CreateImageViews()
 VkImageView* FSwapChainImp::GetView(int32 Idx)
 {
 	return &ImageViews[Idx];
+}
+
+void FSwapChainImp::CleanUp()
+{
+	for(int32 i = 0 ; i < ImageViews.size() ; ++ i)
+	{
+		vkDestroyImageView(*GRHI->GetDevice(),ImageViews[i],nullptr);
+	}
+
+	vkDestroySwapchainKHR(*GRHI->GetDevice(),SwapChain,nullptr);
 }
 
 FSwapChain* FSwapChain::CreateSwapChain(VkExtent2D DisplaySize)

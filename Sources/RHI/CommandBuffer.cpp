@@ -23,8 +23,9 @@ FCommandBufferPool::FCommandBufferPool()
 		, &poolInfo, nullptr, &Pool));
 }
 
-FCommandBuffers::FCommandBuffers(uint32 Size,FCommandBufferPool* Pool)
+FCommandBuffers::FCommandBuffers(uint32 Size,FCommandBufferPool* InPool)
 {
+	Pool = InPool;
 	Buffers.resize(Size);
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -36,4 +37,9 @@ FCommandBuffers::FCommandBuffers(uint32 Size,FCommandBufferPool* Pool)
 		*GRHI->GetDevice()
 		, &allocInfo, Buffers.data()));
 
+}
+
+void FCommandBuffers::FreeCommandBuffer()
+{
+	vkFreeCommandBuffers(*GRHI->GetDevice(),Pool->Pool,Buffers.size(),Buffers.data());
 }

@@ -15,6 +15,8 @@ class FRenderPass
 public:
     static FRenderPass * Create(FSwapChain * SwapChain );
 
+    virtual ~FRenderPass();
+
     VkRenderPass RenderPass;
 };
 

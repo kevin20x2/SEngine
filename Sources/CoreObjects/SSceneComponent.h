@@ -22,6 +22,10 @@ public:
     {
         WorldTransform.Location = Location;
     }
+    FVector GetWorldLocation() const
+    {
+        return WorldTransform.Location;
+    }
     void SetRotation(const FQuat & Rotation)
     {
         WorldTransform.Rotation = Rotation;

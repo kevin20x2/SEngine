@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <cstdio>
 #include "VkEngine.h"
+#include "CoreObjects/Engine.h"
 #include "Platform/Window.h"
 #include "Rendering/Renderer.h"
 #include "RHI/RHI.h"
@@ -15,10 +16,15 @@ int main()
 
     InitRHI(Window);
 
-    FRenderer * Renderer = new FRenderer();
-    Renderer->Initailize();
+    FEngine * Engine = new FEngine;
+    Engine->Initialize();
+
+    //FRenderer * Renderer = new FRenderer();
+    //Renderer->Initailize();
     //KzVkEngine * Engine = new KzVkEngine(Window);
     //Engine->InitVulkan();
+
+    auto Renderer =Engine->GetRenderer();
 
 
     while (!Window->ShouldClose())

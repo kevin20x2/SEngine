@@ -57,6 +57,11 @@ public:
     	return &PresentQueue;
     }
 
+	virtual void SetDisplaySize(int32 InWidth, int32 Height) override
+    {
+    	DisplaySize = {(uint32)InWidth,(uint32)Height};
+    }
+
     void Initialize(FWindow * InWindow);
 
 

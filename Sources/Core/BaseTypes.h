@@ -5,6 +5,7 @@
 #ifndef BASETYPES_H
 #define BASETYPES_H
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -20,5 +21,15 @@ using TSharedPtr = std::shared_ptr<T>;
 
 template <typename T>
 using TUniquePtr = std::unique_ptr<T>;
+
+template <typename T>
+using TWeakPtr = std::weak_ptr<T>;
+
+template <typename T>
+using TFunction = std::function<T>;
+
+
+template <typename Key, typename Value>
+using TMap  = std::unordered_map<Key,Value>;
 
 #endif //BASETYPES_H

@@ -7,9 +7,17 @@
 #include <memory>
 
 #include "volk.h"
+#include "CoreObjects/Engine.h"
 #include "Maths/Math.h"
 #include "Maths/Vector2.h"
 #include "RHI/RHI.h"
+
+void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
+{
+	auto Renderer = GEngine->GetRenderer();
+	GRHI->SetDisplaySize(Width,Height);
+	Renderer->OnResize(Window,Width,Height);
+}
 
 void FRenderer::Initailize()
 {
@@ -48,24 +56,13 @@ void FRenderer::Initailize()
     PixelShader = std::make_shared<FPixelShaderProgram>("../../shaders/test.frag");
 
 
-    Pipeline = TUniquePtr<FGraphicsPipeline>(new FGraphicsPipeline(
-        {VertexShader.get(),PixelShader.get(), DescriptorSetLayout.get() ,
-            RenderPass.get() } ) );
-
+	RecreatePipeline();
     CommandBufferPool = TUniquePtr<FCommandBufferPool>(new FCommandBufferPool());
 
     CommandBuffers = TUniquePtr<FCommandBuffers>(new FCommandBuffers(MaxFrameInFlight,CommandBufferPool.get()));
 
-    FrameBuffers.resize(MaxFrameInFlight);
+	RecreateFrameBuffers();
 
-    int32 ViewIdx = 0;
-    for(auto & FrameBuffer : FrameBuffers )
-    {
-        FrameBuffer = TSharedPtr <FFrameBuffer>( new FFrameBuffer(
-            ViewIdx,RenderPass.get(),SwapChain.get()
-            ));
-        ViewIdx ++ ;
-    }
 
 	TArray <FVector> Vertices = {
     	{-1.0f,-1.0f,-1.0f}, {-1.0f,-1.0f,1.0f} ,
@@ -106,9 +103,20 @@ void FRenderer::Initailize()
 		new FIndexBuffer({(uint32)(Indexes.size()* sizeof(uint16)), (uint16 *)Indexes.data()}));
 
     CreateSyncObjects();
-	Camera = new SCameraComponent();
+	Camera = TSharedPtr<SCameraComponent>( new SCameraComponent());
 	Camera->SetWorldLocation({-5,0,1});
 	Camera->SetRotation(FQuat(glm::radians(30.0f),FVector(0,1,0)));
+
+	GEngine->GetInput()->BindKey(GLFW_KEY_W, [WeakCamera = TWeakPtr<SCameraComponent>(Camera)]()
+	{
+		auto SharedCamera=WeakCamera.lock();
+		if(SharedCamera != nullptr)
+		{
+			auto OldPos = SharedCamera->GetWorldLocation();
+			OldPos.z += 0.1f;
+			SharedCamera->SetWorldLocation(OldPos);
+		}
+	});
 
 	for(auto V : Vertices)
 	{
@@ -181,6 +189,42 @@ void FRenderer::Render()
 	CurrentFrame = (CurrentFrame + 1) % GRHI->GetMaxFrameInFlight();
 }
 
+void FRenderer::OnResize(GLFWwindow* Window, int32 Width, int32 Height)
+{
+	printf("Resize %d %d",Width,Height);
+	SwapChain->CleanUp();
+	SwapChain = std::unique_ptr<FSwapChain>(
+        FSwapChain::CreateSwapChain(GRHI->GetDisplaySize()) );
+    RenderPass = TSharedPtr<FRenderPass>(
+        FRenderPass::Create(SwapChain.get())
+        );
+	RecreateFrameBuffers();
+	RecreatePipeline();
+	CommandBuffers->FreeCommandBuffer();
+}
+
+void FRenderer::RecreatePipeline()
+{
+    Pipeline = TUniquePtr<FGraphicsPipeline>(new FGraphicsPipeline(
+        {VertexShader.get(),PixelShader.get(), DescriptorSetLayout.get() ,
+            RenderPass.get() } ) );
+}
+
+void FRenderer::RecreateFrameBuffers()
+{
+	FrameBuffers.clear();
+    uint32 MaxFrameInFlight = GRHI->GetMaxFrameInFlight();
+    FrameBuffers.resize(MaxFrameInFlight);
+    int32 ViewIdx = 0;
+    for(auto & FrameBuffer : FrameBuffers )
+    {
+        FrameBuffer = TSharedPtr <FFrameBuffer>( new FFrameBuffer(
+            ViewIdx,RenderPass.get(),SwapChain.get()
+            ));
+        ViewIdx ++ ;
+    }
+}
+
 void FRenderer::CreateSyncObjects()
 {
     int32 Count = GRHI->GetMaxFrameInFlight();
@@ -208,6 +252,7 @@ void FRenderer::CreateSyncObjects()
 
 void FRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageIndex)
 {
+	if(ImageIndex >= FrameBuffers.size()) return;
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 	beginInfo.flags = 0;

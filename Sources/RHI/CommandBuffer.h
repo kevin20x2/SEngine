@@ -21,12 +21,16 @@ class FCommandBuffers
 public:
     FCommandBuffers(uint32 Size,FCommandBufferPool * Pool);
 
+    void FreeCommandBuffer();
+
     VkCommandBuffer GetHandle(int32 Idx)
     {
         return Buffers[Idx];
     }
 
     TArray <VkCommandBuffer> Buffers;
+
+    FCommandBufferPool * Pool;
 };
 
 

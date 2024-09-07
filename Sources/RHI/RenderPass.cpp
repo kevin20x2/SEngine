@@ -55,3 +55,8 @@ FRenderPass* FRenderPass::Create(FSwapChain* SwapChain)
 		& Result->RenderPass));
 	return Result;
 }
+
+FRenderPass::~FRenderPass()
+{
+	vkDestroyRenderPass(*GRHI->GetDevice(),RenderPass,nullptr);
+}

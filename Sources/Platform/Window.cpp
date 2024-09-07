@@ -7,6 +7,8 @@
 #include <stdexcept>
 
 #include "GLFW/glfw3.h"
+#include "Input/Input.h"
+#include "Rendering/Renderer.h"
 
 FWindow::FWindow(int32_t InWidth, int32_t InHeight) :
 Width(InWidth),Height(InHeight)
@@ -36,10 +38,14 @@ void FWindow::Init()
 
     Handle = glfwCreateWindow(Width, Height, "SEngine",nullptr,nullptr);
 
+
     if(!Handle)
     {
         throw std::runtime_error("Create Window Failed");
     }
+
+    glfwSetKeyCallback(Handle,RawInputEvent);
+    glfwSetFramebufferSizeCallback(Handle,OnRawWindowResize);
 
     glfwSetInputMode(Handle, GLFW_STICKY_KEYS,1);
     glfwSetInputMode(Handle, GLFW_STICKY_MOUSE_BUTTONS,1);

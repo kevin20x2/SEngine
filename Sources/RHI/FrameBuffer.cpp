@@ -25,3 +25,13 @@ FFrameBuffer::FFrameBuffer(int32 ViewIdx,FRenderPass * InRenderPass,FSwapChain* 
 			&framebufferInfo, nullptr,
 		                             &FrameBuffer));
 }
+
+FFrameBuffer::~FFrameBuffer()
+{
+	Destroy();
+}
+
+void FFrameBuffer::Destroy()
+{
+	vkDestroyFramebuffer(*GRHI->GetDevice(),FrameBuffer,nullptr);
+}
