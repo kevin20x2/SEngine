@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <string>
 #include <vector>
 
 using int32 = int32_t;
@@ -31,5 +32,7 @@ using TFunction = std::function<T>;
 
 template <typename Key, typename Value>
 using TMap  = std::unordered_map<Key,Value>;
+
+using FString = std::string;
 
 #endif //BASETYPES_H
