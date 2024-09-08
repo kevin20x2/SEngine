@@ -7,10 +7,5 @@
 
 
 
-struct FVector2
-{
-    float X , Y;
-};
-
 
 #endif //VECTOR2_H

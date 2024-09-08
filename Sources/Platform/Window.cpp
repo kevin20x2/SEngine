@@ -45,7 +45,10 @@ void FWindow::Init()
     }
 
     glfwSetKeyCallback(Handle,RawInputEvent);
+    glfwSetScrollCallback(Handle,RawScrollCallback);
     glfwSetFramebufferSizeCallback(Handle,OnRawWindowResize);
+    glfwSetCursorPosCallback(Handle,RawCursorPositionCallback);
+    glfwSetMouseButtonCallback(Handle,RawMouseButtonCallback);
 
     glfwSetInputMode(Handle, GLFW_STICKY_KEYS,1);
     glfwSetInputMode(Handle, GLFW_STICKY_MOUSE_BUTTONS,1);

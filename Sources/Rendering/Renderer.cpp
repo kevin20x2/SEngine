@@ -5,6 +5,7 @@
 #include "Renderer.h"
 
 #include <memory>
+#include <spdlog/spdlog.h>
 
 #include "volk.h"
 #include "CoreObjects/Engine.h"
@@ -67,32 +68,6 @@ void FRenderer::Initailize()
 	Primitive = TSharedPtr<SPrimitiveComponent>(new SPrimitiveComponent(nullptr));
 
 
-
-	TArray <FVector> Vertices = {
-    	{-1.0f,-1.0f,-1.0f}, {-1.0f,-1.0f,1.0f} ,
-    	{-1.0f,1.0f,-1.0f}, {-1.0f,1.0f,1.0f} ,
-
-    	{1.0f,-1.0f,-1.0f}, {1.0f,-1.0f,1.0f} ,
-    	{1.0f,1.0f,-1.0f}, {1.0f,1.0f,1.0f} ,
-	};
-
-
-
-	TArray <uint16> Indexes = {
-		0,1,2 , // front
-		1,3,2 ,
-		4,1,0, // left
-		4,5,1,
-		2,3,6, // right
-		3,7,6 ,
-		0,4,2 , // bottom
-		2,4,6 ,
-		1,5,3, // top
-		3,5,7,
-		5,4,6, // back
-		7,5,6
-	};
-
 	TSharedPtr< FStaticMesh> StaticMesh = TSharedPtr<FStaticMesh>(new FStaticMesh({},{}));
 	Primitive->SetStaticMesh(StaticMesh);
 	FFbxMeshImporter Importer;
@@ -103,7 +78,7 @@ void FRenderer::Initailize()
 	    CreateSyncObjects();
 	Camera = TSharedPtr<SCameraComponent>( new SCameraComponent());
 	Camera->SetWorldLocation({-3,0,1});
-	Camera->SetRotation(FQuat(glm::radians(30.0f),FVector(0,1,0)));
+	//Camera->SetRotation(FQuat(glm::radians(30.0f),FVector(0,1,0)));
 
 	GEngine->GetInput()->BindKey(GLFW_KEY_W, [WeakCamera = TWeakPtr<SCameraComponent>(Camera)]()
 	{
@@ -127,12 +102,21 @@ void FRenderer::Initailize()
 		}
 	});
 
-	/*for(auto V : Vertices)
+	GEngine->GetInput()->BindScrollOperation([WeakCamera = TWeakPtr<SCameraComponent>(Camera)](double Value)
 	{
-		auto VP = Camera->GetViewMatrix() * Camera->GetProjectinMatrix();
-		auto ClipP =  FVector4(V,1.0f)  *VP;
-		printf("%f %f %f %f\n",ClipP.x,ClipP.y,ClipP.z,ClipP.w);
-	}*/
+		auto SharedCamera=WeakCamera.lock();
+		if(SharedCamera != nullptr)
+		{
+			auto Forward = SharedCamera->GetForward();
+			spdlog::info("dir: {}",ToString(Forward));
+			float Scale = 0.1f;
+			auto OldPos = SharedCamera->GetWorldLocation();
+			OldPos += Scale *(float)(Value)* Forward;
+			SharedCamera->SetWorldLocation(OldPos);
+		}
+	});
+
+
 }
 
 void FRenderer::Render()

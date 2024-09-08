@@ -8,12 +8,17 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include "Core/BaseTypes.h"
+
 
 using FQuat = glm::quat;
 using FVector = glm::vec3;
 using FVector4 = glm::vec4;
+using FVector2 = glm::vec2;
 
 //using FTransform = Eigen::Transform<float,3,Eigen::Affine>;
+
+FString ToString(const FVector & Vec);
 
 using FMatrix4 = glm::mat4;
 

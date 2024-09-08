@@ -30,6 +30,7 @@ public:
     {
         WorldTransform.Rotation = Rotation;
     }
+    FVector GetForward() const ;
 
 protected:
 

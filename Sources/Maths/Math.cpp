@@ -4,6 +4,13 @@
 
 #include "Math.h"
 
+FString ToString(const FVector& Vec)
+{
+    char MaxBuffer[256];
+    sprintf(MaxBuffer,"%f %f %f", Vec.x,Vec.y,Vec.z);
+    return MaxBuffer;
+}
+
 /*
 #include <cmath>
 

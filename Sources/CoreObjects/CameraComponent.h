@@ -18,8 +18,8 @@ public:
     FMatrix4 GetProjectinMatrix();
 
     float Fov = 0.333f* glm::pi<float>();
-    float NearPlane = 1;
-    float FarPlane = 100;
+    float NearPlane = 0.1;
+    float FarPlane = 10000;
 };
 
 

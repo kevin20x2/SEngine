@@ -102,6 +102,7 @@ target_include_directories(SEngine PUBLIC
  ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/volk
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glm
         ${FBX_ROOT_PATH}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/spdlog/include
         #${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/eigen-3.4.0
  )
 
