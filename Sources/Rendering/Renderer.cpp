@@ -10,6 +10,7 @@
 #include "CoreObjects/Engine.h"
 #include "Maths/Math.h"
 #include "Maths/Vector2.h"
+#include "Platform/FbxMeshImporter.h"
 #include "RHI/RHI.h"
 
 void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
@@ -75,10 +76,7 @@ void FRenderer::Initailize()
     	{1.0f,1.0f,-1.0f}, {1.0f,1.0f,1.0f} ,
 	};
 
-	printf("\n");
-	BaseVertexBuffer = TSharedPtr<FVertexBuffer>(
-		new FVertexBuffer({(uint32)(Vertices.size()* sizeof(FVector)), (float *)Vertices.data()})
-		);
+
 
 	TArray <uint16> Indexes = {
 		0,1,2 , // front
@@ -95,16 +93,16 @@ void FRenderer::Initailize()
 		7,5,6
 	};
 
-	TSharedPtr< FStaticMesh> StaticMesh = TSharedPtr<FStaticMesh>(new FStaticMesh(Vertices,Indexes));
+	TSharedPtr< FStaticMesh> StaticMesh = TSharedPtr<FStaticMesh>(new FStaticMesh({},{}));
 	Primitive->SetStaticMesh(StaticMesh);
+	FFbxMeshImporter Importer;
+	Importer.ImportMesh("../../Assets/gy.fbx",StaticMesh.get());
+
 	Primitive->CreateRHIResource();
 	/*Indexes = {0,1,2};*/
-	IndexBuffer = TSharedPtr<FIndexBuffer>(
-		new FIndexBuffer({(uint32)(Indexes.size()* sizeof(uint16)), (uint16 *)Indexes.data()}));
-
-    CreateSyncObjects();
+	    CreateSyncObjects();
 	Camera = TSharedPtr<SCameraComponent>( new SCameraComponent());
-	Camera->SetWorldLocation({-5,0,1});
+	Camera->SetWorldLocation({-3,0,1});
 	Camera->SetRotation(FQuat(glm::radians(30.0f),FVector(0,1,0)));
 
 	GEngine->GetInput()->BindKey(GLFW_KEY_W, [WeakCamera = TWeakPtr<SCameraComponent>(Camera)]()
@@ -114,6 +112,17 @@ void FRenderer::Initailize()
 		{
 			auto OldPos = SharedCamera->GetWorldLocation();
 			OldPos.z += 0.1f;
+			SharedCamera->SetWorldLocation(OldPos);
+		}
+	});
+
+	GEngine->GetInput()->BindKey(GLFW_KEY_S, [WeakCamera = TWeakPtr<SCameraComponent>(Camera)]()
+	{
+		auto SharedCamera=WeakCamera.lock();
+		if(SharedCamera != nullptr)
+		{
+			auto OldPos = SharedCamera->GetWorldLocation();
+			OldPos.z -= 0.1f;
 			SharedCamera->SetWorldLocation(OldPos);
 		}
 	});
@@ -278,11 +287,11 @@ void FRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 	VkRect2D scissor{};
 	scissor.extent = SwapChainExtent;
 
-	static float grey;
-	grey += 0.005f;
+	static float grey= 0.5;
+	/*grey += 0.005f;
 	if (grey > 1.0f) {
 		grey = 0.0f;
-	}
+	}*/
 	VkClearValue clearColor = {{{grey, grey, grey, 1.0f}}};
 
 	renderPassInfo.clearValueCount = 1;

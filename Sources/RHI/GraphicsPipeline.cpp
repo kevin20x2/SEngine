@@ -8,6 +8,7 @@
 #include "volk.h"
 #include "Maths/Math.h"
 #include "Maths/Vector2.h"
+#include "Rendering/Mesh.h"
 
 
 FGraphicsPipeline::~FGraphicsPipeline()
@@ -37,6 +38,7 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
 
 	VkPipelineVertexInputStateCreateInfo VertexInputInfo{};
 
+	/*
 	VkVertexInputBindingDescription VertexBindingDescription;
 	VertexBindingDescription.binding = 0;
 	VertexBindingDescription.stride = sizeof(FVector);
@@ -53,7 +55,9 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
 	VertexInputInfo.vertexBindingDescriptionCount = 1;
 	VertexInputInfo.pVertexBindingDescriptions = &VertexBindingDescription;
 	VertexInputInfo.vertexAttributeDescriptionCount = 1;
-	VertexInputInfo.pVertexAttributeDescriptions = &VertexAttributeDescription;
+	VertexInputInfo.pVertexAttributeDescriptions = &VertexAttributeDescription;*/
+
+	VertexInputInfo =  FStaticMesh::GenerateVertexInputStateCreateInfo(EMeshVertexElementMask::Position | EMeshVertexElementMask::Normal );
 
 	VkPipelineInputAssemblyStateCreateInfo InputAssembly{};
 	InputAssembly.sType =

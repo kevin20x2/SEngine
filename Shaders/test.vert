@@ -3,8 +3,8 @@
 struct VSInput
 {
     [[vk::location(0)]] float3 Pos : POSITION ;
-    //[[vk::location(1)]] float2 UV : TEXCOORD0;
-    //[[vk::location(2)]] float3 Normal : NORMAL0;
+    //[[vk::location(1)]] float4 Color : Color;
+    [[vk::location(2)]] float4 Normal : NORMAL0;
 };
 
 struct UBO
@@ -20,7 +20,8 @@ cbuffer ubo :register(b0) { UBO ubo; }
 struct VSOutput
 {
     float4 Pos : SV_POSITION;
-    [[vk::location(0)]] float2 UV :TEXCOORD0;
+    //[[vk::location(0)]] float4 Color : Color;
+    [[vk::location(1)]] float4 Normal : NORMAL0;
 };
 
 VSOutput main(VSInput input)
@@ -29,6 +30,7 @@ VSOutput main(VSInput input)
     //output.UV = input.UV;
     output.Pos = mul(float4(input.Pos.xyz,1.0f),ubo.Mvp);
     //output.Pos = float4(input.Pos.xy, 0.5f,1.0f);
-
+    //output.Color = input.Color;
+    output.Normal = input.Normal;
     return output;
 }

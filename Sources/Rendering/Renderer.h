@@ -55,8 +55,8 @@ protected:
     TSharedPtr<FVertexShaderProgram> VertexShader;
     TSharedPtr<FPixelShaderProgram> PixelShader;
 
-    TSharedPtr <FVertexBuffer> BaseVertexBuffer;
-    TSharedPtr <FIndexBuffer> IndexBuffer;
+    //TSharedPtr <FVertexBuffer> BaseVertexBuffer;
+    //TSharedPtr <FIndexBuffer> IndexBuffer;
 
     void RecreatePipeline();
 

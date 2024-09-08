@@ -10,9 +10,7 @@ void SPrimitiveComponent::CreateRHIResource()
 {
     if(Mesh == nullptr) return ;
 
-    VB.reset(new FVertexBuffer({
-       static_cast<uint32>( Mesh->Vertices.size()*sizeof(FVector)),
-        (float *)Mesh->Vertices.data() }));
+    VB = Mesh->CreateVertexBuffer();
 
     IB.reset(new FIndexBuffer({uint32 (Mesh->Indexes.size() * sizeof(uint16)),
         (uint16*)Mesh->Indexes.data()}));

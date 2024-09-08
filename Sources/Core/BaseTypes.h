@@ -35,4 +35,17 @@ using TMap  = std::unordered_map<Key,Value>;
 
 using FString = std::string;
 
+#define S_DEFINE_ENUM_FLAGS(Enum) \
+    inline bool EnumHasAnyFlags(Enum A, Enum B)\
+    { return (((uint32)A) & ((uint32)B)) != 0 ; }\
+    \
+    inline void operator|=(Enum & Lhs ,Enum Rhs)\
+    { Lhs = (Enum)(((uint32)Lhs) | ((uint32)Rhs)); }\
+    inline Enum operator |(Enum Lhs ,Enum Rhs)\
+    { return (Enum) ((((uint32)(Lhs)) | ((uint32)Rhs)));}
+
+
+
+
+
 #endif //BASETYPES_H

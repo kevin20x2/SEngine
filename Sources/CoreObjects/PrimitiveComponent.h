@@ -26,8 +26,6 @@ protected:
 
     TSharedPtr<FStaticMesh > Mesh;
 
-
-
     TSharedPtr<FVertexBuffer> VB;
     TSharedPtr <FIndexBuffer> IB;
 };
