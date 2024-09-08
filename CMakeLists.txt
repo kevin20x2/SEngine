@@ -78,7 +78,9 @@ add_executable(SEngine Sources/Application.cpp
         Sources/CoreObjects/Engine.cpp
         Sources/CoreObjects/Engine.h
         Sources/Input/Input.cpp
-        Sources/Input/Input.h)
+        Sources/Input/Input.h
+        Sources/CoreObjects/Material.cpp
+        Sources/CoreObjects/Material.h)
 
 target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES GLM_FORCE_LEFT_HANDED)
 

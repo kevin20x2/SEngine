@@ -6,6 +6,7 @@
 #define RENDERER_H
 #include "Core/BaseTypes.h"
 #include "CoreObjects/CameraComponent.h"
+#include "CoreObjects/PrimitiveComponent.h"
 #include "GLFW/glfw3.h"
 #include "RHI/CommandBuffer.h"
 #include "RHI/DescriptorPool.h"
@@ -35,6 +36,8 @@ public:
 protected:
 
     TSharedPtr< SCameraComponent > Camera;
+
+    TSharedPtr<SPrimitiveComponent> Primitive;
 
     TUniquePtr<FSwapChain> SwapChain;
 

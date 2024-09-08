@@ -63,6 +63,9 @@ void FRenderer::Initailize()
 
 	RecreateFrameBuffers();
 
+	Primitive = TSharedPtr<SPrimitiveComponent>(new SPrimitiveComponent(nullptr));
+
+
 
 	TArray <FVector> Vertices = {
     	{-1.0f,-1.0f,-1.0f}, {-1.0f,-1.0f,1.0f} ,
@@ -71,14 +74,7 @@ void FRenderer::Initailize()
     	{1.0f,-1.0f,-1.0f}, {1.0f,-1.0f,1.0f} ,
     	{1.0f,1.0f,-1.0f}, {1.0f,1.0f,1.0f} ,
 	};
-	//printf("sizeof %d\n",sizeof(FVector));
-	/*Vertices = {{0,0,0 }, {1,1,0.f}, {0,1.0f,0.0f } };
-	float * Array = (float * ) Vertices.data();
-	printf("\n");
-	for(int32 i = 0 ; i< 9  ;++i)
-	{
-		printf("%f ", Array[i]);
-	}*/
+
 	printf("\n");
 	BaseVertexBuffer = TSharedPtr<FVertexBuffer>(
 		new FVertexBuffer({(uint32)(Vertices.size()* sizeof(FVector)), (float *)Vertices.data()})
@@ -98,6 +94,10 @@ void FRenderer::Initailize()
 		5,4,6, // back
 		7,5,6
 	};
+
+	TSharedPtr< FStaticMesh> StaticMesh = TSharedPtr<FStaticMesh>(new FStaticMesh(Vertices,Indexes));
+	Primitive->SetStaticMesh(StaticMesh);
+	Primitive->CreateRHIResource();
 	/*Indexes = {0,1,2};*/
 	IndexBuffer = TSharedPtr<FIndexBuffer>(
 		new FIndexBuffer({(uint32)(Indexes.size()* sizeof(uint16)), (uint16 *)Indexes.data()}));
@@ -118,12 +118,12 @@ void FRenderer::Initailize()
 		}
 	});
 
-	for(auto V : Vertices)
+	/*for(auto V : Vertices)
 	{
 		auto VP = Camera->GetViewMatrix() * Camera->GetProjectinMatrix();
 		auto ClipP =  FVector4(V,1.0f)  *VP;
 		printf("%f %f %f %f\n",ClipP.x,ClipP.y,ClipP.z,ClipP.w);
-	}
+	}*/
 }
 
 void FRenderer::Render()
@@ -292,20 +292,23 @@ void FRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 	vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
 	                  Pipeline->GetHandle());
 
-	VkBuffer VertexBuffers[] = {BaseVertexBuffer->GetHandle()};
 
-	VkDeviceSize Offsets[] = {0};
-	vkCmdBindVertexBuffers(CommandBuffer,0,1,VertexBuffers,Offsets);
-	vkCmdBindIndexBuffer(CommandBuffer,IndexBuffer->GetHandle(),0,VK_INDEX_TYPE_UINT16);
 	vkCmdSetScissor(CommandBuffer, 0, 1, &scissor);
 	vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
-	vkCmdSetCullMode(CommandBuffer,VK_CULL_MODE_NONE);
+	vkCmdSetCullMode(CommandBuffer,VK_CULL_MODE_BACK_BIT);
 	vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
 	                        Pipeline->GetLayout(), 0, 1, &DescriptorSets->GetHandle()[CurrentFrame],
 	                        0, nullptr);
 
+	Primitive->OnRecordCommandBuffer(CommandBuffer);
+
+	/*VkBuffer VertexBuffers[] = {BaseVertexBuffer->GetHandle()};
+	VkDeviceSize Offsets[] = {0};
+	vkCmdBindVertexBuffers(CommandBuffer,0,1,VertexBuffers,Offsets);
+	vkCmdBindIndexBuffer(CommandBuffer,IndexBuffer->GetHandle(),0,VK_INDEX_TYPE_UINT16);
+
 	//vkCmdDraw(CommandBuffer, 3, 1, 0, 0);
-	vkCmdDrawIndexed(CommandBuffer,36,1,0,0,0);
+	vkCmdDrawIndexed(CommandBuffer,36,1,0,0,0);*/
 	vkCmdEndRenderPass(CommandBuffer);
 	VK_CHECK(vkEndCommandBuffer(CommandBuffer));
 }
