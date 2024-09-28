@@ -13,6 +13,7 @@
 #include "Maths/Vector2.h"
 #include "Platform/FbxMeshImporter.h"
 #include "RHI/RHI.h"
+#include "Platform/Path.h"
 
 void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
 {
@@ -54,8 +55,8 @@ void FRenderer::Initailize()
         FRenderPass::Create(SwapChain.get())
         );
 
-    VertexShader = std::make_shared<FVertexShaderProgram>("../../shaders/test.vert");
-    PixelShader = std::make_shared<FPixelShaderProgram>("../../shaders/test.frag");
+    VertexShader = std::make_shared<FVertexShaderProgram>(FPath::GetApplicationDir()+  "/shaders/test.vert");
+    PixelShader = std::make_shared<FPixelShaderProgram>(FPath::GetApplicationDir() + "/shaders/test.frag");
 
 
 	RecreatePipeline();
@@ -71,7 +72,7 @@ void FRenderer::Initailize()
 	TSharedPtr< FStaticMesh> StaticMesh = TSharedPtr<FStaticMesh>(new FStaticMesh({},{}));
 	Primitive->SetStaticMesh(StaticMesh);
 	FFbxMeshImporter Importer;
-	Importer.ImportMesh("../../Assets/gy.fbx",StaticMesh.get());
+	Importer.ImportMesh("../Assets/gy.fbx",StaticMesh.get());
 
 	Primitive->CreateRHIResource();
 	/*Indexes = {0,1,2};*/
@@ -288,7 +289,7 @@ void FRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 
 	vkCmdSetScissor(CommandBuffer, 0, 1, &scissor);
 	vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
-	vkCmdSetCullMode(CommandBuffer,VK_CULL_MODE_BACK_BIT);
+	//vkCmdSetCullMode(CommandBuffer,VK_CULL_MODE_BACK_BIT);
 	vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
 	                        Pipeline->GetLayout(), 0, 1, &DescriptorSets->GetHandle()[CurrentFrame],
 	                        0, nullptr);

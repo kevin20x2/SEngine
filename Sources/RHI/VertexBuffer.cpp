@@ -18,7 +18,7 @@ FVertexBuffer::FVertexBuffer(const FVertexBufferCreateInfo& Info)
     BufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
     auto Device = *GRHI->GetDevice();
-    vkCreateBuffer(Device,&BufferInfo,nullptr,&Buffer);
+    VK_CHECK(vkCreateBuffer(Device,&BufferInfo,nullptr,&Buffer));
 
     VkMemoryRequirements MemRequrements;
 

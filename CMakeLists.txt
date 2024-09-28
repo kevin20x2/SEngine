@@ -85,11 +85,18 @@ add_executable(SEngine Sources/Application.cpp
         Sources/Platform/MeshImporter.h
         Sources/Platform/FbxMeshImporter.cpp
         Sources/Platform/FbxMeshImporter.h
-        Sources/Platform/FbxCommon/Common.cxx)
+        Sources/Platform/FbxCommon/Common.cxx
+        Sources/Platform/Path.cpp
+        Sources/Platform/Path.h)
 
 target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES GLM_FORCE_LEFT_HANDED)
+target_compile_definitions(SEngine PUBLIC ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
-set(FBX_ROOT_PATH "C:/Program Files/Autodesk/FBX/FBX SDK/2020.3.2")
+if(WIN32)
+    set(FBX_ROOT_PATH "C:/Program Files/Autodesk/FBX/FBX SDK/2020.3.2")
+elseif(APPLE)
+    set(FBX_ROOT_PATH "/Applications/Autodesk/FBX SDK/2020.3.2")
+endif()
 
 set_property(TARGET SEngine PROPERTY CXX_STANDARD 17)
 set_property(TARGET SEngine PROPERTY CXX_STANDARD_REQUIRED ON)
@@ -105,10 +112,16 @@ target_include_directories(SEngine PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/spdlog/include
         #${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/eigen-3.4.0
  )
-
+if(WIN32)
 target_link_directories(SEngine PUBLIC
-        ${FBX_ROOT_PATH}/lib/vs2019/x64/debug
-)
+        ${FBX_ROOT_PATH}/lib/vs2019/x64/debug )
+elseif(APPLE)
+    target_link_directories(SEngine PUBLIC
+       ${FBX_ROOT_PATH}/lib/clang/debug)
+endif()
 
-
+if(WIN32)
  target_link_libraries(SEngine PUBLIC volk glslang SPIRV glslang-default-resource-limits glfw libfbxsdk)
+elseif(APPLE)
+    target_link_libraries(SEngine PUBLIC c++ c++abi volk glslang SPIRV glslang-default-resource-limits glfw fbxsdk)
+endif()

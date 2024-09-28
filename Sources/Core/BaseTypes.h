@@ -9,6 +9,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 using int32 = int32_t;
 using uint32 = uint32_t;

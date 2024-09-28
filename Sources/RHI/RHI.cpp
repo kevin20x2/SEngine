@@ -106,6 +106,14 @@ void FRHIImp::CreateInstance()
 {
 	uint32_t Count = 0;
 	auto RequiredExtensions =  glfwGetRequiredInstanceExtensions(&Count); // Platform->GetRequiredExtension();//GetRequiredExtensions(bEnableValidationLayer);
+	TArray <const char * > Extensions;
+	for(int32 i = 0 ; i < Count ; ++ i)
+	{
+		Extensions.push_back(RequiredExtensions[i]);
+	}
+#ifdef  VK_USE_PLATFORM_METAL_EXT
+	Extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+#endif
 	VkApplicationInfo AppInfo{  };
 	AppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	AppInfo.pApplicationName = "zkVulkan";
@@ -118,8 +126,8 @@ void FRHIImp::CreateInstance()
 
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	createInfo.pApplicationInfo = &AppInfo;
-	createInfo.enabledExtensionCount = Count;// RequiredExtensions.size();
-	createInfo.ppEnabledExtensionNames = RequiredExtensions;// RequiredExtensions.data();
+	createInfo.enabledExtensionCount = Extensions.size();// RequiredExtensions.size();
+	createInfo.ppEnabledExtensionNames = Extensions.data();// RequiredExtensions.data();
 	createInfo.pApplicationInfo = &AppInfo;
 	#ifdef VK_USE_PLATFORM_METAL_EXT
 	createInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
