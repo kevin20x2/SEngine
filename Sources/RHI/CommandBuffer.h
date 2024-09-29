@@ -11,6 +11,11 @@ class FCommandBufferPool
 public:
     FCommandBufferPool();
 
+	VkCommandPool GetPool() const
+	{
+		return Pool;
+	}
+
 private:
     VkCommandPool Pool;
     friend class FCommandBuffers;

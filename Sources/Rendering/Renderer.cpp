@@ -306,3 +306,8 @@ void FRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 	vkCmdEndRenderPass(CommandBuffer);
 	VK_CHECK(vkEndCommandBuffer(CommandBuffer));
 }
+FCommandBufferPool *
+FRenderer::GetCommandBufferPool() const
+{
+	return CommandBufferPool.get();
+}

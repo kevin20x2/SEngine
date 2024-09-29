@@ -33,6 +33,8 @@ public:
 
     void OnResize(GLFWwindow * Window,int32 Width, int32 Height);
 
+	FCommandBufferPool * GetCommandBufferPool() const;
+
 protected:
 
     TSharedPtr< SCameraComponent > Camera;

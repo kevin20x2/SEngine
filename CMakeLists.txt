@@ -87,10 +87,18 @@ add_executable(SEngine Sources/Application.cpp
         Sources/Platform/FbxMeshImporter.h
         Sources/Platform/FbxCommon/Common.cxx
         Sources/Platform/Path.cpp
-        Sources/Platform/Path.h)
+        Sources/Platform/Path.h
+        Sources/Platform/TextureLoader.cpp
+        Sources/Platform/TextureLoader.h
+        Sources/RHI/Texture.cpp
+        Sources/RHI/Texture.h
+        Sources/Platform/CImgTextureLoader.cpp
+        Sources/Platform/CImgTextureLoader.h
+)
 
 target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES GLM_FORCE_LEFT_HANDED)
 target_compile_definitions(SEngine PUBLIC ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+target_compile_definitions(SEngine PUBLIC cimg_display=0)
 
 if(WIN32)
     set(FBX_ROOT_PATH "C:/Program Files/Autodesk/FBX/FBX SDK/2020.3.2")
@@ -110,6 +118,7 @@ target_include_directories(SEngine PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glm
         ${FBX_ROOT_PATH}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/spdlog/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/CImg
         #${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/eigen-3.4.0
  )
 if(WIN32)
