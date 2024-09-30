@@ -8,6 +8,7 @@
 #include "DescriptorSetLayout.h"
 #include "UniformBuffer.h"
 #include "Core/BaseTypes.h"
+#include "Texture.h"
 
 
 class FDescriptorSets
@@ -16,7 +17,8 @@ public:
     static FDescriptorSets * Create(
         const TArray<FDescriptorSetLayout * > & Layouts,
         const FDescriptorPool & Pool,
-        const TArray<FUniformBuffer *> & Buffers
+        const TArray<FUniformBuffer *> & Buffers,
+		TSharedPtr<FTexture> Texture
         );
     const TArray <VkDescriptorSet> & GetHandle()
     {

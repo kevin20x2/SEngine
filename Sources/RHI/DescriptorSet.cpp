@@ -8,7 +8,7 @@
 #include "volk.h"
 
 FDescriptorSets* FDescriptorSets::Create(const TArray<FDescriptorSetLayout*>& Layouts,
-                                         const FDescriptorPool& Pool, const TArray<FUniformBuffer*>& Buffers)
+                                         const FDescriptorPool& Pool, const TArray<FUniformBuffer*>& Buffers, TSharedPtr<FTexture> Texture)
 {
     FDescriptorSets * Result = new FDescriptorSets();
 
@@ -38,8 +38,8 @@ FDescriptorSets* FDescriptorSets::Create(const TArray<FDescriptorSetLayout*>& La
 
 		VkDescriptorImageInfo ImageInfo = {
 			.imageLayout =VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-			.imageView = nullptr,
-			.sampler = nullptr
+			.imageView = Texture->GetImageView(),
+			.sampler = Texture->GetSampler()
 		};
 
 
@@ -52,8 +52,21 @@ FDescriptorSets* FDescriptorSets::Create(const TArray<FDescriptorSetLayout*>& La
 		DescriptorWrite.descriptorCount = 1;
 		DescriptorWrite.pBufferInfo = &BufferInfo;
 
+		VkWriteDescriptorSet ImageWrite =
+			{
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = Result->DescriptorSets[i],
+			.dstBinding = 1,
+			.dstArrayElement = 0 ,
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.descriptorCount = 1,
+			.pImageInfo = & ImageInfo
+			};
+
+		VkWriteDescriptorSet DstWrites [] = { DescriptorWrite , ImageWrite};
+
 		vkUpdateDescriptorSets(*GRHI->GetDevice(),
-			1, &DescriptorWrite, 0, nullptr);
+			2, DstWrites, 0, nullptr);
 	}
 
 

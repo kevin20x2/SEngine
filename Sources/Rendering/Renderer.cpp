@@ -53,7 +53,7 @@ void FRenderer::Initailize()
 
     DescriptorSets = TUniquePtr<FDescriptorSets>(
         FDescriptorSets::Create({DescriptorSetLayout.get(),DescriptorSetLayout.get()},*DescriptorPool,
-            {UniformBuffers[0].get(),UniformBuffers[1].get()}
+            {UniformBuffers[0].get(),UniformBuffers[1].get()}, Texture
             )
         );
 
