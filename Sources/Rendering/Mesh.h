@@ -16,6 +16,7 @@ enum class EMeshVertexElementMask
     Position = 0x1,
     Color = 0x2,
     Normal = 0x4,
+	TexCoord0 = 0x8
 };
 S_DEFINE_ENUM_FLAGS(EMeshVertexElementMask)
 
@@ -37,6 +38,7 @@ public :
     TArray <uint16> Indexes;
     TArray <FVector4> Colors;
     TArray <FVector4> Normals;
+	TArray <FVector2> TexCoord0;
 
     EMeshVertexElementMask ElementMask = EMeshVertexElementMask::Position;
 };

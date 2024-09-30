@@ -118,6 +118,7 @@ target_include_directories(SEngine PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/glm
         ${FBX_ROOT_PATH}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/spdlog/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/libpng-1.6.44
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/CImg
         #${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/eigen-3.4.0
  )
@@ -132,5 +133,5 @@ endif()
 if(WIN32)
  target_link_libraries(SEngine PUBLIC volk glslang SPIRV glslang-default-resource-limits glfw libfbxsdk)
 elseif(APPLE)
-    target_link_libraries(SEngine PUBLIC c++ c++abi volk glslang SPIRV glslang-default-resource-limits glfw fbxsdk)
+    target_link_libraries(SEngine PUBLIC c++ c++abi volk glslang SPIRV glslang-default-resource-limits glfw fbxsdk png_static)
 endif()

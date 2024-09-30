@@ -20,6 +20,16 @@ class FTexture
 public:
 	explicit FTexture(const FTextureCreateParams & Params);
 
+	VkImageView GetImageView() const
+	{
+		return ImageView;
+	}
+
+	VkSampler GetSampler() const
+	{
+		return Sampler;
+	}
+
 protected:
 	uint32 Height,Width;
 	VkImage ImageHandle;
@@ -27,6 +37,10 @@ protected:
 	VkDeviceMemory DeviceMemory;
 	VkDeviceMemory ImageMemory;
 
+
+	VkImageView ImageView;
+
+	VkSampler Sampler;
 };
 
 

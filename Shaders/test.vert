@@ -5,6 +5,7 @@ struct VSInput
     [[vk::location(0)]] float3 Pos : POSITION ;
     //[[vk::location(1)]] float4 Color : Color;
     [[vk::location(2)]] float4 Normal : NORMAL0;
+    [[vk::location(3)]] float2 Uv : TEXCOORD0;
 };
 
 struct UBO
@@ -22,6 +23,7 @@ struct VSOutput
     float4 Pos : SV_POSITION;
     //[[vk::location(0)]] float4 Color : Color;
     [[vk::location(1)]] float4 Normal : NORMAL0;
+    [[vk::location(2)]] float2 Uv : TEXCOORD0;
 };
 
 VSOutput main(VSInput input)
@@ -32,5 +34,6 @@ VSOutput main(VSInput input)
     //output.Pos = float4(input.Pos.xy, 0.5f,1.0f);
     //output.Color = input.Color;
     output.Normal = input.Normal;
+    output.Uv = input.Uv;
     return output;
 }

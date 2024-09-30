@@ -59,6 +59,18 @@ VkPipelineVertexInputStateCreateInfo FStaticMesh::GenerateVertexInputStateCreate
 
 	}
 
+	if(EnumHasAnyFlags(Mask, EMeshVertexElementMask::TexCoord0))
+	{
+		DescriptionCount ++ ;
+		Stride += sizeof(FVector2);
+		auto & UvDesc = Descriptions.emplace_back();
+		UvDesc.binding = 0;
+		UvDesc.location = 3;
+		UvDesc.format = VK_FORMAT_R32G32_SFLOAT;
+		UvDesc.offset = Offset;
+		Offset += sizeof(FVector2);
+	}
+
 
 	static VkVertexInputBindingDescription VertexBindingDescription;
 	VertexBindingDescription.binding = 0;
@@ -92,6 +104,10 @@ uint32 FStaticMesh::GetStride() const
 	{
 		Stride += sizeof(FVector4);
 	}
+	if(EnumHasAnyFlags(ElementMask , EMeshVertexElementMask::TexCoord0))
+	{
+		Stride += sizeof(FVector2);
+	}
 
 	return Stride;
 }
@@ -123,6 +139,11 @@ TSharedPtr<FVertexBuffer> FStaticMesh::CreateVertexBuffer()
 		{
 			memcpy(pBuffer, & Normals[Idx],sizeof(FVector4));
 			pBuffer += sizeof(FVector4);
+		}
+		if(EnumHasAnyFlags(ElementMask,EMeshVertexElementMask::TexCoord0))
+		{
+			memcpy(pBuffer,&TexCoord0[Idx],sizeof(FVector2));
+			pBuffer += sizeof(FVector2);
 		}
 	}
 

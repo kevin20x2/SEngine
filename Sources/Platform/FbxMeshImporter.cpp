@@ -95,10 +95,12 @@ static void CollectMesh(FbxNode * InNode, FTravelFbxNodeContext & Context)
 
     // Polygons
 	Context.Mesh->Normals.resize(Context.Mesh->Positions.size());
+	Context.Mesh->TexCoord0.resize(Context.Mesh->Positions.size());
 	auto AddNormal =[&](int32 PointIdx,const FbxVector4 & Normal)
 	{
 		Context.Mesh->Normals[PointIdx] = (FVector4(Normal[0],Normal[1],Normal[2],Normal[3]));
 	};
+
 
 	int32 VertexId = 0 ;
     for(int i = 0; i < pMesh->GetPolygonCount(); ++i)
@@ -111,6 +113,67 @@ static void CollectMesh(FbxNode * InNode, FTravelFbxNodeContext & Context)
             Context.Mesh->Indexes.push_back(PointIndex + VertexOffset);
         	CollectVertexColor(pMesh,Context,PointIndex,VertexId);
         	bool bHasNormal = false;
+			bool bHasUv = false;
+	        auto AddUv = [&](int32 PointIdx, const FbxVector2 & Uv)
+	        {
+				bHasUv = true;
+		        Context.Mesh->TexCoord0[PointIdx] = FVector2(Uv[0],Uv[1]);
+	        };
+
+	        for (int32 l = 0; l < pMesh->GetElementUVCount(); ++l)
+	        {
+		        FbxGeometryElementUV* leUV = pMesh->GetElementUV( l);
+		        //FBXSDK_sprintf(header, 100, "            Texture UV: ");
+
+		        switch (leUV->GetMappingMode())
+		        {
+		        default:
+			        break;
+		        case FbxGeometryElement::eByControlPoint:
+			        switch (leUV->GetReferenceMode())
+			        {
+			        case FbxGeometryElement::eDirect:
+				        AddUv(PointIndex, leUV->GetDirectArray().GetAt(VertexId));
+				        break;
+			        case FbxGeometryElement::eIndexToDirect:
+			        {
+				        int id = leUV->GetIndexArray().GetAt(VertexId);
+				        AddUv(PointIndex, leUV->GetDirectArray().GetAt(id));
+			        }
+				        break;
+			        default:
+				        break; // other reference modes not shown here!
+			        }
+			        break;
+
+		        case FbxGeometryElement::eByPolygonVertex:
+		        {
+			        int lTextureUVIndex = pMesh->GetTextureUVIndex(i, j);
+			        switch (leUV->GetReferenceMode())
+			        {
+			        case FbxGeometryElement::eDirect:
+			        case FbxGeometryElement::eIndexToDirect:
+			        {
+				        AddUv(PointIndex, leUV->GetDirectArray().GetAt(lTextureUVIndex));
+			        }
+				        break;
+			        default:
+				        break; // other reference modes not shown here!
+			        }
+		        }
+			        break;
+
+		        case FbxGeometryElement::eByPolygon: // doesn't make much sense for UVs
+		        case FbxGeometryElement::eAllSame:   // doesn't make much sense for UVs
+		        case FbxGeometryElement::eNone:       // doesn't make much sense for UVs
+			        break;
+		        }
+	        }
+			if(bHasUv)
+			{
+				Context.Mesh->ElementMask |= EMeshVertexElementMask::TexCoord0;
+			}
+
             for (int32 l = 0; l < pMesh->GetElementNormalCount(); ++l)
             {
 	            FbxGeometryElementNormal* leNormal = pMesh->GetElementNormal(l);

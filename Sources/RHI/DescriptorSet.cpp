@@ -36,6 +36,13 @@ FDescriptorSets* FDescriptorSets::Create(const TArray<FDescriptorSetLayout*>& La
 		BufferInfo.offset = 0;
 		BufferInfo.range = 16 * sizeof(float);
 
+		VkDescriptorImageInfo ImageInfo = {
+			.imageLayout =VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+			.imageView = nullptr,
+			.sampler = nullptr
+		};
+
+
 		VkWriteDescriptorSet DescriptorWrite{};
 		DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		DescriptorWrite.dstSet = Result->DescriptorSets[i];

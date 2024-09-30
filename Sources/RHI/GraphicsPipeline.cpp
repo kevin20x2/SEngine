@@ -57,7 +57,8 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
 	VertexInputInfo.vertexAttributeDescriptionCount = 1;
 	VertexInputInfo.pVertexAttributeDescriptions = &VertexAttributeDescription;*/
 
-	VertexInputInfo =  FStaticMesh::GenerateVertexInputStateCreateInfo(EMeshVertexElementMask::Position | EMeshVertexElementMask::Normal );
+	VertexInputInfo =  FStaticMesh::GenerateVertexInputStateCreateInfo(
+		EMeshVertexElementMask::Position | EMeshVertexElementMask::Normal | EMeshVertexElementMask::TexCoord0 );
 
 	VkPipelineInputAssemblyStateCreateInfo InputAssembly{};
 	InputAssembly.sType =

@@ -3,6 +3,8 @@
 //
 
 #include "CImgTextureLoader.h"
+//#define cimg_use_jpeg
+#define cimg_use_png
 #include "CImg.h"
 
 using namespace cimg_library;
@@ -12,5 +14,16 @@ TSharedPtr<FTexture> FCImgTextureLoader::LoadTexture(const FString &Path)
 	int32 Height = Src.height();
 	int32 Width = Src.width();
 
-	return nullptr;
+	FTextureCreateParams Params =
+		{
+		  .BufferSize =static_cast<uint32>(sizeof(uint32) * Height * Width ),
+		  .Height = (uint32) Height,
+		  .Width = (uint32) Width,
+		  .BufferPtr = Src.data()
+		};
+
+	auto Texture =
+		TSharedPtr<FTexture>(new FTexture(Params));
+
+	return Texture;
 }

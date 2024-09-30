@@ -22,5 +22,14 @@ private:
     void Init();
 };
 
+class FImageSamplerDescriptorSetLayout : public FDescriptorSetLayout
+{
+public:
+	static FImageSamplerDescriptorSetLayout * Create();
+private:
+	void Init();
+
+};
+
 
 #endif //DESCRIPTORSETLAYOUT_H

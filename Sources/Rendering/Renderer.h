@@ -19,6 +19,7 @@
 #include "RHI/IndexBuffer.h"
 #include "RHI/RenderPass.h"
 #include "RHI/Shader.h"
+#include "RHI/Texture.h"
 
 
 void OnRawWindowResize(GLFWwindow * Window, int Width, int Height);
@@ -51,6 +52,8 @@ protected:
 
     TArray <
     TSharedPtr<FUniformBuffer > >  UniformBuffers;
+
+	TSharedPtr <FTexture> Texture;
 
     TSharedPtr<FRenderPass> RenderPass;
 

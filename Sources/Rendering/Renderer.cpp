@@ -14,6 +14,7 @@
 #include "Platform/FbxMeshImporter.h"
 #include "RHI/RHI.h"
 #include "Platform/Path.h"
+#include "Platform/CImgTextureLoader.h"
 
 void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
 {
@@ -41,6 +42,11 @@ void FRenderer::Initailize()
 
     }
 
+	CommandBufferPool = TUniquePtr<FCommandBufferPool>(new FCommandBufferPool());
+
+	FCImgTextureLoader Loader;
+	Texture =  Loader.LoadTexture(FPath::GetApplicationDir() + "/Assets/Textures/phptze1bz.png" );
+
     DescriptorPool = TUniquePtr<FDescriptorPool>(
         FUniformBufferDescriptorPool::Create(MaxFrameInFlight,MaxFrameInFlight)
         );
@@ -60,7 +66,6 @@ void FRenderer::Initailize()
 
 
 	RecreatePipeline();
-    CommandBufferPool = TUniquePtr<FCommandBufferPool>(new FCommandBufferPool());
 
     CommandBuffers = TUniquePtr<FCommandBuffers>(new FCommandBuffers(MaxFrameInFlight,CommandBufferPool.get()));
 
