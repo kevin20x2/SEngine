@@ -2,8 +2,8 @@
 // Created by kevin on 2024/8/11.
 //
 
-#ifndef SHADER_H
-#define SHADER_H
+#ifndef SHADERPROGRAM_H
+#define SHADERPROGRAM_H
 #include <vulkan/vulkan_core.h>
 #include "Core/BaseTypes.h"
 
@@ -22,6 +22,10 @@ public:
     {
         return ShaderModule;
     }
+	const TArray<FDescriptorSetLayoutInfo> & GetDescriptorSetLayoutInfos()
+	{
+		return DescriptorSetLayoutInfos;
+	}
 protected:
     VkShaderModule ShaderModule;
 
@@ -42,4 +46,4 @@ public:
 	explicit FPixelShaderProgram(const FString & FilePath);
 };
 
-#endif //SHADER_H
+#endif //SHADERPROGRAM_H

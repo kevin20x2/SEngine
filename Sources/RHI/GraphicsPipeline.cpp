@@ -24,38 +24,20 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
 	VertShaderStageInfo.sType =
 		VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	VertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-	VertShaderStageInfo.module = Info.VertexShader->GetShaderModule();
+	VertShaderStageInfo.module = Info.Shader->GetVertexShader()->GetShaderModule();
 	VertShaderStageInfo.pName = "main";
 
 	VkPipelineShaderStageCreateInfo FragShaderStageInfo{};
 	FragShaderStageInfo.sType =
 		VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	FragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-	FragShaderStageInfo.module = Info.PixelShader->GetShaderModule();
+	FragShaderStageInfo.module = Info.Shader->GetPixelShader()->GetShaderModule();
 	FragShaderStageInfo.pName = "main";
 
 	VkPipelineShaderStageCreateInfo ShaderStages[] = { VertShaderStageInfo , FragShaderStageInfo };
 
 	VkPipelineVertexInputStateCreateInfo VertexInputInfo{};
 
-	/*
-	VkVertexInputBindingDescription VertexBindingDescription;
-	VertexBindingDescription.binding = 0;
-	VertexBindingDescription.stride = sizeof(FVector);
-	VertexBindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-	VkVertexInputAttributeDescription VertexAttributeDescription;
-	VertexAttributeDescription.binding = 0;
-	VertexAttributeDescription.location = 0;
-	VertexAttributeDescription.format = VK_FORMAT_R32G32B32_SFLOAT;
-	VertexAttributeDescription.offset = 0;
-
-	VertexInputInfo.sType =
-		VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	VertexInputInfo.vertexBindingDescriptionCount = 1;
-	VertexInputInfo.pVertexBindingDescriptions = &VertexBindingDescription;
-	VertexInputInfo.vertexAttributeDescriptionCount = 1;
-	VertexInputInfo.pVertexAttributeDescriptions = &VertexAttributeDescription;*/
 
 	VertexInputInfo =  FStaticMesh::GenerateVertexInputStateCreateInfo(
 		EMeshVertexElementMask::Position | EMeshVertexElementMask::Normal | EMeshVertexElementMask::TexCoord0 );
@@ -118,7 +100,7 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
   VkPipelineLayoutCreateInfo PipelineLayoutInfo{};
   PipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
   PipelineLayoutInfo.setLayoutCount = 1;
-  PipelineLayoutInfo.pSetLayouts = &Info.DescriptorSetLayout->Layout;
+  PipelineLayoutInfo.pSetLayouts = &Info.Shader->GetDescriptorSetLayoutRef();
   PipelineLayoutInfo.pushConstantRangeCount = 0;
   PipelineLayoutInfo.pPushConstantRanges = nullptr;
 

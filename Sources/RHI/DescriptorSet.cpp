@@ -7,23 +7,18 @@
 #include "RHI.h"
 #include "volk.h"
 
-FDescriptorSets* FDescriptorSets::Create(const TArray<FDescriptorSetLayout*>& Layouts,
+FDescriptorSets* FDescriptorSets::Create(const TArray<VkDescriptorSetLayout>& Layouts,
                                          const FDescriptorPool& Pool, const TArray<FUniformBuffer*>& Buffers, TSharedPtr<FTexture> Texture)
 {
     FDescriptorSets * Result = new FDescriptorSets();
 
-    TArray <VkDescriptorSetLayout > VkLayouts;
-    for(auto & Layout : Layouts )
-    {
-        VkLayouts.push_back(Layout->Layout);
-    }
 	uint32 Count = Layouts.size();
 
 	VkDescriptorSetAllocateInfo AllocInfo{};
 	AllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	AllocInfo.descriptorPool = Pool.Pool;
 	AllocInfo.descriptorSetCount = Count;
-	AllocInfo.pSetLayouts = VkLayouts.data();
+	AllocInfo.pSetLayouts = Layouts.data();
 
 	Result->DescriptorSets.resize(Count);
 	VK_CHECK(vkAllocateDescriptorSets(*GRHI->GetDevice(), &AllocInfo,
@@ -58,12 +53,22 @@ FDescriptorSets* FDescriptorSets::Create(const TArray<FDescriptorSetLayout*>& La
 			.dstSet = Result->DescriptorSets[i],
 			.dstBinding = 1,
 			.dstArrayElement = 0 ,
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
 			.descriptorCount = 1,
 			.pImageInfo = & ImageInfo
 			};
+		VkWriteDescriptorSet SamplerWrite =
+			{
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet = Result->DescriptorSets[i],
+				.dstBinding = 2,
+				.dstArrayElement = 0 ,
+				.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
+				.descriptorCount = 1,
+				.pImageInfo = & ImageInfo
+			};
 
-		VkWriteDescriptorSet DstWrites [] = { DescriptorWrite , ImageWrite};
+		VkWriteDescriptorSet DstWrites [] = { DescriptorWrite , ImageWrite,SamplerWrite};
 
 		vkUpdateDescriptorSets(*GRHI->GetDevice(),
 			2, DstWrites, 0, nullptr);

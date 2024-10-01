@@ -15,7 +15,7 @@ class FDescriptorSets
 {
 public:
     static FDescriptorSets * Create(
-        const TArray<FDescriptorSetLayout * > & Layouts,
+        const TArray<VkDescriptorSetLayout> & Layouts,
         const FDescriptorPool & Pool,
         const TArray<FUniformBuffer *> & Buffers,
 		TSharedPtr<FTexture> Texture

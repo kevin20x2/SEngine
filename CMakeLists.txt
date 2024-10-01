@@ -38,8 +38,8 @@ add_executable(SEngine
         Sources/RHI/DescriptorSet.h
         Sources/RHI/RenderPass.cpp
         Sources/RHI/RenderPass.h
-        Sources/RHI/Shader.cpp
-        Sources/RHI/Shader.h
+        Sources/RHI/ShaderProgram.cpp
+        Sources/RHI/ShaderProgram.h
         Sources/RHI/GraphicsPipeline.cpp
         Sources/RHI/GraphicsPipeline.h
         Sources/Rendering/Renderer.cpp
@@ -99,6 +99,10 @@ add_executable(SEngine
         Sources/RHI/Texture.h
         Sources/Platform/CImgTextureLoader.cpp
         Sources/Platform/CImgTextureLoader.h
+        Sources/Rendering/Shader.cpp
+        Sources/Rendering/Shader.h
+        Sources/AssetManager/AssetManager.cpp
+        Sources/AssetManager/AssetManager.h
 )
 
 target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES GLM_FORCE_LEFT_HANDED)

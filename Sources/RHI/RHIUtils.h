@@ -8,7 +8,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "RHI.h"
-#include "Shader.h"
+#include "ShaderProgram.h"
 
 
 class FRHIUtils

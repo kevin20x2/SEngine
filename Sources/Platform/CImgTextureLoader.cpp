@@ -24,11 +24,10 @@ TSharedPtr<FTexture> FCImgTextureLoader::LoadTexture(const FString &Path)
 	{
 		for(uint32 j = 0 ; j < Width; ++ j)
 		{
-			// G , B ,A , R ????
-			ReorderedColor[4 *(i * Width + j) + 0] = Src(i,j,0,1);
-			ReorderedColor[4 *(i * Width + j) + 1] = Src(i,j,0,2);
-			ReorderedColor[4 *(i * Width + j) + 2] = Spectrum == 3 ?  255 : Src(i,j,0,4);
-			ReorderedColor[4 *(i * Width + j) + 3] = Src(i,j,0,0);
+			ReorderedColor[4 *(i * Width + j) + 0] = Src(i,j,0,0);
+			ReorderedColor[4 *(i * Width + j) + 1] = Src(i,j,0,1);
+			ReorderedColor[4 *(i * Width + j) + 2] = Src(i,j,0,2);
+			ReorderedColor[4 *(i * Width + j) + 3] = Spectrum == 3 ?  255 : Src(i,j,0,3);
 		}
 
 	}

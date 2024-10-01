@@ -19,12 +19,22 @@ FUniformBufferDescriptorPool* FUniformBufferDescriptorPool::Create(uint32 Descri
 		{
 			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			.descriptorCount = DescriptorCount
+		},
+		{
+			.type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+			.descriptorCount = DescriptorCount
+		},
+		{
+			.type = VK_DESCRIPTOR_TYPE_SAMPLER,
+			.descriptorCount = DescriptorCount
 		}
 	};
 
+	uint32 Count =  sizeof(PoolSize) / sizeof(VkDescriptorPoolSize);
+
 	VkDescriptorPoolCreateInfo PoolInfo{};
 	PoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	PoolInfo.poolSizeCount = 2;
+	PoolInfo.poolSizeCount = Count;
 	PoolInfo.pPoolSizes = PoolSize;
 	PoolInfo.maxSets = static_cast <uint32_t>(MaxSetNum);
 	VK_CHECK(vkCreateDescriptorPool(

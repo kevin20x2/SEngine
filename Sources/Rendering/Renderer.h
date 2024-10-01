@@ -18,8 +18,9 @@
 #include "RHI/GraphicsPipeline.h"
 #include "RHI/IndexBuffer.h"
 #include "RHI/RenderPass.h"
-#include "RHI/Shader.h"
+#include "RHI/ShaderProgram.h"
 #include "RHI/Texture.h"
+#include "Shader.h"
 
 
 void OnRawWindowResize(GLFWwindow * Window, int Width, int Height);
@@ -44,7 +45,7 @@ protected:
 
     TUniquePtr<FSwapChain> SwapChain;
 
-    TUniquePtr<FDescriptorSetLayout> DescriptorSetLayout;
+    //TUniquePtr<FDescriptorSetLayout> DescriptorSetLayout;
 
     TUniquePtr<FDescriptorPool > DescriptorPool;
 
@@ -57,11 +58,11 @@ protected:
 
     TSharedPtr<FRenderPass> RenderPass;
 
-    TSharedPtr<FVertexShaderProgram> VertexShader;
-    TSharedPtr<FPixelShaderProgram> PixelShader;
+	TSharedPtr <FShader> Shader;
 
-    //TSharedPtr <FVertexBuffer> BaseVertexBuffer;
-    //TSharedPtr <FIndexBuffer> IndexBuffer;
+    //TSharedPtr<FVertexShaderProgram> VertexShader;
+    //TSharedPtr<FPixelShaderProgram> PixelShader;
+
 
     void RecreatePipeline();
 

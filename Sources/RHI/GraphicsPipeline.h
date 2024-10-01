@@ -8,14 +8,13 @@
 
 #include "DescriptorSetLayout.h"
 #include "RenderPass.h"
-#include "Shader.h"
+#include "ShaderProgram.h"
+#include "Rendering/Shader.h"
 
 
 struct FGrpahicsPipelineCreateInfo
 {
-    FVertexShaderProgram * VertexShader;
-    FPixelShaderProgram * PixelShader;
-    FDescriptorSetLayout * DescriptorSetLayout;
+	FShader * Shader;
     FRenderPass * RenderPass;
 };
 

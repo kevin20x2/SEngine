@@ -1,7 +1,8 @@
 
-
+[[vk::combinedImageSampler(1)]]
 Texture2D texColor : register(t1 ,space0);
-SamplerState samplerColor : register(s1,space0);
+[[vk::combinedImageSampler(1)]]
+SamplerState samplerColor : register(s2,space0);
 
 
 struct VSOutput
@@ -16,5 +17,5 @@ float4 main(VSOutput input) :SV_TARGET
 {
     float4 color = texColor.Sample(samplerColor,input.Uv);
     //return float4(input.Uv, 0.0f,1.0f);
-    return color.wxyz;
+    return color;
 }

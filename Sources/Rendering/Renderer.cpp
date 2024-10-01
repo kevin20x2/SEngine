@@ -28,9 +28,14 @@ void FRenderer::Initailize()
     SwapChain = std::unique_ptr<FSwapChain>(
         FSwapChain::CreateSwapChain(GRHI->GetDisplaySize()) );
 
-    DescriptorSetLayout = std::unique_ptr<FDescriptorSetLayout>(
-        FUniformBufferDescriptorSetLayout::Create() );
 
+	auto VertexShader = std::make_shared<FVertexShaderProgram>(FPath::GetApplicationDir()+  "/shaders/test.vert");
+	auto PixelShader = std::make_shared<FPixelShaderProgram>(FPath::GetApplicationDir() + "/shaders/test.frag");
+
+	Shader = TSharedPtr<FShader>(new FShader(VertexShader,PixelShader));
+
+	//DescriptorSetLayout = std::unique_ptr<FDescriptorSetLayout>(
+		//FUniformBufferDescriptorSetLayout::Create() );
 
     uint32 MaxFrameInFlight = GRHI->GetMaxFrameInFlight();
     UniformBuffers.resize(GRHI->GetMaxFrameInFlight());
@@ -52,7 +57,7 @@ void FRenderer::Initailize()
         );
 
     DescriptorSets = TUniquePtr<FDescriptorSets>(
-        FDescriptorSets::Create({DescriptorSetLayout.get(),DescriptorSetLayout.get()},*DescriptorPool,
+        FDescriptorSets::Create({Shader->GetDescriptorSetLayout(),Shader->GetDescriptorSetLayout()},*DescriptorPool,
             {UniformBuffers[0].get(),UniformBuffers[1].get()}, Texture
             )
         );
@@ -61,8 +66,6 @@ void FRenderer::Initailize()
         FRenderPass::Create(SwapChain.get())
         );
 
-    VertexShader = std::make_shared<FVertexShaderProgram>(FPath::GetApplicationDir()+  "/shaders/test.vert");
-    PixelShader = std::make_shared<FPixelShaderProgram>(FPath::GetApplicationDir() + "/shaders/test.frag");
 
 
 	RecreatePipeline();
@@ -205,7 +208,7 @@ void FRenderer::OnResize(GLFWwindow* Window, int32 Width, int32 Height)
 void FRenderer::RecreatePipeline()
 {
     Pipeline = TUniquePtr<FGraphicsPipeline>(new FGraphicsPipeline(
-        {VertexShader.get(),PixelShader.get(), DescriptorSetLayout.get() ,
+        {Shader.get()  ,
             RenderPass.get() } ) );
 }
 
