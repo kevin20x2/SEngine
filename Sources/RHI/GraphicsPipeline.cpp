@@ -6,9 +6,6 @@
 
 #include "RHI.h"
 #include "volk.h"
-#include "Maths/Math.h"
-#include "Maths/Vector2.h"
-#include "Rendering/Mesh.h"
 
 
 FGraphicsPipeline::~FGraphicsPipeline()
@@ -36,11 +33,17 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
 
 	VkPipelineShaderStageCreateInfo ShaderStages[] = { VertShaderStageInfo , FragShaderStageInfo };
 
-	VkPipelineVertexInputStateCreateInfo VertexInputInfo{};
+	//VkPipelineVertexInputStateCreateInfo VertexInputInfo{};
 
+	auto VertexInputInfo = Info.Shader->GetVertexInputInfo();
 
-	VertexInputInfo =  FStaticMesh::GenerateVertexInputStateCreateInfo(
-		EMeshVertexElementMask::Position | EMeshVertexElementMask::Normal | EMeshVertexElementMask::TexCoord0 );
+	auto VertexInputStateCreateInfo = VertexInputInfo.CreateInfo;
+	VertexInputStateCreateInfo.vertexBindingDescriptionCount = VertexInputInfo.BindingDescription.size();
+	VertexInputStateCreateInfo.pVertexBindingDescriptions = VertexInputInfo.BindingDescription.data();
+	VertexInputStateCreateInfo.vertexAttributeDescriptionCount = VertexInputInfo.AttributeDescription.size();
+	VertexInputStateCreateInfo.pVertexAttributeDescriptions = VertexInputInfo.AttributeDescription.data();
+	//=  FStaticMesh::GenerateVertexInputStateCreateInfo(
+		//EMeshVertexElementMask::Position | EMeshVertexElementMask::Normal | EMeshVertexElementMask::TexCoord0 );
 
 	VkPipelineInputAssemblyStateCreateInfo InputAssembly{};
 	InputAssembly.sType =
@@ -118,7 +121,7 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
   PipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
   PipelineInfo.stageCount = 2;
   PipelineInfo.pStages = ShaderStages;
-  PipelineInfo.pVertexInputState = &VertexInputInfo;
+  PipelineInfo.pVertexInputState = &VertexInputStateCreateInfo;
   PipelineInfo.pInputAssemblyState = &InputAssembly;
   PipelineInfo.pViewportState = &ViewportState;
   PipelineInfo.pRasterizationState = &RasterizationState;

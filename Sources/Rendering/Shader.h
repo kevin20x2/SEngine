@@ -32,6 +32,11 @@ public:
 		return PixelShaderProgram.get();
 	}
 
+	const FVertexInputInfo & GetVertexInputInfo()
+	{
+		return VertexShaderProgram->VertexInputInfo;
+	}
+
 protected:
 
 	void GenerateDescriptorSetLayout();

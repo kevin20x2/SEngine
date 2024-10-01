@@ -15,6 +15,13 @@ struct FDescriptorSetLayoutInfo
 	TArray <VkDescriptorSetLayoutBinding> Bindings;
 };
 
+struct FVertexInputInfo
+{
+	VkPipelineVertexInputStateCreateInfo CreateInfo;
+	TArray <VkVertexInputBindingDescription> BindingDescription;
+	TArray <VkVertexInputAttributeDescription> AttributeDescription;
+};
+
 class FShaderProgram
 {
 public:
@@ -37,6 +44,7 @@ class FVertexShaderProgram : public FShaderProgram
 public:
 	explicit FVertexShaderProgram(const FString & FilePath);
     explicit FVertexShaderProgram(const char * FilePath );
+	FVertexInputInfo VertexInputInfo;
 };
 
 class FPixelShaderProgram : public FShaderProgram

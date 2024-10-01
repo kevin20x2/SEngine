@@ -9,6 +9,7 @@
 
 #include "RHI.h"
 #include "ShaderProgram.h"
+#include "spirv_reflect.h"
 
 
 class FRHIUtils
@@ -24,7 +25,14 @@ public:
 
     static uint32 FindMemoryType(uint32 TypeFilter , VkMemoryPropertyFlags Properties);
 
-    static VkShaderModule LoadHlslShaderByFilePath(const std::string & FilePath, VkShaderStageFlagBits Stage, TArray <FDescriptorSetLayoutInfo> & Infos );
+    static VkShaderModule LoadHlslShaderByFilePath(const std::string & FilePath,
+												   VkShaderStageFlagBits Stage,
+												   TArray <FDescriptorSetLayoutInfo> & Infos,
+												   FVertexInputInfo & OutVertexInputInfo
+												   );
+
+
+	static FVertexInputInfo GenerateVertexInputStateCreateInfo(TArray <SpvReflectInterfaceVariable *> InputVars);
 
 	static void CreateBuffer(VkBufferUsageFlagBits Usage,uint32 BufferSize,
 							 VkFlags PropertyFlags,VkBuffer & Buffer, VkDeviceMemory & DeviceMemory);
