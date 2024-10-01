@@ -13,6 +13,7 @@
 #include "SPIRV/GlslangToSpv.h"
 #include "SPIRV/Logger.h"
 #include "CoreObjects/Engine.h"
+#include "spirv_reflect.h"
 
 bool FRHIUtils::IsDeivceSuitable(VkPhysicalDevice Device, VkSurfaceKHR Surface)
 {
@@ -112,7 +113,7 @@ uint32 FRHIUtils::FindMemoryType(uint32 TypeFilter, VkMemoryPropertyFlags Proper
 	return -1;
 }
 
-VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, VkShaderStageFlagBits Stage)
+VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, VkShaderStageFlagBits Stage,TArray <FDescriptorSetLayoutInfo> & LayoutInfos)
 {
 
 	std::vector <uint32_t> Spirv;
@@ -201,6 +202,47 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 
 	glslang::FinalizeProcess();
 
+	{ // reflect
+		SpvReflectShaderModule ReflectShaderModule = {};
+		auto Result = spvReflectCreateShaderModule(Spirv.size() * sizeof(uint32), Spirv.data(), &ReflectShaderModule);
+		assert(Result == SPV_REFLECT_RESULT_SUCCESS);
+
+		uint32 DescriptorCount = 0;
+		Result = spvReflectEnumerateDescriptorSets(&ReflectShaderModule, &DescriptorCount, nullptr);
+		assert(Result == SPV_REFLECT_RESULT_SUCCESS);
+
+		TArray<SpvReflectDescriptorSet *> Sets(DescriptorCount);
+
+		Result = spvReflectEnumerateDescriptorSets(&ReflectShaderModule, &DescriptorCount, Sets.data());
+
+		LayoutInfos.resize(DescriptorCount);
+
+		for(uint32 i = 0; i < Sets.size(); ++ i )
+		{
+			const auto & ReflectSet =  *Sets[i];
+			auto & LayoutInfo = LayoutInfos[i];
+			LayoutInfo.Bindings.resize(ReflectSet.binding_count);
+			for(uint32 BindingIdx = 0 ; BindingIdx < ReflectSet.binding_count ; ++ BindingIdx )
+			{
+				const auto & RefBinding = *ReflectSet.bindings[BindingIdx];
+				VkDescriptorSetLayoutBinding & Binding = LayoutInfo.Bindings[BindingIdx];
+				Binding.binding = RefBinding.binding;
+				Binding.descriptorType = static_cast<VkDescriptorType>(RefBinding.descriptor_type);
+				Binding.descriptorCount = 1;
+
+				for(uint32 Dim = 0 ; Dim < RefBinding.array.dims_count ; ++ Dim)
+				{
+					Binding.descriptorCount += RefBinding.array.dims[Dim];
+				}
+				Binding.stageFlags = static_cast<VkShaderStageFlagBits>(ReflectShaderModule.shader_stage);
+			}
+			LayoutInfo.SetNumber = ReflectSet.set;
+			LayoutInfo.CreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+			LayoutInfo.CreateInfo.bindingCount = ReflectSet.binding_count;
+			LayoutInfo.CreateInfo.pBindings = LayoutInfo.Bindings.data();
+		}
+		spvReflectDestroyShaderModule(&ReflectShaderModule);
+	}
 
 	VkShaderModule ShaderModule;
 	VkShaderModuleCreateInfo ModuleCreateInfo;

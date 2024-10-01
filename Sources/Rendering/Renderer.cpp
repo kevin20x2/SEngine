@@ -140,7 +140,7 @@ void FRenderer::Render()
 
 	FMatrix4 Data (1.0f) ;
 	auto ViewMatrix = Camera->GetViewMatrix();
-	auto TestView = FVector4(0,0,0,1) * ViewMatrix;
+	//auto TestView = FVector4(0,0,0,1) * ViewMatrix;
 	auto ProjecionMatrix = Camera->GetProjectinMatrix();
 	Data = ViewMatrix * ProjecionMatrix;
 	//Data = FMatrix4(1.0f);

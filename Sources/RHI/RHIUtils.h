@@ -8,6 +8,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "RHI.h"
+#include "Shader.h"
 
 
 class FRHIUtils
@@ -23,7 +24,7 @@ public:
 
     static uint32 FindMemoryType(uint32 TypeFilter , VkMemoryPropertyFlags Properties);
 
-    static VkShaderModule LoadHlslShaderByFilePath(const std::string & FilePath, VkShaderStageFlagBits Stage);
+    static VkShaderModule LoadHlslShaderByFilePath(const std::string & FilePath, VkShaderStageFlagBits Stage, TArray <FDescriptorSetLayoutInfo> & Infos );
 
 	static void CreateBuffer(VkBufferUsageFlagBits Usage,uint32 BufferSize,
 							 VkFlags PropertyFlags,VkBuffer & Buffer, VkDeviceMemory & DeviceMemory);

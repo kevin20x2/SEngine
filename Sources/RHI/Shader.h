@@ -8,6 +8,13 @@
 #include "Core/BaseTypes.h"
 
 
+struct FDescriptorSetLayoutInfo
+{
+	uint32 SetNumber;
+	VkDescriptorSetLayoutCreateInfo CreateInfo;
+	TArray <VkDescriptorSetLayoutBinding> Bindings;
+};
+
 class FShaderProgram
 {
 public:
@@ -15,9 +22,10 @@ public:
     {
         return ShaderModule;
     }
-
 protected:
     VkShaderModule ShaderModule;
+
+	TArray <FDescriptorSetLayoutInfo> DescriptorSetLayoutInfos;
 };
 
 class FVertexShaderProgram : public FShaderProgram

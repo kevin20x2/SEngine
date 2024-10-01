@@ -230,14 +230,17 @@ void FInput::OnDragEnd(EMouseType Type)
 
 void FInput::RegisterDragBegin(FDragBeginFuncType&& Func)
 {
+	DragBeginBindings.emplace_back(Func);
 }
 
 void FInput::RegisterDragEnd(FDragEndFuncType&& Func)
 {
+	DragEndBindings.emplace_back(Func);
 }
 
 void FInput::RegisterDragging(FDraggingFuncType&& Func)
 {
+	DraggingBindings.emplace_back(Func);
 }
 
 void FInput::BindKey(int key, FKeyCallFuncType && Func)

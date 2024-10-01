@@ -8,9 +8,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 add_subdirectory(ThirdParty)
 
-add_executable(SEngine Sources/Application.cpp 
-					Sources/VkEngine.cpp 
-					Sources/VkEngine.h
+
+set(Spirv_ReflectSource
+        ThirdParty/SPIRV-Reflect/spirv_reflect.cpp
+)
+
+add_executable(SEngine
+        ${Spirv_ReflectSource}
+        Sources/Application.cpp
         Sources/Platform/Window.cpp
         Sources/Platform/Window.h
         Sources/RHI/VertexBuffer.h
@@ -120,6 +125,7 @@ target_include_directories(SEngine PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/spdlog/include
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/libpng-1.6.44
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/CImg
+        ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/SPIRV-Reflect
         #${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/eigen-3.4.0
  )
 if(WIN32)

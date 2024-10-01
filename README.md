@@ -9,6 +9,17 @@
 4. Load Model
 5. Camera
 
+
+TODO:
+
+1. shader-> GenDescriptionLayout
+-> GenVertexLayout
+
+2. MouseOperation code
+
+3 .sceneComponent 功能　
+
+
 RoadMap:
-6. Material
+6. Material -> PipelineObject
 7. PBR
