@@ -8,6 +8,7 @@
 #include "Rendering/Mesh.h"
 #include "RHI/IndexBuffer.h"
 #include "RHI/VertexBuffer.h"
+#include "Rendering/Material.h"
 
 
 class SPrimitiveComponent : public SCoreComponentBase
@@ -21,11 +22,23 @@ public:
         Mesh = InMesh;
     }
     void CreateRHIResource();
-    virtual void OnRecordCommandBuffer(VkCommandBuffer CommandBuffer);
+    virtual void OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,uint32 CurrentFrame);
+
+	SMaterialInterface * GetMaterial() const
+	{
+		return Material.get();
+	}
+
+	void SetMaterial(TSharedPtr<SMaterialInterface> InMaterial)
+	{
+		Material = InMaterial;
+	}
+
 protected:
 
-    TSharedPtr<FStaticMesh > Mesh;
+	TSharedPtr <SMaterialInterface> Material;
 
+    TSharedPtr<FStaticMesh > Mesh;
     TSharedPtr<FVertexBuffer> VB;
     TSharedPtr <FIndexBuffer> IB;
 };

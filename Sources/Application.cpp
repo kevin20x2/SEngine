@@ -1,6 +1,6 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
-#include "VkEngine.h"
+//#include "VkEngine.h"
 #include "CoreObjects/Engine.h"
 #include "Platform/Window.h"
 #include "RHI/RHI.h"

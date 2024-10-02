@@ -12,6 +12,10 @@ class FUniformBuffer
 public:
     static FUniformBuffer * Create(uint32 InSize);
 
+	VkBuffer GetBuffer() const
+	{
+		return Buffer;
+	}
     void Init();
     void UpdateData(void * InData);
 private:

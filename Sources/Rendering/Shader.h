@@ -3,6 +3,7 @@
 //
 #pragma once
 #include "RHI/ShaderProgram.h"
+#include "MaterialParameter.h"
 
 
 class FShader
@@ -37,9 +38,14 @@ public:
 		return VertexShaderProgram->VertexInputInfo;
 	}
 
+	void GenerateDefaultMaterialParams(FMaterialParameters & MaterialParams );
+
 protected:
 
 	void GenerateDescriptorSetLayout();
+
+	using DescriptorSetLayoutBindingList = TArray <VkDescriptorSetLayoutBinding>;
+	TArray <DescriptorSetLayoutBindingList> GenerateLayoutBindings();
 
 	FString ShaderPath;
 

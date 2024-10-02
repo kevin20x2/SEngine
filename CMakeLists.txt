@@ -84,8 +84,6 @@ add_executable(SEngine
         Sources/CoreObjects/Engine.h
         Sources/Input/Input.cpp
         Sources/Input/Input.h
-        Sources/CoreObjects/Material.cpp
-        Sources/CoreObjects/Material.h
         Sources/Platform/MeshImporter.cpp
         Sources/Platform/MeshImporter.h
         Sources/Platform/FbxMeshImporter.cpp
@@ -103,6 +101,10 @@ add_executable(SEngine
         Sources/Rendering/Shader.h
         Sources/AssetManager/AssetManager.cpp
         Sources/AssetManager/AssetManager.h
+        Sources/Rendering/Material.cpp
+        Sources/Rendering/Material.h
+        Sources/Rendering/MaterialParameter.cpp
+        Sources/Rendering/MaterialParameter.h
 )
 
 target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES GLM_FORCE_LEFT_HANDED)

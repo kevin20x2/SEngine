@@ -49,7 +49,7 @@ protected:
 
     TUniquePtr<FDescriptorPool > DescriptorPool;
 
-    TUniquePtr<FDescriptorSets> DescriptorSets;
+    //TUniquePtr<FDescriptorSets> DescriptorSets;
 
     TArray <
     TSharedPtr<FUniformBuffer > >  UniformBuffers;
@@ -64,9 +64,10 @@ protected:
     //TSharedPtr<FPixelShaderProgram> PixelShader;
 
 
-    void RecreatePipeline();
+    //void RecreatePipeline();
 
-    TUniquePtr<FGraphicsPipeline> Pipeline;
+
+    //TUniquePtr<FGraphicsPipeline> Pipeline;
 
     TUniquePtr<FCommandBufferPool> CommandBufferPool;
 

@@ -17,8 +17,12 @@ void SPrimitiveComponent::CreateRHIResource()
 
 }
 
-void SPrimitiveComponent::OnRecordCommandBuffer(VkCommandBuffer CommandBuffer)
+void SPrimitiveComponent::OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,uint32 CurrentFrame)
 {
+	if(Material)
+	{
+		Material->OnRecordCommandBuffer(CommandBuffer,CurrentFrame);
+	}
     VkBuffer VertexBuffers[] = {VB->GetHandle()};
     VkDeviceSize Offsets[] = {0};
 

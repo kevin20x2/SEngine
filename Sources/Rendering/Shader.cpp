@@ -42,3 +42,66 @@ void FShader::GenerateDescriptorSetLayout()
 									&CreateInfo, nullptr,&DescriptorSetLayout));
 	}
 }
+void
+FShader::GenerateDefaultMaterialParams(FMaterialParameters &MaterialParams)
+{
+	auto BindingListList = GenerateLayoutBindings();
+	uint32 DescriptorIdx = 0 ;
+	for(auto & BindingList : BindingListList)
+	{
+		for(auto & Binding : BindingList )
+		{
+			if(Binding.descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE)
+			{
+				auto & Texture = MaterialParams.Parameters.emplace_back(TSharedPtr<FMaterialParameterTexture>(
+					new FMaterialParameterTexture()
+					));
+				Texture->DescriptorIdx = DescriptorIdx;
+				Texture->BindingSlotIdx = Binding.binding;
+			}
+			if(Binding.descriptorType == VK_DESCRIPTOR_TYPE_SAMPLER)
+			{
+				auto & Sampler = MaterialParams.Parameters.emplace_back(TSharedPtr <FMaterialParameterSampler>(
+					new FMaterialParameterSampler()
+					));
+				Sampler->DescriptorIdx = DescriptorIdx;
+				Sampler->BindingSlotIdx = Binding.binding;
+			}
+		}
+		DescriptorIdx ++ ;
+	}
+}
+TArray<FShader::DescriptorSetLayoutBindingList>
+FShader::GenerateLayoutBindings()
+{
+
+	if(VertexShaderProgram == nullptr || PixelShaderProgram == nullptr)
+	{
+		return {};
+	}
+	auto & VertexInfos = VertexShaderProgram->GetDescriptorSetLayoutInfos();
+	auto & PixelInfos = PixelShaderProgram->GetDescriptorSetLayoutInfos();
+
+	if(VertexInfos.size() != PixelInfos.size())
+	{
+		return {};
+	}
+
+	TArray<FShader::DescriptorSetLayoutBindingList> Results;
+
+	for(uint32 i = 0 ; i < VertexInfos.size(); ++ i)
+	{
+		TArray <VkDescriptorSetLayoutBinding> Bindings;
+		for(auto & Binding : VertexInfos[i].Bindings)
+		{
+			Bindings.push_back(Binding);
+		}
+
+		for(auto & Binding : PixelInfos[i].Bindings)
+		{
+			Bindings.push_back(Binding);
+		}
+		Results.push_back(Bindings);
+	}
+	return Results;
+}

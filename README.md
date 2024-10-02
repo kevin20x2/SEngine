@@ -9,11 +9,11 @@
 4. Load Model
 5. Camera
 
+1. shader-> GenDescriptionLayout
+   -> GenVertexLayout
 
 TODO:
-
-1. shader-> GenDescriptionLayout
--> GenVertexLayout
+1. shader dynamic binding uniform buffer 
 
 2. MouseOperation code
 

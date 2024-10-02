@@ -10,7 +10,6 @@
 #include "volk.h"
 #include "CoreObjects/Engine.h"
 #include "Maths/Math.h"
-#include "Maths/Vector2.h"
 #include "Platform/FbxMeshImporter.h"
 #include "RHI/RHI.h"
 #include "Platform/Path.h"
@@ -56,27 +55,35 @@ void FRenderer::Initailize()
         FUniformBufferDescriptorPool::Create(MaxFrameInFlight,MaxFrameInFlight)
         );
 
+	/*
     DescriptorSets = TUniquePtr<FDescriptorSets>(
         FDescriptorSets::Create({Shader->GetDescriptorSetLayout(),Shader->GetDescriptorSetLayout()},*DescriptorPool,
             {UniformBuffers[0].get(),UniformBuffers[1].get()}, Texture
             )
         );
+        */
 
     RenderPass = TSharedPtr<FRenderPass>(
         FRenderPass::Create(SwapChain.get())
         );
 
 
+	auto Material = TSharedPtr<SMaterialInterface>(new SMaterialInterface(
+		Shader
+		) );
+	Material->Initialize(DescriptorPool->Pool,RenderPass.get());
+	Material->SetupViewData(UniformBuffers);
+	Material->SetTexture(1,Texture);
+	//Material->CreatePipeline(RenderPass.get());
 
-	RecreatePipeline();
+	//RecreatePipeline();
 
     CommandBuffers = TUniquePtr<FCommandBuffers>(new FCommandBuffers(MaxFrameInFlight,CommandBufferPool.get()));
 
 	RecreateFrameBuffers();
 
 	Primitive = TSharedPtr<SPrimitiveComponent>(new SPrimitiveComponent(nullptr));
-
-
+	Primitive->SetMaterial(Material);
 	TSharedPtr< FStaticMesh> StaticMesh = TSharedPtr<FStaticMesh>(new FStaticMesh({},{}));
 	Primitive->SetStaticMesh(StaticMesh);
 	FFbxMeshImporter Importer;
@@ -201,16 +208,12 @@ void FRenderer::OnResize(GLFWwindow* Window, int32 Width, int32 Height)
         FRenderPass::Create(SwapChain.get())
         );
 	RecreateFrameBuffers();
-	RecreatePipeline();
+	Primitive->GetMaterial()->CreatePipeline(RenderPass.get());
+	//RecreatePipeline();
 	CommandBuffers->FreeCommandBuffer();
 }
 
-void FRenderer::RecreatePipeline()
-{
-    Pipeline = TUniquePtr<FGraphicsPipeline>(new FGraphicsPipeline(
-        {Shader.get()  ,
-            RenderPass.get() } ) );
-}
+
 
 void FRenderer::RecreateFrameBuffers()
 {
@@ -281,36 +284,27 @@ void FRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 	scissor.extent = SwapChainExtent;
 
 	static float grey= 0.5;
-	/*grey += 0.005f;
-	if (grey > 1.0f) {
-		grey = 0.0f;
-	}*/
+
 	VkClearValue clearColor = {{{grey, grey, grey, 1.0f}}};
 
 	renderPassInfo.clearValueCount = 1;
 	renderPassInfo.pClearValues = &clearColor;
 	vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo,
 	                     VK_SUBPASS_CONTENTS_INLINE);
-	vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-	                  Pipeline->GetHandle());
+
+	//vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+	  //                Pipeline->GetHandle());
+
 
 
 	vkCmdSetScissor(CommandBuffer, 0, 1, &scissor);
 	vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
-	//vkCmdSetCullMode(CommandBuffer,VK_CULL_MODE_BACK_BIT);
-	vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-	                        Pipeline->GetLayout(), 0, 1, &DescriptorSets->GetHandle()[CurrentFrame],
-	                        0, nullptr);
+	//vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+	  //                      Pipeline->GetLayout(), 0, 1, &DescriptorSets->GetHandle()[CurrentFrame],
+	    //                    0, nullptr);
 
-	Primitive->OnRecordCommandBuffer(CommandBuffer);
+	Primitive->OnRecordCommandBuffer(CommandBuffer,CurrentFrame);
 
-	/*VkBuffer VertexBuffers[] = {BaseVertexBuffer->GetHandle()};
-	VkDeviceSize Offsets[] = {0};
-	vkCmdBindVertexBuffers(CommandBuffer,0,1,VertexBuffers,Offsets);
-	vkCmdBindIndexBuffer(CommandBuffer,IndexBuffer->GetHandle(),0,VK_INDEX_TYPE_UINT16);
-
-	//vkCmdDraw(CommandBuffer, 3, 1, 0, 0);
-	vkCmdDrawIndexed(CommandBuffer,36,1,0,0,0);*/
 	vkCmdEndRenderPass(CommandBuffer);
 	VK_CHECK(vkEndCommandBuffer(CommandBuffer));
 }
