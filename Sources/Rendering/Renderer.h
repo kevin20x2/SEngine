@@ -45,11 +45,8 @@ protected:
 
     TUniquePtr<FSwapChain> SwapChain;
 
-    //TUniquePtr<FDescriptorSetLayout> DescriptorSetLayout;
 
     TUniquePtr<FDescriptorPool > DescriptorPool;
-
-    //TUniquePtr<FDescriptorSets> DescriptorSets;
 
     TArray <
     TSharedPtr<FUniformBuffer > >  UniformBuffers;
@@ -58,20 +55,15 @@ protected:
 
     TSharedPtr<FRenderPass> RenderPass;
 
+	TArray <TSharedPtr <FDepthTexture> >  DepthTextures;
+
 	TSharedPtr <FShader> Shader;
-
-    //TSharedPtr<FVertexShaderProgram> VertexShader;
-    //TSharedPtr<FPixelShaderProgram> PixelShader;
-
-
-    //void RecreatePipeline();
-
-
-    //TUniquePtr<FGraphicsPipeline> Pipeline;
 
     TUniquePtr<FCommandBufferPool> CommandBufferPool;
 
     TUniquePtr<FCommandBuffers> CommandBuffers;
+
+	void RecreateSwapChains();
     void RecreateFrameBuffers();
 
     TArray <

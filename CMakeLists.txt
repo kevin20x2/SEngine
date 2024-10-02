@@ -105,6 +105,8 @@ add_executable(SEngine
         Sources/Rendering/Material.h
         Sources/Rendering/MaterialParameter.cpp
         Sources/Rendering/MaterialParameter.h
+        Sources/RHI/DepthTexture.cpp
+        Sources/RHI/DepthTexture.h
 )
 
 target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES GLM_FORCE_LEFT_HANDED)

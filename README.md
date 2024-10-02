@@ -11,8 +11,10 @@
 
 1. shader-> GenDescriptionLayout
    -> GenVertexLayout
+6. Material -> PipelineObject
 
 TODO:
+0 .depthstencil buffer
 1. shader dynamic binding uniform buffer 
 
 2. MouseOperation code
@@ -21,5 +23,4 @@ TODO:
 
 
 RoadMap:
-6. Material -> PipelineObject
 7. PBR

@@ -7,14 +7,19 @@
 #include "volk.h"
 #include "RHIUtils.h"
 
-FTexture::FTexture(const FTextureCreateParams &Params)
+FTexture::FTexture()
+{
+
+}
+void
+FTexture::Initialize(const FTextureCreateParams &Params)
 {
 
 	FRHIUtils::CreateBuffer(
 		VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 		Params.BufferSize,
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-		VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 		BufferHandle,
 		DeviceMemory);
 
@@ -23,27 +28,28 @@ FTexture::FTexture(const FTextureCreateParams &Params)
 		void *Data ;
 		auto Device = GRHI->GetDevice();
 		vkMapMemory(*Device,
-					DeviceMemory,0,Params.BufferSize,0,&Data);
+		            DeviceMemory,0,Params.BufferSize,0,&Data);
 		memcpy(Data,Params.BufferPtr,Params.BufferSize);
 		vkUnmapMemory(*Device,DeviceMemory);
 	}
 
 	FRHIUtils::CreateImage(Params.Height,Params.Width,
-						   VK_FORMAT_R8G8B8A8_SRGB,
-						   VK_IMAGE_TILING_OPTIMAL,
-						   VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-						   VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT ,
-						   ImageHandle,
-						   ImageMemory );
+	                       VK_FORMAT_R8G8B8A8_SRGB,
+	                       VK_IMAGE_TILING_OPTIMAL,
+	                       VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+	                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT ,
+	                       ImageHandle,
+	                       ImageMemory );
 
 	FRHIUtils::TransitionImageLayout(ImageHandle,
-									 VK_FORMAT_R8G8B8A8_SRGB,
-									 VK_IMAGE_LAYOUT_UNDEFINED,
-									 VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	                                 VK_FORMAT_R8G8B8A8_SRGB,
+	                                 VK_IMAGE_LAYOUT_UNDEFINED,
+	                                 VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	FRHIUtils::CopyBufferToImage(ImageHandle,BufferHandle,Params.Height,Params.Width);
 
-	VkImageViewCreateInfo viewInfo{};
+	auto Device = *GRHI->GetDevice();
+/*	VkImageViewCreateInfo viewInfo{};
 	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	viewInfo.image = ImageHandle;
 	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
@@ -54,9 +60,10 @@ FTexture::FTexture(const FTextureCreateParams &Params)
 	viewInfo.subresourceRange.baseArrayLayer = 0;
 	viewInfo.subresourceRange.layerCount = 1;
 
-	auto Device = *GRHI->GetDevice();
 
-	VK_CHECK(vkCreateImageView(Device,&viewInfo,nullptr,&ImageView));
+	VK_CHECK(vkCreateImageView(Device,&viewInfo,nullptr,&ImageView));*/
+
+	FRHIUtils::CreateImageView(ImageHandle,VK_FORMAT_R8G8B8A8_SRGB,VK_IMAGE_ASPECT_COLOR_BIT,ImageView);
 
 	VkSamplerCreateInfo samplerInfo{};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -80,4 +87,10 @@ FTexture::FTexture(const FTextureCreateParams &Params)
 	samplerInfo.maxLod = 0.0f;
 
 	vkCreateSampler(Device,&samplerInfo,nullptr,&Sampler);
+
+}
+FTexture::~FTexture()
+{
+	vkDestroyImage( * GRHI->GetDevice(),ImageHandle,nullptr);
+	vkDestroyImageView(*GRHI->GetDevice(),ImageView,nullptr);
 }

@@ -30,6 +30,14 @@ public:
 	{
 		return  &SwapChain;
 	}
+	virtual uint32 GetImageCount() const override
+	{
+		return Images.size();
+	}
+	~FSwapChainImp()
+	{
+		CleanUp();
+	}
 
 	virtual void CleanUp() override;
 private:

@@ -7,17 +7,20 @@
 #include "RHI.h"
 #include "SwapChain.h"
 #include "volk.h"
+#include "RHI/DepthTexture.h"
 
-FFrameBuffer::FFrameBuffer(int32 ViewIdx,FRenderPass * InRenderPass,FSwapChain* InSwapChain)
+FFrameBuffer::FFrameBuffer(int32 ViewIdx,FRenderPass * InRenderPass,
+						   FSwapChain* InSwapChain,
+						   TArray <TSharedPtr<FDepthTexture>> InDepthTexList
+						   )
 {
-	//for (size_t i = 0; i < Swa&&pChainImageViews.size(); i++) {
-		VkImageView attachments[] = { *InSwapChain->GetView(ViewIdx)};
+		TArray < VkImageView> attachments = { *InSwapChain->GetView(ViewIdx),InDepthTexList[ViewIdx]->GetImageView()};
 
 		VkFramebufferCreateInfo framebufferInfo{};
 		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		framebufferInfo.renderPass = InRenderPass->RenderPass;
-		framebufferInfo.attachmentCount = 1;
-		framebufferInfo.pAttachments = attachments;
+		framebufferInfo.attachmentCount = attachments.size();
+		framebufferInfo.pAttachments = attachments.data();
 		framebufferInfo.width = InSwapChain->GetExtent().width;
 		framebufferInfo.height = InSwapChain->GetExtent().height;
 		framebufferInfo.layers = 1;

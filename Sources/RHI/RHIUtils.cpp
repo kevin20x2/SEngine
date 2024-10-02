@@ -396,6 +396,7 @@ FRHIUtils::TransitionImageLayout(VkImage Image, VkFormat Format, VkImageLayout S
 		barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 
 		barrier.image = Image;
+
 		barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		barrier.subresourceRange.baseMipLevel = 0;
 		barrier.subresourceRange.levelCount = 1;
@@ -404,10 +405,24 @@ FRHIUtils::TransitionImageLayout(VkImage Image, VkFormat Format, VkImageLayout S
 
 		barrier.srcAccessMask = 0; // TODO
 		barrier.dstAccessMask = 0; // TODO
+		VkPipelineStageFlags sourceStage = 0;
+		VkPipelineStageFlags destinationStage = 0 ;
+		if(SrcLayout == VK_IMAGE_LAYOUT_UNDEFINED && DstLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
+		{
+			barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+
+			if (HasStencilComponent(Format)) {
+				barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
+			}
+			barrier.srcAccessMask = 0;
+			barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+			sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+			destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+		}
 
 		vkCmdPipelineBarrier(
 			Buffer,
-			0 /* TODO */, 0 /* TODO */,
+			sourceStage /* TODO */, destinationStage /* TODO */,
 			0,
 			0, nullptr,
 			0, nullptr,
@@ -886,4 +901,63 @@ FRHIUtils::GenerateVertexInputStateCreateInfo(TArray<SpvReflectInterfaceVariable
 		return  {vertex_input_state_create_info,
 				 {binding_description },
 				 attribute_descriptions } ;
+}
+VkFormat
+FRHIUtils::FindSupportFormat(const TArray<VkFormat> &Formats,
+                             VkImageTiling ImageTiling,
+                             VkFormatFeatureFlags FeatureFlags)
+{
+	for(auto Format : Formats)
+	{
+		VkFormatProperties Properties;
+		vkGetPhysicalDeviceFormatProperties(*GRHI->GetPhysicalDevice(),Format , & Properties);
+		if(ImageTiling == VK_IMAGE_TILING_LINEAR &&
+			(Properties.linearTilingFeatures & FeatureFlags) == FeatureFlags  )
+		{
+			return Format;
+		}
+		if(ImageTiling == VK_IMAGE_TILING_OPTIMAL && (
+			(Properties.optimalTilingFeatures & FeatureFlags) == FeatureFlags ))
+		{
+			return Format;
+		}
+	}
+
+	throw std::runtime_error("cant find support format");
+	return VK_FORMAT_R32_UINT;
+}
+VkFormat
+FRHIUtils::FindDepthFormat()
+{
+	return FindSupportFormat({
+		VK_FORMAT_D24_UNORM_S8_UINT ,
+		VK_FORMAT_D32_SFLOAT ,
+		VK_FORMAT_D32_SFLOAT_S8_UINT
+	}, VK_IMAGE_TILING_OPTIMAL,VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+}
+void
+FRHIUtils::CreateImageView(VkImage Image, VkFormat Format, VkImageAspectFlags AspectFlags,VkImageView & ImageView)
+{
+	VkImageViewCreateInfo ViewInfo {
+		.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+		.image = Image,
+		.viewType = VK_IMAGE_VIEW_TYPE_2D,
+		.format = Format,
+		.subresourceRange =
+			{
+			.aspectMask = AspectFlags  ,
+			.baseMipLevel = 0 ,
+			.levelCount = 1,
+			.baseArrayLayer = 0,
+			.layerCount = 1
+			}
+	};
+
+	VK_CHECK(vkCreateImageView(*GRHI->GetDevice(),&ViewInfo,nullptr, &ImageView));
+}
+bool
+FRHIUtils::HasStencilComponent(VkFormat format)
+{
+	//return false;
+	return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 }

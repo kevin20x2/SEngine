@@ -40,13 +40,9 @@ TSharedPtr<FTexture> FCImgTextureLoader::LoadTexture(const FString &Path)
 		  .BufferPtr = ReorderedColor.data()
 		};
 
-	//for(int32 i = 127 ; i < 128 ; ++ i)
-	{
-	//	for(int32 j = 0 ; j < Width; ++ j)
-	}
 
 	auto Texture =
-		TSharedPtr<FTexture>(new FTexture(Params));
+		FTexture::CreateTexture(Params);
 
 	return Texture;
 }

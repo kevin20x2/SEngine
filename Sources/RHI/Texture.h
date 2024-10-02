@@ -17,8 +17,22 @@ struct FTextureCreateParams
 
 class FTexture
 {
+
 public:
-	explicit FTexture(const FTextureCreateParams & Params);
+	explicit FTexture();
+	virtual ~FTexture();
+
+public:
+	template <typename TextureType = FTexture>
+	static TSharedPtr <TextureType>
+	    CreateTexture(const FTextureCreateParams & Params)
+	{
+		auto Result = std::make_shared<TextureType>();
+		Result->Initialize(Params);
+		return Result;
+	}
+
+	virtual void Initialize(const FTextureCreateParams & Params);
 
 	VkImageView GetImageView() const
 	{

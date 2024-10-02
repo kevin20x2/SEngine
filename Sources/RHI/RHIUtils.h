@@ -64,6 +64,15 @@ public:
 	static void TransitionImageLayout(VkImage Image,VkFormat Format, VkImageLayout SrcLayout ,VkImageLayout DstLayout  );
 
 	static void CopyBufferToImage(VkImage Image , VkBuffer Buffer, uint32 Height, uint32 Width);
+
+	static void CreateImageView(VkImage Image,VkFormat Format, VkImageAspectFlags AspectFlags,VkImageView & ImageView);
+
+	static VkFormat FindSupportFormat(const TArray <VkFormat> & Formats,VkImageTiling ImageTiling, VkFormatFeatureFlags FeatureFlags);
+
+	static VkFormat FindDepthFormat();
+
+	static bool
+	HasStencilComponent(VkFormat format);
 };
 
 

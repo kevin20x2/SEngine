@@ -14,6 +14,7 @@
 #include "RHI/RHI.h"
 #include "Platform/Path.h"
 #include "Platform/CImgTextureLoader.h"
+#include "RHI/DepthTexture.h"
 
 void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
 {
@@ -24,9 +25,6 @@ void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
 
 void FRenderer::Initailize()
 {
-    SwapChain = std::unique_ptr<FSwapChain>(
-        FSwapChain::CreateSwapChain(GRHI->GetDisplaySize()) );
-
 
 	auto VertexShader = std::make_shared<FVertexShaderProgram>(FPath::GetApplicationDir()+  "/shaders/test.vert");
 	auto PixelShader = std::make_shared<FPixelShaderProgram>(FPath::GetApplicationDir() + "/shaders/test.frag");
@@ -55,13 +53,8 @@ void FRenderer::Initailize()
         FUniformBufferDescriptorPool::Create(MaxFrameInFlight,MaxFrameInFlight)
         );
 
-	/*
-    DescriptorSets = TUniquePtr<FDescriptorSets>(
-        FDescriptorSets::Create({Shader->GetDescriptorSetLayout(),Shader->GetDescriptorSetLayout()},*DescriptorPool,
-            {UniformBuffers[0].get(),UniformBuffers[1].get()}, Texture
-            )
-        );
-        */
+	RecreateSwapChains();
+
 
     RenderPass = TSharedPtr<FRenderPass>(
         FRenderPass::Create(SwapChain.get())
@@ -74,9 +67,7 @@ void FRenderer::Initailize()
 	Material->Initialize(DescriptorPool->Pool,RenderPass.get());
 	Material->SetupViewData(UniformBuffers);
 	Material->SetTexture(1,Texture);
-	//Material->CreatePipeline(RenderPass.get());
 
-	//RecreatePipeline();
 
     CommandBuffers = TUniquePtr<FCommandBuffers>(new FCommandBuffers(MaxFrameInFlight,CommandBufferPool.get()));
 
@@ -90,11 +81,9 @@ void FRenderer::Initailize()
 	Importer.ImportMesh("../Assets/gy.fbx",StaticMesh.get());
 
 	Primitive->CreateRHIResource();
-	/*Indexes = {0,1,2};*/
 	    CreateSyncObjects();
 	Camera = TSharedPtr<SCameraComponent>( new SCameraComponent());
 	Camera->SetWorldLocation({-3,0,1});
-	//Camera->SetRotation(FQuat(glm::radians(30.0f),FVector(0,1,0)));
 
 	GEngine->GetInput()->BindKey(GLFW_KEY_W, [WeakCamera = TWeakPtr<SCameraComponent>(Camera)]()
 	{
@@ -201,9 +190,7 @@ void FRenderer::Render()
 void FRenderer::OnResize(GLFWwindow* Window, int32 Width, int32 Height)
 {
 	printf("Resize %d %d",Width,Height);
-	SwapChain->CleanUp();
-	SwapChain = std::unique_ptr<FSwapChain>(
-        FSwapChain::CreateSwapChain(GRHI->GetDisplaySize()) );
+	RecreateSwapChains();
     RenderPass = TSharedPtr<FRenderPass>(
         FRenderPass::Create(SwapChain.get())
         );
@@ -224,7 +211,7 @@ void FRenderer::RecreateFrameBuffers()
     for(auto & FrameBuffer : FrameBuffers )
     {
         FrameBuffer = TSharedPtr <FFrameBuffer>( new FFrameBuffer(
-            ViewIdx,RenderPass.get(),SwapChain.get()
+            ViewIdx,RenderPass.get(),SwapChain.get(),DepthTextures
             ));
         ViewIdx ++ ;
     }
@@ -285,23 +272,19 @@ void FRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 
 	static float grey= 0.5;
 
-	VkClearValue clearColor = {{{grey, grey, grey, 1.0f}}};
+	TArray <VkClearValue> clearColor = {
+		{.color = {grey, grey, grey, 1.0f} },
+		{.depthStencil = {1.0f,0}}
+	};
 
-	renderPassInfo.clearValueCount = 1;
-	renderPassInfo.pClearValues = &clearColor;
+	renderPassInfo.clearValueCount = clearColor.size();
+	renderPassInfo.pClearValues = clearColor.data();
 	vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo,
 	                     VK_SUBPASS_CONTENTS_INLINE);
-
-	//vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-	  //                Pipeline->GetHandle());
-
 
 
 	vkCmdSetScissor(CommandBuffer, 0, 1, &scissor);
 	vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
-	//vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-	  //                      Pipeline->GetLayout(), 0, 1, &DescriptorSets->GetHandle()[CurrentFrame],
-	    //                    0, nullptr);
 
 	Primitive->OnRecordCommandBuffer(CommandBuffer,CurrentFrame);
 
@@ -312,4 +295,20 @@ FCommandBufferPool *
 FRenderer::GetCommandBufferPool() const
 {
 	return CommandBufferPool.get();
+}
+
+void FRenderer::RecreateSwapChains()
+{
+	SwapChain = std::unique_ptr<FSwapChain>(
+		FSwapChain::CreateSwapChain(GRHI->GetDisplaySize()) );
+
+	DepthTextures.resize(SwapChain->GetImageCount()) ;
+	for(auto & DepthTexture : DepthTextures) {
+		DepthTexture =
+			FTexture::CreateTexture<FDepthTexture>({
+				                                       0,
+				                                       SwapChain->GetExtent().height,
+				                                       SwapChain->GetExtent().width
+			                                       });
+	}
 }

@@ -11,12 +11,14 @@
 
 
 class FSwapChain;
+class FDepthTexture;
 
 class FFrameBuffer
 {
 public:
 
-    FFrameBuffer(int32 ViewIdx ,FRenderPass * InRenderPass,FSwapChain * InSwapChain);
+    FFrameBuffer(int32 ViewIdx ,
+				 FRenderPass * InRenderPass,FSwapChain * InSwapChain, TArray < TSharedPtr <FDepthTexture >>  InDepthTexList);
 
     virtual ~FFrameBuffer();
     void Destroy();

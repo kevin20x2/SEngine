@@ -82,6 +82,19 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
 	  Multisampling.alphaToCoverageEnable = VK_FALSE;
 	  Multisampling.alphaToOneEnable = VK_FALSE;
 
+	  VkPipelineDepthStencilStateCreateInfo DepthStencil {
+		  .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+		  .depthTestEnable = VK_TRUE,
+		  .depthWriteEnable = VK_TRUE,
+		  .depthCompareOp = VK_COMPARE_OP_LESS,
+		  .depthBoundsTestEnable = VK_FALSE,
+		  .stencilTestEnable = VK_FALSE,
+		  .front = {},
+		  .back = {},
+		  .minDepthBounds = 0.0f,
+		  .maxDepthBounds = 1.0f,
+	  };
+
   VkPipelineColorBlendAttachmentState ColorBlendAttachment{};
   ColorBlendAttachment.colorWriteMask =
       VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
@@ -126,7 +139,7 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
   PipelineInfo.pViewportState = &ViewportState;
   PipelineInfo.pRasterizationState = &RasterizationState;
   PipelineInfo.pMultisampleState = &Multisampling;
-  PipelineInfo.pDepthStencilState = nullptr;
+	PipelineInfo.pDepthStencilState = & DepthStencil;
   PipelineInfo.pColorBlendState = &ColorBlending;
   PipelineInfo.pDynamicState = &dynamicStateCI;
   PipelineInfo.layout = Layout;

@@ -7,7 +7,6 @@
 #include "RHI.h"
 #include "volk.h"
 
-
 FUniformBufferDescriptorSetLayout* FUniformBufferDescriptorSetLayout::Create()
 {
     FUniformBufferDescriptorSetLayout * Layout = new FUniformBufferDescriptorSetLayout;

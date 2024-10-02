@@ -24,6 +24,8 @@ public:
     virtual VkExtent2D GetExtent() = 0;
 
     virtual void CleanUp() = 0;
+
+	virtual uint32 GetImageCount() const = 0;
 };
 
 
