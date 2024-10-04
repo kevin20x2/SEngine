@@ -11,7 +11,6 @@
 #include "volk.h"
 #include "glslang/Public/ShaderLang.h"
 #include "SPIRV/GlslangToSpv.h"
-#include "SPIRV/Logger.h"
 #include "CoreObjects/Engine.h"
 #include "spirv_reflect.h"
 
@@ -868,7 +867,7 @@ FRHIUtils::GenerateVertexInputStateCreateInfo(TArray<SpvReflectInterfaceVariable
 		binding_description.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 		VkPipelineVertexInputStateCreateInfo vertex_input_state_create_info = {
 			VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
-		std::vector<VkVertexInputAttributeDescription> attribute_descriptions;
+		TArray<VkVertexInputAttributeDescription> attribute_descriptions;
 		attribute_descriptions.reserve(InputVars.size());
 		for (size_t i_var = 0; i_var < InputVars.size(); ++i_var) {
 			const SpvReflectInterfaceVariable& refl_var = *(InputVars[i_var]);

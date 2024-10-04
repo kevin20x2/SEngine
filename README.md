@@ -9,12 +9,12 @@
 4. Load Model
 5. Camera
 
+0 .depthstencil buffer
 1. shader-> GenDescriptionLayout
    -> GenVertexLayout
 6. Material -> PipelineObject
 
 TODO:
-0 .depthstencil buffer
 1. shader dynamic binding uniform buffer 
 
 2. MouseOperation code
@@ -24,3 +24,5 @@ TODO:
 
 RoadMap:
 7. PBR
+8 . 海面渲染
+8. 雾

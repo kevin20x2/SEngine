@@ -31,8 +31,6 @@ void FRenderer::Initailize()
 
 	Shader = TSharedPtr<FShader>(new FShader(VertexShader,PixelShader));
 
-	//DescriptorSetLayout = std::unique_ptr<FDescriptorSetLayout>(
-		//FUniformBufferDescriptorSetLayout::Create() );
 
     uint32 MaxFrameInFlight = GRHI->GetMaxFrameInFlight();
     UniformBuffers.resize(GRHI->GetMaxFrameInFlight());
@@ -73,15 +71,16 @@ void FRenderer::Initailize()
 
 	RecreateFrameBuffers();
 
-	Primitive = TSharedPtr<SPrimitiveComponent>(new SPrimitiveComponent(nullptr));
+	auto Primitive = TSharedPtr<SPrimitiveComponent>(new SPrimitiveComponent(nullptr));
 	Primitive->SetMaterial(Material);
 	TSharedPtr< FStaticMesh> StaticMesh = TSharedPtr<FStaticMesh>(new FStaticMesh({},{}));
 	Primitive->SetStaticMesh(StaticMesh);
 	FFbxMeshImporter Importer;
-	Importer.ImportMesh("../Assets/gy.fbx",StaticMesh.get());
+	Importer.ImportMesh(FPath::GetApplicationDir() +  "/Assets/gy.fbx",StaticMesh.get());
 
 	Primitive->CreateRHIResource();
-	    CreateSyncObjects();
+	Primitive->OnRegister();
+	CreateSyncObjects();
 	Camera = TSharedPtr<SCameraComponent>( new SCameraComponent());
 	Camera->SetWorldLocation({-3,0,1});
 
@@ -139,15 +138,13 @@ void FRenderer::Render()
 
 	FMatrix4 Data (1.0f) ;
 	auto ViewMatrix = Camera->GetViewMatrix();
-	//auto TestView = FVector4(0,0,0,1) * ViewMatrix;
 	auto ProjecionMatrix = Camera->GetProjectinMatrix();
 	Data = ViewMatrix * ProjecionMatrix;
-	//Data = FMatrix4(1.0f);
 
-	//Data.setIdentity();
 	UniformBuffers[CurrentFrame]->UpdateData(&Data);
 
 	RecordCommandBuffer(CommandBuffers->Buffers[CurrentFrame],ImageIndex);
+
 	// Submit
 	VkSubmitInfo submitInfo {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -195,7 +192,13 @@ void FRenderer::OnResize(GLFWwindow* Window, int32 Width, int32 Height)
         FRenderPass::Create(SwapChain.get())
         );
 	RecreateFrameBuffers();
-	Primitive->GetMaterial()->CreatePipeline(RenderPass.get());
+	for(auto Primitive  : Primitives)
+	{
+		if(Primitive)
+		{
+			Primitive->GetMaterial()->CreatePipeline(RenderPass.get());
+		}
+	}
 	//RecreatePipeline();
 	CommandBuffers->FreeCommandBuffer();
 }
@@ -286,7 +289,14 @@ void FRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 	vkCmdSetScissor(CommandBuffer, 0, 1, &scissor);
 	vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
 
-	Primitive->OnRecordCommandBuffer(CommandBuffer,CurrentFrame);
+	//Primitive->OnRecordCommandBuffer(CommandBuffer,CurrentFrame);
+	for(auto P : Primitives)
+	{
+		if(P)
+		{
+			P->OnRecordCommandBuffer(CommandBuffer,CurrentFrame);
+		}
+	}
 
 	vkCmdEndRenderPass(CommandBuffer);
 	VK_CHECK(vkEndCommandBuffer(CommandBuffer));
@@ -311,4 +321,27 @@ void FRenderer::RecreateSwapChains()
 				                                       SwapChain->GetExtent().width
 			                                       });
 	}
+}
+bool FRenderer::OnAddPrimitive(SPrimitiveComponent *InComp)
+{
+	if(InComp == nullptr) return false;
+
+	if(Primitives.Contains(InComp->AsShared()))
+	{
+		spdlog::warn("Primitive already contained");
+		return false;
+	}
+	Primitives.Add(InComp->AsShared());
+	return true;
+}
+bool FRenderer::OnRemovePrimitive(SPrimitiveComponent *InComp)
+{
+	if(InComp == nullptr) return false;
+
+	if(Primitives.Contains(InComp->AsShared()))
+	{
+		Primitives.Remove(InComp->AsShared());
+		return true;
+	}
+	return false;
 }

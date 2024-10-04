@@ -11,6 +11,8 @@
 class SSceneComponent : public SCoreComponentBase
 {
 public:
+	S_REGISTER_CLASS(SCoreComponentBase)
+
     SSceneComponent():SCoreComponentBase(nullptr) {}
 
     FTransform GetWorldTransform() const

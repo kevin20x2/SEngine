@@ -12,6 +12,8 @@
 class SCameraComponent : public SSceneComponent
 {
 public:
+	S_REGISTER_CLASS(SSceneComponent)
+
     SCameraComponent() {}
 
     FMatrix4 GetViewMatrix();

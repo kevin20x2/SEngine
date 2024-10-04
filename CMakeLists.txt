@@ -107,6 +107,7 @@ add_executable(SEngine
         Sources/Rendering/MaterialParameter.h
         Sources/RHI/DepthTexture.cpp
         Sources/RHI/DepthTexture.h
+        Sources/Core/Array.h
 )
 
 target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES GLM_FORCE_LEFT_HANDED)
@@ -134,7 +135,7 @@ target_include_directories(SEngine PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/libpng-1.6.44
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/CImg
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/SPIRV-Reflect
-        #${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/eigen-3.4.0
+        ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/NanoRtti/Include
  )
 if(WIN32)
 target_link_directories(SEngine PUBLIC

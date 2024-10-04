@@ -15,6 +15,8 @@ class SPrimitiveComponent : public SCoreComponentBase
 {
 
 public:
+	S_REGISTER_CLASS(SCoreComponentBase)
+
     SPrimitiveComponent(TSharedPtr<SActor > InActor) :
     SCoreComponentBase(InActor) {}
     void SetStaticMesh(TSharedPtr<FStaticMesh> InMesh)
@@ -33,6 +35,9 @@ public:
 	{
 		Material = InMaterial;
 	}
+
+	virtual void OnRegister() override;
+	virtual void OnUnRegister() override;
 
 protected:
 

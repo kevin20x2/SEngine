@@ -37,11 +37,15 @@ public:
 
 	FCommandBufferPool * GetCommandBufferPool() const;
 
+	bool OnAddPrimitive(SPrimitiveComponent * InComp);
+	bool OnRemovePrimitive(SPrimitiveComponent * InComp);
 protected:
 
     TSharedPtr< SCameraComponent > Camera;
 
-    TSharedPtr<SPrimitiveComponent> Primitive;
+    //TSharedPtr<SPrimitiveComponent> Primitive;
+
+	TArray < TSharedPtr<SPrimitiveComponent> > Primitives;
 
     TUniquePtr<FSwapChain> SwapChain;
 

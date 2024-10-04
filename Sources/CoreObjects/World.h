@@ -15,6 +15,9 @@ class SWorld : public SObject
 
     void Tick(float DeltaTime);
 
+
+
+protected:
     using FActorArray = TArray <TSharedPtr<SActor>>;
     FActorArray Actors;
 

@@ -5,6 +5,7 @@
 #include "PrimitiveComponent.h"
 
 #include "volk.h"
+#include "Engine.h"
 
 void SPrimitiveComponent::CreateRHIResource()
 {
@@ -32,3 +33,16 @@ void SPrimitiveComponent::OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,ui
     vkCmdDrawIndexed(CommandBuffer, Mesh->Indexes.size(),1,0,0,0);
 
 }
+
+void SPrimitiveComponent::OnRegister()
+{
+	SCoreComponentBase::OnRegister();
+	GEngine->GetRenderer()->OnAddPrimitive(this);
+}
+void
+SPrimitiveComponent::OnUnRegister()
+{
+	SCoreComponentBase::OnUnRegister();
+	GEngine->GetRenderer()->OnRemovePrimitive(this);
+}
+

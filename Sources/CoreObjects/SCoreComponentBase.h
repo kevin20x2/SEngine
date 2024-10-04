@@ -13,11 +13,17 @@ class SActor;
 class SCoreComponentBase : public SObject
 {
 public:
+	S_REGISTER_CLASS(SObject)
+
     explicit SCoreComponentBase(const TSharedPtr<SActor> & InActor) :
         Owner(InActor)
     {
     }
 
+	SActor * GetOwner() const
+	{
+		return Owner.get();
+	}
     virtual void OnRegister();
     virtual void OnUnRegister();
 
