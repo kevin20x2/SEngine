@@ -105,6 +105,8 @@ if(NOT MSVC)
         "-Wno-logical-op-parentheses"
         "-Wno-unused-parameter")
 endif()
+add_subdirectory(zlib)
+
 add_subdirectory(libpng-1.6.44)
 
 

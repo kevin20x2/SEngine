@@ -13,3 +13,6 @@
 [submodule "ThirdParty/NanoRtti"]
 	path = ThirdParty/NanoRtti
 	url = https://github.com/gongminmin/NanoRtti.git
+[submodule "ThirdParty/zlib"]
+	path = ThirdParty/zlib
+	url = https://github.com/madler/zlib.git

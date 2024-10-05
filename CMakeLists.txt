@@ -120,7 +120,7 @@ elseif(APPLE)
     set(FBX_ROOT_PATH "/Applications/Autodesk/FBX SDK/2020.3.2")
 endif()
 
-set_property(TARGET SEngine PROPERTY CXX_STANDARD 17)
+set_property(TARGET SEngine PROPERTY CXX_STANDARD 20)
 set_property(TARGET SEngine PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET SEngine PROPERTY CXX_EXTENSIONS Off)
 
@@ -146,7 +146,7 @@ elseif(APPLE)
 endif()
 
 if(WIN32)
- target_link_libraries(SEngine PUBLIC volk glslang SPIRV glslang-default-resource-limits glfw libfbxsdk)
+ target_link_libraries(SEngine PUBLIC volk glslang SPIRV glslang-default-resource-limits glfw libfbxsdk png_static)
 elseif(APPLE)
     target_link_libraries(SEngine PUBLIC c++ c++abi volk glslang SPIRV glslang-default-resource-limits glfw fbxsdk png_static)
 endif()

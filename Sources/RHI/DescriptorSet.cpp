@@ -32,9 +32,9 @@ FDescriptorSets* FDescriptorSets::Create(const TArray<VkDescriptorSetLayout>& La
 		BufferInfo.range = 16 * sizeof(float);
 
 		VkDescriptorImageInfo ImageInfo = {
-			.imageLayout =VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+			.sampler = Texture->GetSampler(),
 			.imageView = Texture->GetImageView(),
-			.sampler = Texture->GetSampler()
+			.imageLayout =VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 		};
 
 
@@ -53,8 +53,8 @@ FDescriptorSets* FDescriptorSets::Create(const TArray<VkDescriptorSetLayout>& La
 			.dstSet = Result->DescriptorSets[i],
 			.dstBinding = 1,
 			.dstArrayElement = 0 ,
-			.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
 			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
 			.pImageInfo = & ImageInfo
 			};
 		VkWriteDescriptorSet SamplerWrite =
@@ -63,8 +63,8 @@ FDescriptorSets* FDescriptorSets::Create(const TArray<VkDescriptorSetLayout>& La
 				.dstSet = Result->DescriptorSets[i],
 				.dstBinding = 2,
 				.dstArrayElement = 0 ,
-				.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
 				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
 				.pImageInfo = & ImageInfo
 			};
 
