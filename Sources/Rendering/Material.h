@@ -22,7 +22,7 @@ public:
 
 	void Initialize(VkDescriptorPool Pool ,FRenderPass * RenderPass);
 
-	virtual void SetupViewData(const TArray <TSharedPtr<FUniformBuffer> > & InUniformBuffers);
+	virtual void OnSetupViewData();
 	virtual void CreateDescriptionSets(VkDescriptorPool Pool);
 	virtual void CreatePipeline(FRenderPass * RenderPass);
 	virtual void InitMaterialParameters();

@@ -5,20 +5,21 @@
 #ifndef PRIMITIVECOMPONENT_H
 #define PRIMITIVECOMPONENT_H
 #include "SCoreComponentBase.h"
+#include "SSceneComponent.h"
 #include "Rendering/Mesh.h"
 #include "RHI/IndexBuffer.h"
 #include "RHI/VertexBuffer.h"
 #include "Rendering/Material.h"
 
 
-class SPrimitiveComponent : public SCoreComponentBase
+class SPrimitiveComponent : public SSceneComponent
 {
 
 public:
-	S_REGISTER_CLASS(SCoreComponentBase)
+	S_REGISTER_CLASS(SSceneComponent)
 
     SPrimitiveComponent(TSharedPtr<SActor > InActor) :
-    SCoreComponentBase(InActor) {}
+    SSceneComponent(InActor) {}
     void SetStaticMesh(TSharedPtr<FStaticMesh> InMesh)
     {
         Mesh = InMesh;

@@ -36,7 +36,7 @@ public:
 	}
 	~FSwapChainImp()
 	{
-		CleanUp();
+		//CleanUp();
 	}
 
 	virtual void CleanUp() override;

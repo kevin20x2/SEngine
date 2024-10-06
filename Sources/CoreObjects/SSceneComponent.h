@@ -4,6 +4,7 @@
 
 #ifndef SSCENECOMPONENT_H
 #define SSCENECOMPONENT_H
+#include "Actor.h"
 #include "SCoreComponentBase.h"
 #include "Maths/Transform.h"
 
@@ -13,7 +14,9 @@ class SSceneComponent : public SCoreComponentBase
 public:
 	S_REGISTER_CLASS(SCoreComponentBase)
 
-    SSceneComponent():SCoreComponentBase(nullptr) {}
+    SSceneComponent( TSharedPtr <SActor > InOwner ) :
+        SCoreComponentBase(InOwner) {}
+
 
     FTransform GetWorldTransform() const
     {

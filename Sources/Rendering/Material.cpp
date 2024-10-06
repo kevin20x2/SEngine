@@ -1,10 +1,11 @@
-//
+﻿//
 // Created by 郑文凯 on 2024/10/2.
 //
 
 #include "Material.h"
 #include "RHI/RHI.h"
 #include "volk.h"
+#include "CoreObjects/Engine.h"
 
 void SMaterialInterface::CreateDescriptionSets(VkDescriptorPool Pool)
 {
@@ -43,6 +44,7 @@ SMaterialInterface::Initialize(VkDescriptorPool Pool, FRenderPass *RenderPass)
 	CreateDescriptionSets(Pool);
 	CreatePipeline(RenderPass);
 	InitMaterialParameters();
+	OnSetupViewData();
 }
 void
 SMaterialInterface::OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,uint32 CurrentFrame)
@@ -64,18 +66,18 @@ SMaterialInterface::SetTexture(uint32 Binding, TSharedPtr<FTexture> InTexture)
 		MaterialParameters.BindParametersToDescriptorSet(DescriptionSet);
 	}
 }
-void
-SMaterialInterface::SetupViewData(const TArray<TSharedPtr<FUniformBuffer>> &InUniformBuffers)
+void SMaterialInterface::OnSetupViewData()
 {
-	if(InUniformBuffers.size() != DescriptionSets.size()) return ;
+	auto SceneView = GEngine->GetRenderer()->GetSceneView();
+	if(SceneView == nullptr) return;
 
 	for(uint32 Idx = 0 ; Idx < DescriptionSets.size() ; ++ Idx)
 	{
 		VkDescriptorBufferInfo BufferInfo =
 			{
-			.buffer = InUniformBuffers[Idx]->GetBuffer(),
+			.buffer = SceneView->GetUniformBuffer(Idx)->GetBuffer(),
 			.offset = 0,
-			.range =16 *sizeof(float)
+			.range = sizeof(FViewDataShape)
 			};
 		VkWriteDescriptorSet DescriptorWrite{};
 		DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -89,7 +91,33 @@ SMaterialInterface::SetupViewData(const TArray<TSharedPtr<FUniformBuffer>> &InUn
 		vkUpdateDescriptorSets(*GRHI->GetDevice(),
 		                       1,&DescriptorWrite ,0, nullptr);
 
+	}
+
+	auto PrimitiveData = GEngine->GetRenderer()->GetPrimitiveData();
+	if(PrimitiveData == nullptr) return ;
+
+	for(uint32 Idx = 0 ; Idx < DescriptionSets.size() ; ++ Idx)
+	{
+		VkDescriptorBufferInfo BufferInfo =
+			{
+			.buffer = PrimitiveData->GetUniformBuffer(Idx)->GetBuffer(),
+			.offset = 0,
+			.range = sizeof(FPerPrimitiveRenderDataShape)
+			};
+		VkWriteDescriptorSet DescriptorWrite{};
+		DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		DescriptorWrite.dstSet = DescriptionSets[Idx];
+		DescriptorWrite.dstBinding = 1;
+		DescriptorWrite.dstArrayElement = 0;
+		DescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		DescriptorWrite.descriptorCount = 1;
+		DescriptorWrite.pBufferInfo = &BufferInfo;
+
+		vkUpdateDescriptorSets(*GRHI->GetDevice(),
+		                       1,&DescriptorWrite ,0, nullptr);
 
 	}
+
+
 
 }

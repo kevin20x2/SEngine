@@ -14,13 +14,15 @@ class SCameraComponent : public SSceneComponent
 public:
 	S_REGISTER_CLASS(SSceneComponent)
 
-    SCameraComponent() {}
+    SCameraComponent(TSharedPtr<SActor> InOwner) :
+	SSceneComponent(InOwner)
+	{}
 
     FMatrix4 GetViewMatrix();
     FMatrix4 GetProjectinMatrix();
 
     float Fov = 0.333f* glm::pi<float>();
-    float NearPlane = 0.1;
+    float NearPlane = 0.1f;
     float FarPlane = 10000;
 };
 

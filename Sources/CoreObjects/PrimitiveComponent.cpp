@@ -24,6 +24,10 @@ void SPrimitiveComponent::OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,ui
 	{
 		Material->OnRecordCommandBuffer(CommandBuffer,CurrentFrame);
 	}
+	auto PrimitiveData = GEngine->GetRenderer()->GetPrimitiveData();
+	PrimitiveData->UpdateModelMatrix( GetWorldTransform().ToMatrix() );
+	PrimitiveData->SyncData(CurrentFrame);
+
     VkBuffer VertexBuffers[] = {VB->GetHandle()};
     VkDeviceSize Offsets[] = {0};
 

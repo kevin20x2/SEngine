@@ -15,5 +15,4 @@ class FTextureLoader
 	virtual TSharedPtr < FTexture > LoadTexture(const FString & FilePath ) = 0 ;
 };
 
-
 #endif //TEXTURELOADER_H

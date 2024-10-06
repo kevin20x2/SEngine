@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by kevin on 2024/8/11.
 //
 
@@ -32,15 +32,11 @@ void FRenderer::Initailize()
 	Shader = TSharedPtr<FShader>(new FShader(VertexShader,PixelShader));
 
 
-    uint32 MaxFrameInFlight = GRHI->GetMaxFrameInFlight();
-    UniformBuffers.resize(GRHI->GetMaxFrameInFlight());
-    for(auto & UniformBuffer : UniformBuffers)
-    {
-       UniformBuffer  = TSharedPtr<FUniformBuffer>(
-           FUniformBuffer::Create(sizeof(float) * 16)
-        );
+	SceneView = TSharedPtr<FSceneView>(new FSceneView);
 
-    }
+	PrimitiveData = TSharedPtr<FPrimitiveRenderData>(new FPrimitiveRenderData());
+
+    uint32 MaxFrameInFlight = GRHI->GetMaxFrameInFlight();
 
 	CommandBufferPool = TUniquePtr<FCommandBufferPool>(new FCommandBufferPool());
 
@@ -58,13 +54,12 @@ void FRenderer::Initailize()
         FRenderPass::Create(SwapChain.get())
         );
 
-
 	auto Material = TSharedPtr<SMaterialInterface>(new SMaterialInterface(
 		Shader
 		) );
 	Material->Initialize(DescriptorPool->Pool,RenderPass.get());
-	Material->SetupViewData(UniformBuffers);
-	Material->SetTexture(1,Texture);
+	//Material->SetupViewData(UniformBuffers);
+	Material->SetTexture(2,Texture);
 
 
     CommandBuffers = TUniquePtr<FCommandBuffers>(new FCommandBuffers(MaxFrameInFlight,CommandBufferPool.get()));
@@ -81,7 +76,7 @@ void FRenderer::Initailize()
 	Primitive->CreateRHIResource();
 	Primitive->OnRegister();
 	CreateSyncObjects();
-	Camera = TSharedPtr<SCameraComponent>( new SCameraComponent());
+	Camera = TSharedPtr<SCameraComponent>( new SCameraComponent(nullptr));
 	Camera->SetWorldLocation({-3,0,1});
 
 	GEngine->GetInput()->BindKey(GLFW_KEY_W, [WeakCamera = TWeakPtr<SCameraComponent>(Camera)]()
@@ -136,12 +131,8 @@ void FRenderer::Render()
 
 	vkResetFences(Device,1,&InFlightFences[CurrentFrame]);
 
-	FMatrix4 Data (1.0f) ;
-	auto ViewMatrix = Camera->GetViewMatrix();
-	auto ProjecionMatrix = Camera->GetProjectinMatrix();
-	Data = ViewMatrix * ProjecionMatrix;
-
-	UniformBuffers[CurrentFrame]->UpdateData(&Data);
+	SceneView->UpdateViewData(Camera.get());
+	SceneView->SyncData(CurrentFrame);
 
 	RecordCommandBuffer(CommandBuffers->Buffers[CurrentFrame],ImageIndex);
 
@@ -309,6 +300,10 @@ FRenderer::GetCommandBufferPool() const
 
 void FRenderer::RecreateSwapChains()
 {
+	if(SwapChain)
+	{
+		SwapChain->CleanUp();
+	}
 	SwapChain = std::unique_ptr<FSwapChain>(
 		FSwapChain::CreateSwapChain(GRHI->GetDisplaySize()) );
 

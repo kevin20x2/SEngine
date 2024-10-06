@@ -108,6 +108,10 @@ add_executable(SEngine
         Sources/RHI/DepthTexture.cpp
         Sources/RHI/DepthTexture.h
         Sources/Core/Array.h
+        Sources/Rendering/SceneView.cpp
+        Sources/Rendering/SceneView.h
+        Sources/Rendering/PrimitiveRenderData.cpp
+        Sources/Rendering/PrimitiveRenderData.h
 )
 
 target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES GLM_FORCE_LEFT_HANDED)

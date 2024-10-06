@@ -1,8 +1,6 @@
 
-[[vk::combinedImageSampler(1)]]
-Texture2D texColor : register(t1 ,space0);
-[[vk::combinedImageSampler(1)]]
-SamplerState samplerColor : register(s2,space0);
+Texture2D texColor : register(t2 ,space0);
+SamplerState samplerColor : register(s3,space0);
 
 
 struct VSOutput

@@ -1,5 +1,4 @@
 
-
 struct VSInput
 {
     [[vk::location(0)]] float3 Pos : POSITION ;
@@ -8,14 +7,19 @@ struct VSInput
     [[vk::location(3)]] float2 Uv : TEXCOORD0;
 };
 
-struct UBO
+struct FViewData
 {
-    
-    float4x4 Mvp;
+    float4x4 ViewProjection;
+    float3 ViewPos;
 };
 
+struct FPrimitiveData
+{
+    float4x4 Model;
+};
 
-cbuffer ubo :register(b0) { UBO ubo; }
+cbuffer ViewBuffer :register(b0) { FViewData ViewData; }
+cbuffer PrimitiveBuffer : register(b1) { FPrimitiveData PrimitiveData; }
 
 
 struct VSOutput
@@ -29,10 +33,8 @@ struct VSOutput
 VSOutput main(VSInput input)
 {
     VSOutput output = (VSOutput)0;
-    //output.UV = input.UV;
-    output.Pos = mul(float4(input.Pos.xyz,1.0f),ubo.Mvp);
-    //output.Pos = float4(input.Pos.xy, 0.5f,1.0f);
-    //output.Color = input.Color;
+    float4 WorldPos = mul(float4(input.Pos.xyz,1.0f) , PrimitiveData.Model);
+    output.Pos = mul(WorldPos,ViewData.ViewProjection);
     output.Normal = input.Normal;
     output.Uv = input.Uv;
     return output;

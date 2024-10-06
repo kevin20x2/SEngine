@@ -4,21 +4,18 @@
 
 #ifndef RENDERER_H
 #define RENDERER_H
+#include "PrimitiveRenderData.h"
+#include "SceneView.h"
 #include "Core/BaseTypes.h"
 #include "CoreObjects/CameraComponent.h"
 #include "CoreObjects/PrimitiveComponent.h"
 #include "GLFW/glfw3.h"
 #include "RHI/CommandBuffer.h"
 #include "RHI/DescriptorPool.h"
-#include "RHI/DescriptorSetLayout.h"
 #include "RHI/SwapChain.h"
 #include "RHI/UniformBuffer.h"
-#include "RHI/DescriptorSet.h"
 #include "RHI/FrameBuffer.h"
-#include "RHI/GraphicsPipeline.h"
-#include "RHI/IndexBuffer.h"
 #include "RHI/RenderPass.h"
-#include "RHI/ShaderProgram.h"
 #include "RHI/Texture.h"
 #include "Shader.h"
 
@@ -39,11 +36,20 @@ public:
 
 	bool OnAddPrimitive(SPrimitiveComponent * InComp);
 	bool OnRemovePrimitive(SPrimitiveComponent * InComp);
+
+	FSceneView * GetSceneView()
+	{
+		return SceneView.get();
+	}
+	FPrimitiveRenderData * GetPrimitiveData()
+	{
+		return PrimitiveData.get();
+	}
+
 protected:
 
     TSharedPtr< SCameraComponent > Camera;
 
-    //TSharedPtr<SPrimitiveComponent> Primitive;
 
 	TArray < TSharedPtr<SPrimitiveComponent> > Primitives;
 
@@ -52,8 +58,10 @@ protected:
 
     TUniquePtr<FDescriptorPool > DescriptorPool;
 
-    TArray <
-    TSharedPtr<FUniformBuffer > >  UniformBuffers;
+
+	TSharedPtr<FSceneView > SceneView;
+
+	TSharedPtr <FPrimitiveRenderData> PrimitiveData;
 
 	TSharedPtr <FTexture> Texture;
 
