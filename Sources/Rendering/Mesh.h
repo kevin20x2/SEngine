@@ -23,6 +23,7 @@ S_DEFINE_ENUM_FLAGS(EMeshVertexElementMask)
 class FStaticMesh
 {
 public :
+    explicit FStaticMesh() {}
     explicit FStaticMesh(const TArray <FVector> & InVertices, const TArray <uint16> & Indexes );
 
 

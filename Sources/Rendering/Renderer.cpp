@@ -66,18 +66,18 @@ void FRenderer::Initailize()
 
 	RecreateFrameBuffers();
 
-	auto Primitive = TSharedPtr<SPrimitiveComponent>(new SPrimitiveComponent(nullptr));
-	Primitive->SetMaterial(Material);
-	TSharedPtr< FStaticMesh> StaticMesh = TSharedPtr<FStaticMesh>(new FStaticMesh({},{}));
-	Primitive->SetStaticMesh(StaticMesh);
+	//auto Primitive = TSharedPtr<SPrimitiveComponent>(new SPrimitiveComponent(nullptr));
+	//Primitive->SetMaterial(Material);
+	//TSharedPtr< FStaticMesh> StaticMesh = TSharedPtr<FStaticMesh>(new FStaticMesh({},{}));
+	//Primitive->SetStaticMesh(StaticMesh);
 	FFbxMeshImporter Importer;
-	Importer.ImportMesh(FPath::GetApplicationDir() +  "/Assets/gy.fbx",StaticMesh.get());
+	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/gy.fbx",Material.get());
 
-	Primitive->CreateRHIResource();
-	Primitive->OnRegister();
+	//Primitive->CreateRHIResource();
+	//Primitive->OnRegister();
 	CreateSyncObjects();
 	Camera = TSharedPtr<SCameraComponent>( new SCameraComponent(nullptr));
-	Camera->SetWorldLocation({-3,0,1});
+	Camera->SetWorldLocation({-300,0,250});
 
 	GEngine->GetInput()->BindKey(GLFW_KEY_W, [WeakCamera = TWeakPtr<SCameraComponent>(Camera)]()
 	{
@@ -108,7 +108,7 @@ void FRenderer::Initailize()
 		{
 			auto Forward = SharedCamera->GetForward();
 			spdlog::info("dir: {}",ToString(Forward));
-			float Scale = 0.1f;
+			float Scale = 10.0f;
 			auto OldPos = SharedCamera->GetWorldLocation();
 			OldPos += Scale *(float)(Value)* Forward;
 			SharedCamera->SetWorldLocation(OldPos);
@@ -226,7 +226,7 @@ void FRenderer::CreateSyncObjects()
 	FenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
     auto Device = *GRHI->GetDevice();
-	for(size_t i = 0 ;i < Count; ++ i)
+	for(int32 i = 0 ;i < Count; ++ i)
 	{
 		VK_CHECK(vkCreateSemaphore(Device, &SemaphoreInfo,nullptr, &ImageAvailableSems[i]));
 
@@ -280,7 +280,6 @@ void FRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 	vkCmdSetScissor(CommandBuffer, 0, 1, &scissor);
 	vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
 
-	//Primitive->OnRecordCommandBuffer(CommandBuffer,CurrentFrame);
 	for(auto P : Primitives)
 	{
 		if(P)

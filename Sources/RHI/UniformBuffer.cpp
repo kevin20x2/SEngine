@@ -16,6 +16,12 @@ FUniformBuffer* FUniformBuffer::Create(uint32 InSize)
 	return UniformBuffer;
 }
 
+FUniformBuffer::~FUniformBuffer()
+{
+	vkDestroyBuffer(*GRHI->GetDevice(),Buffer,nullptr);
+	vkFreeMemory(*GRHI->GetDevice(), BufferMemory,nullptr );
+}
+
 void FUniformBuffer::Init()
 {
     VkBufferCreateInfo BufferInfo{  };

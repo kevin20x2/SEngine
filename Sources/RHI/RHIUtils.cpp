@@ -173,7 +173,7 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 
 	if (!Program.link(Messages))
 	{
-		printf("Failed to parse HLSL Shader ,Error %s \ n  %s", Shader.getInfoDebugLog(), Shader.getInfoDebugLog());
+		printf("Failed to parse HLSL Shader ,Error %s \n  %s", Shader.getInfoDebugLog(), Shader.getInfoDebugLog());
 		throw std::runtime_error("Fail to parse HLSL Shader");
 	}
 
@@ -869,7 +869,7 @@ FRHIUtils::GenerateVertexInputStateCreateInfo(TArray<SpvReflectInterfaceVariable
 			VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
 		TArray<VkVertexInputAttributeDescription> attribute_descriptions;
 		attribute_descriptions.reserve(InputVars.size());
-		for (size_t i_var = 0; i_var < InputVars.size(); ++i_var) {
+		for (uint32 i_var = 0; i_var < InputVars.size(); ++i_var) {
 			const SpvReflectInterfaceVariable& refl_var = *(InputVars[i_var]);
 			// ignore built-in variables
 			if (refl_var.decoration_flags & SPV_REFLECT_DECORATION_BUILT_IN) {

@@ -48,6 +48,8 @@ public:
 
 protected:
 
+	TSharedPtr<SActor> Actor;
+
     TSharedPtr< SCameraComponent > Camera;
 
 

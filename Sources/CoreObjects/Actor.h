@@ -5,8 +5,11 @@
 #ifndef ACTOR_H
 #define ACTOR_H
 #include "SCoreComponentBase.h"
+#include "SSceneComponent.h"
 #include "Core/BaseTypes.h"
 
+
+class SSceneComponent;
 
 class SActor : public SObject
 {
@@ -40,11 +43,27 @@ public:
 			Components.Add(InComp);
 		}
 	}
+	void SetRootComponent(SSceneComponent * InSceneComp);
+	SSceneComponent * GetRootComponent() const
+	{
+		return RootComponent.get();
+	}
+
+
 protected:
     FComponentArray Components;
 
+	TSharedPtr <SSceneComponent> RootComponent;
 };
 
+
+template <class Type, typename... ArgTypes>
+TSharedPtr <Type> SNew( ArgTypes... Args )
+{
+	TSharedPtr <Type> Result =
+		TSharedPtr<Type>(new Type(Args...));
+	return Result;
+}
 
 
 #endif //ACTOR_H

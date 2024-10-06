@@ -11,6 +11,7 @@
 #include "RHI/VertexBuffer.h"
 #include "Rendering/Material.h"
 
+class FPrimitiveRenderData;
 
 class SPrimitiveComponent : public SSceneComponent
 {
@@ -47,6 +48,8 @@ protected:
     TSharedPtr<FStaticMesh > Mesh;
     TSharedPtr<FVertexBuffer> VB;
     TSharedPtr <FIndexBuffer> IB;
+
+	TSharedPtr <FPrimitiveRenderData > RenderData;
 };
 
 #endif //PRIMITIVECOMPONENT_H

@@ -93,20 +93,23 @@ void SMaterialInterface::OnSetupViewData()
 
 	}
 
-	auto PrimitiveData = GEngine->GetRenderer()->GetPrimitiveData();
-	if(PrimitiveData == nullptr) return ;
+}
 
-	for(uint32 Idx = 0 ; Idx < DescriptionSets.size() ; ++ Idx)
+void SMaterialInterface::OnSetupPrimitiveData(FPrimitiveRenderData* InRenderData, uint32 CurrentFrame)
+{
+	if(InRenderData == nullptr) return ;
+
+	//for(uint32 Idx = 0 ; Idx < DescriptionSets.size() ; ++ Idx)
 	{
 		VkDescriptorBufferInfo BufferInfo =
 			{
-			.buffer = PrimitiveData->GetUniformBuffer(Idx)->GetBuffer(),
+			.buffer = InRenderData->GetUniformBuffer(CurrentFrame)->GetBuffer(),
 			.offset = 0,
 			.range = sizeof(FPerPrimitiveRenderDataShape)
 			};
 		VkWriteDescriptorSet DescriptorWrite{};
 		DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		DescriptorWrite.dstSet = DescriptionSets[Idx];
+		DescriptorWrite.dstSet = DescriptionSets[CurrentFrame];
 		DescriptorWrite.dstBinding = 1;
 		DescriptorWrite.dstArrayElement = 0;
 		DescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -117,7 +120,4 @@ void SMaterialInterface::OnSetupViewData()
 		                       1,&DescriptorWrite ,0, nullptr);
 
 	}
-
-
-
 }

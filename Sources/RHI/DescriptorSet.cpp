@@ -24,7 +24,7 @@ FDescriptorSets* FDescriptorSets::Create(const TArray<VkDescriptorSetLayout>& La
 	VK_CHECK(vkAllocateDescriptorSets(*GRHI->GetDevice(), &AllocInfo,
 		Result->DescriptorSets.data()));
 
-	for (size_t i = 0; i < Count; ++i)
+	for (uint32 i = 0; i < Count; ++i)
 	{
 		VkDescriptorBufferInfo BufferInfo{};
 		BufferInfo.buffer = Buffers[i]->Buffer;

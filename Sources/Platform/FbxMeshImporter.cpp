@@ -3,12 +3,20 @@
 //
 
 #include "FbxMeshImporter.h"
+
+#include <spdlog/spdlog.h>
+
+#include "CoreObjects/PrimitiveComponent.h"
 #include "FbxCommon/Common.h"
 #include "Rendering/Mesh.h"
 
 struct FTravelFbxNodeContext
 {
-    FStaticMesh * Mesh;
+    FStaticMesh * Mesh = nullptr;
+	SSceneComponent * CurSceneComponent = nullptr;
+	SPrimitiveComponent * PrimitiveComponent = nullptr;
+	SActor * Actor = nullptr;
+	SMaterialInterface * DefaultMaterial = nullptr;
 };
 
 static void CollectVertexColor(FbxMesh* pMesh, FTravelFbxNodeContext& Context,int32 PointIndex,int32 VertexId)
@@ -82,7 +90,7 @@ static void CollectVertexColor(FbxMesh* pMesh, FTravelFbxNodeContext& Context,in
 static void CollectMesh(FbxNode * InNode, FTravelFbxNodeContext & Context)
 {
     FbxMesh * pMesh = (FbxMesh*) InNode->GetNodeAttribute();
-    printf("MeshName : %s\n",(char *)pMesh->GetName());
+    //printf("MeshName : %s\n",(char *)pMesh->GetName());
     FbxVector4 * lControlPoints = pMesh->GetControlPoints();
     int32 VertexOffset = Context.Mesh->Positions.size();
 
@@ -211,19 +219,78 @@ static void CollectMesh(FbxNode * InNode, FTravelFbxNodeContext & Context)
 
 static void TravelFbxNodeResursive(FbxNode * InNode,FTravelFbxNodeContext & Context)
 {
-    if(InNode->GetNodeAttribute())
     {
-    	auto Translation = InNode->GetGeometricTranslation(FbxNode::eSourcePivot);
-    	auto Rotation = InNode->GetGeometricRotation(FbxNode::eSourcePivot );
-    	auto Scale = InNode->GetGeometricScaling(FbxNode::eSourcePivot);
+    	//auto Translation = InNode->GetGeometricTranslation(FbxNode::eDestinationPivot);
+    	//auto Rotation = InNode->GetGeometricRotation(FbxNode::eDestinationPivot );
+    	//auto Scale = InNode->GetGeometricScaling(FbxNode::eDestinationPivot);
 
-    FbxNodeAttribute::EType AttributeType
-        = InNode->GetNodeAttribute()->GetAttributeType();
+    	FTransform Transform;
+    	//Transform.Location = FVector( Translation.mData[0],Translation.mData[1],Translation.mData[2]);
+    	//Transform.Scale = FVector(Scale.mData[0],Scale.mData[1],Scale.mData[2]);
 
-        if(AttributeType == FbxNodeAttribute::eMesh)
+    	FbxAMatrix Global ,Local;
+
+    	Global = InNode->EvaluateGlobalTransform();
+    	Local = InNode->EvaluateLocalTransform();
+
+    	auto FbxTrans = Global.GetT();
+    	auto FbxScale = Global.GetS();
+    	Transform.Location = FVector(FbxTrans[0],FbxTrans[1],FbxTrans[2]);
+    	Transform.Scale = FVector(FbxScale[0],FbxScale[1],FbxScale[2]);
+
+
+	    spdlog::info("NodeName {} , Transform : {} {} ", InNode->GetName(), ToString(Transform.Location),ToString(Transform.Scale));
+        //if(AttributeType == FbxNodeAttribute::eMesh)
+	    if (InNode->GetNodeAttribute() && InNode->GetNodeAttribute()->GetAttributeType() == FbxNodeAttribute::eMesh)
         {
-            CollectMesh(InNode,Context);
+        	if(Context.Actor)
+        	{
+			    TSharedPtr<SPrimitiveComponent> NewPrimitive =
+			    	TSharedPtr<SPrimitiveComponent>(new SPrimitiveComponent(Context.Actor->AsShared()));
+        		NewPrimitive->SetName(InNode->GetName());
+			    Context.Actor->AddComponent(NewPrimitive);
+    			if(!Context.Actor->GetRootComponent())
+    			{
+    				Context.Actor->SetRootComponent(NewPrimitive.get());
+    			}
+        		auto NewStaticMesh = SNew<FStaticMesh>();
+        		Context.Mesh = NewStaticMesh.get();
+        		CollectMesh(InNode, Context);
+        		NewPrimitive->SetStaticMesh(NewStaticMesh);
+        		NewPrimitive->SetMaterial(Context.DefaultMaterial->AsShared());
+			    NewPrimitive->OnRegister();
+			    if (Context.CurSceneComponent)
+    			{
+    				NewPrimitive->AttachToParent(Context.CurSceneComponent,ESceneComponentAttachmentRule::KeepWorldTransform);
+    			}
+			    Context.CurSceneComponent = NewPrimitive.get();
+    			NewPrimitive->SetWorldTransform(Transform);
+        	}
+	    	else
+	    	{
+	    		CollectMesh(InNode,Context);
+	    	}
         }
+    	else
+    	{
+    		if(Context.Actor)
+    		{
+			    TSharedPtr<SSceneComponent> NewSceneComp = TSharedPtr<SSceneComponent>(new SSceneComponent(Context.Actor->AsShared()));
+			    NewSceneComp->SetName(InNode->GetName());
+			    Context.Actor->AddComponent(NewSceneComp);
+    			if(!Context.Actor->GetRootComponent())
+    			{
+    				Context.Actor->SetRootComponent(NewSceneComp.get());
+    			}
+			    NewSceneComp->OnRegister();
+    			if(Context.CurSceneComponent)
+    			{
+    				NewSceneComp->AttachToParent(Context.CurSceneComponent,ESceneComponentAttachmentRule::KeepWorldTransform);
+    			}
+			    Context.CurSceneComponent = NewSceneComp.get();
+    			NewSceneComp->SetWorldTransform(Transform);
+    		}
+    	}
     }
 
     for(int32 i = 0 ; i < InNode->GetChildCount() ; ++ i)
@@ -262,4 +329,39 @@ bool FFbxMeshImporter::ImportMesh(const FString& FilePath, FStaticMesh* InStatic
 
     DestroySdkObjects(SdkManager,LoadResult);
     return false;
+}
+
+TSharedPtr<SActor> FFbxMeshImporter::LoadAsSingleActor(const FString& FilePath, SMaterialInterface* DefaultMaterial)
+{
+	FbxManager * SdkManager = nullptr;
+    FbxScene * Scene = nullptr;
+
+    InitializeSdkObjects(SdkManager,Scene);
+
+
+    bool LoadResult = false;
+
+    LoadResult = LoadScene(SdkManager,Scene,FilePath.c_str());
+
+    if(!LoadResult)
+    {
+        printf("fail to load file %s",FilePath.c_str());
+    }
+
+    if(Scene)
+    {
+    	TSharedPtr <SActor> NewActor = TSharedPtr<SActor> (new SActor );
+    	NewActor->SetName("NewActor");
+        FbxNode* RootNode = Scene->GetRootNode();
+
+
+    	FTravelFbxNodeContext Context =
+    		{nullptr,nullptr,nullptr,NewActor.get(),DefaultMaterial} ;
+    	TravelFbxNodeResursive(RootNode, Context);
+
+	    DestroySdkObjects(SdkManager, LoadResult);
+    	return NewActor;
+    }
+    DestroySdkObjects(SdkManager,LoadResult);
+	return nullptr;
 }

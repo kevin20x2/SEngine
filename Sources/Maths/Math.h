@@ -28,7 +28,21 @@ struct FTransform
     FQuat Rotation = FQuat(1,0,0,0);
     FVector Scale = FVector(1);
 
+    static void Multiply(FTransform & Out , const FTransform &  Lhs, const FTransform & Rhs );
+
+    FTransform operator*(const FTransform & Rhs)
+    {
+        FTransform Out;
+        Multiply(Out,*this,Rhs);
+        return Out;
+    }
+
+    FTransform & Invert();
+
     FMatrix4 ToMatrix() const;
+
+    void FromMatrix(const FMatrix4 & InMat);
+
 };
 
 #endif //MATH_H

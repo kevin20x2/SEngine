@@ -8,6 +8,11 @@
 #include "SCoreComponentBase.h"
 #include "Maths/Transform.h"
 
+enum class ESceneComponentAttachmentRule
+{
+    KeepWorldTransform ,
+    KeepRelativeTransform
+};
 
 class SSceneComponent : public SCoreComponentBase
 {
@@ -17,6 +22,7 @@ public:
     SSceneComponent( TSharedPtr <SActor > InOwner ) :
         SCoreComponentBase(InOwner) {}
 
+    void SetWorldTransform(const FTransform & InWorld);
 
     FTransform GetWorldTransform() const
     {
@@ -46,7 +52,16 @@ public:
         return Children.size();
     }
 
+    bool AttachToParent(SSceneComponent * InParent , ESceneComponentAttachmentRule AttachmentRule);
+
+    bool DetachFromParent();
+
 protected:
+
+    void UpdateWorldTransform();
+
+    bool AddChild(SSceneComponent * InChild);
+    bool RemoveChild( SSceneComponent * InChild );
 
     TArray <TSharedPtr <SSceneComponent> > Children;
 

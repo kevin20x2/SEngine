@@ -132,7 +132,7 @@ void FSwapChainImp::CreateSwapChain(VkExtent2D DisplaySize)
 void FSwapChainImp::CreateImageViews()
 {
 	ImageViews.resize(Images.size());
-	for (size_t i = 0; i < Images.size(); i++) {
+	for (uint32 i = 0; i < Images.size(); i++) {
 		VkImageViewCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		createInfo.image = Images[i];

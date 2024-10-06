@@ -107,7 +107,7 @@ void FRHIImp::CreateInstance()
 	uint32_t Count = 0;
 	auto RequiredExtensions =  glfwGetRequiredInstanceExtensions(&Count); // Platform->GetRequiredExtension();//GetRequiredExtensions(bEnableValidationLayer);
 	TArray <const char * > Extensions;
-	for(int32 i = 0 ; i < Count ; ++ i)
+	for(uint32 i = 0 ; i < Count ; ++ i)
 	{
 		Extensions.push_back(RequiredExtensions[i]);
 	}

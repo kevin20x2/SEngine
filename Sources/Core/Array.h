@@ -8,17 +8,25 @@
 #include <algorithm>
 
 template <typename T>
-class TArray : public std::vector <T>
+class TSArrayAllocator :public std::allocator<T>
 {
 public:
+	using size_type = uint32_t;
+};
+
+template <typename T>
+class TArray : public std::vector <T, TSArrayAllocator<T> >
+{
+public:
+	using BaseVectorType = std::vector <T ,TSArrayAllocator<T> > ;
 	TArray() {};
 
 	TArray(std::initializer_list<T> il) :
-		std::vector<T>(il) {}
+		BaseVectorType(il) {}
 
-	TArray(uint32_t Count) : std::vector<T>(Count) {}
-	TArray (const TArray <T> & Rhs) : std::vector<T>(Rhs) {}
-	TArray(uint32_t Count , const T & Default) : std::vector <T> (Count, Default) {}
+	TArray(uint32_t Count) : BaseVectorType(Count) {}
+	TArray (const TArray <T> & Rhs) : BaseVectorType(Rhs) {}
+	TArray(uint32_t Count , const T & Default) : BaseVectorType(Count, Default) {}
 
 	void Add(const T & InValue)
 	{
@@ -34,6 +42,15 @@ public:
 		return  std::remove_if(this->begin(),this->end(),[&](T & V){
 			return V == InValue;
 		}) != this->end();
+	}
+	bool AddUnique(const T & InValue)
+	{
+		if(Contains(InValue))
+		{
+			return false;
+		}
+		Add(InValue);
+		return true;
 	}
 };
 

@@ -16,17 +16,19 @@ void SPrimitiveComponent::CreateRHIResource()
     IB.reset(new FIndexBuffer({uint32 (Mesh->Indexes.size() * sizeof(uint16)),
         (uint16*)Mesh->Indexes.data()}));
 
+	RenderData = SNew<FPrimitiveRenderData>();
+
 }
 
 void SPrimitiveComponent::OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,uint32 CurrentFrame)
 {
+	RenderData->UpdateModelMatrix( GetWorldTransform().ToMatrix() );
+	RenderData->SyncData(CurrentFrame);
 	if(Material)
 	{
 		Material->OnRecordCommandBuffer(CommandBuffer,CurrentFrame);
+		Material->OnSetupPrimitiveData(RenderData.get(),CurrentFrame);
 	}
-	auto PrimitiveData = GEngine->GetRenderer()->GetPrimitiveData();
-	PrimitiveData->UpdateModelMatrix( GetWorldTransform().ToMatrix() );
-	PrimitiveData->SyncData(CurrentFrame);
 
     VkBuffer VertexBuffers[] = {VB->GetHandle()};
     VkDeviceSize Offsets[] = {0};
@@ -41,6 +43,10 @@ void SPrimitiveComponent::OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,ui
 void SPrimitiveComponent::OnRegister()
 {
 	SCoreComponentBase::OnRegister();
+	if(VB == nullptr)
+	{
+		CreateRHIResource();
+	}
 	GEngine->GetRenderer()->OnAddPrimitive(this);
 }
 void

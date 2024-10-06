@@ -12,6 +12,8 @@ class FUniformBuffer
 public:
     static FUniformBuffer * Create(uint32 InSize);
 
+	virtual ~FUniformBuffer();
+
 	VkBuffer GetBuffer() const
 	{
 		return Buffer;

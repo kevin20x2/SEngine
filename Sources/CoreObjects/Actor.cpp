@@ -3,3 +3,9 @@
 //
 
 #include "Actor.h"
+
+void SActor::SetRootComponent(SSceneComponent* InSceneComp)
+{
+	if (!InSceneComp) return;
+	RootComponent = InSceneComp->AsShared();
+}

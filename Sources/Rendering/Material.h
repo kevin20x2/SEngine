@@ -6,12 +6,16 @@
 #define MATERIAL_H
 
 #include "Shader.h"
+#include "CoreObjects/SObject.h"
 #include "RHI/GraphicsPipeline.h"
 #include "RHI/UniformBuffer.h"
 
 
-class SMaterialInterface
+class FPrimitiveRenderData;
+
+class SMaterialInterface : public SObject
 {
+	S_REGISTER_CLASS(SObject)
 public:
 	explicit SMaterialInterface(TSharedPtr<FShader> InShader) :
 		Shader(InShader)
@@ -23,6 +27,7 @@ public:
 	void Initialize(VkDescriptorPool Pool ,FRenderPass * RenderPass);
 
 	virtual void OnSetupViewData();
+	virtual void OnSetupPrimitiveData(FPrimitiveRenderData * InRenderData,uint32 CurrentFrame);
 	virtual void CreateDescriptionSets(VkDescriptorPool Pool);
 	virtual void CreatePipeline(FRenderPass * RenderPass);
 	virtual void InitMaterialParameters();

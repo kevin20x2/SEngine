@@ -11,24 +11,31 @@ FString ToString(const FVector& Vec)
     return MaxBuffer;
 }
 
-/*
-#include <cmath>
-
-float FMath::Sin(float InValue)
+void FTransform::Multiply(FTransform& Out, const FTransform& Lhs, const FTransform& Rhs)
 {
-    return sin(InValue);
+
+    Out.Location = Rhs.Rotation *( Rhs.Scale  * Lhs.Location ) + Rhs.Location;
+    Out.Rotation = Lhs.Rotation * Rhs.Rotation;
+    Out.Scale = Lhs.Scale * Rhs.Scale;
 }
 
-float FMath::Cos(float InValue)
+FTransform & FTransform::Invert()
 {
-    return cos(InValue);
+    Location = - Location;
+    Rotation = inverse(Rotation);
+    Scale = 1.0f / (Scale);
+    return *this;
 }
-*/
+
 FMatrix4 FTransform::ToMatrix() const
 {
     auto TransMat=  glm::translate(FMatrix4(1.0f),Location);
     auto RotMat = glm::mat4_cast(Rotation);
     auto ScaleMat = glm::scale(FMatrix4(1.0f),Scale);
 
-    return ScaleMat * RotMat * TransMat;
+    return TransMat * RotMat * ScaleMat;
+}
+
+void FTransform::FromMatrix(const FMatrix4& InMat)
+{
 }

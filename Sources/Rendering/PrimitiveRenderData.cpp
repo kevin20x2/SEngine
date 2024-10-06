@@ -13,7 +13,7 @@ FPrimitiveRenderData::FPrimitiveRenderData()
 
 void FPrimitiveRenderData::UpdateModelMatrix(const FMatrix4& InMat)
 {
-    RenderData.ModelMatrix = InMat;
+    RenderData.ModelMatrix = glm::transpose(InMat);
 }
 
 void FPrimitiveRenderData::SyncData(uint32 CurrentFrame)
