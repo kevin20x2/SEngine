@@ -24,6 +24,7 @@ class SObject : public std::enable_shared_from_this <SObject>
 public:
 	S_REGISTER_CLASS()
 
+
 	using TypeInfo = NanoRtti::TypeInfo;
 
 	TypeInfo GetType() const
@@ -40,9 +41,21 @@ public:
 	}
 
 
+	const FString & GetName()
+	{
+		return Name;
+	}
+
+	void SetName(const FString & InName)
+	{
+		Name = InName;
+	}
+
 	virtual ~SObject() {};
 
+protected:
 
+	FString Name = "";
 
 };
 

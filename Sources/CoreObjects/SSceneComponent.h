@@ -22,7 +22,6 @@ public:
     {
         return WorldTransform;
     }
-
     void SetWorldLocation(const FVector & Location)
     {
         WorldTransform.Location = Location;
@@ -37,7 +36,21 @@ public:
     }
     FVector GetForward() const ;
 
+    SSceneComponent * GetParent() const
+    {
+        return Parent.get();
+    }
+
+    uint32 GetChildCount() const
+    {
+        return Children.size();
+    }
+
 protected:
+
+    TArray <TSharedPtr <SSceneComponent> > Children;
+
+    TSharedPtr <SSceneComponent> Parent = nullptr;
 
     FTransform WorldTransform;
 

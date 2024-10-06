@@ -34,7 +34,7 @@ void SPrimitiveComponent::OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,ui
     vkCmdBindVertexBuffers(CommandBuffer,0,1,VertexBuffers,Offsets);
     vkCmdBindIndexBuffer(CommandBuffer,IB->GetHandle(),0,VK_INDEX_TYPE_UINT16);
 
-    vkCmdDrawIndexed(CommandBuffer, Mesh->Indexes.size(),1,0,0,0);
+    vkCmdDrawIndexed(CommandBuffer, (uint32)Mesh->Indexes.size(),1,0,0,0);
 
 }
 

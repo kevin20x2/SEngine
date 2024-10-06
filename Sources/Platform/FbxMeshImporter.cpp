@@ -213,6 +213,10 @@ static void TravelFbxNodeResursive(FbxNode * InNode,FTravelFbxNodeContext & Cont
 {
     if(InNode->GetNodeAttribute())
     {
+    	auto Translation = InNode->GetGeometricTranslation(FbxNode::eSourcePivot);
+    	auto Rotation = InNode->GetGeometricRotation(FbxNode::eSourcePivot );
+    	auto Scale = InNode->GetGeometricScaling(FbxNode::eSourcePivot);
+
     FbxNodeAttribute::EType AttributeType
         = InNode->GetNodeAttribute()->GetAttributeType();
 
