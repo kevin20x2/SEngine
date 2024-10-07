@@ -16,7 +16,7 @@ struct VSOutput
 
 float4 main(VSOutput input) :SV_TARGET
 {
-    float4 ao = texColor.Sample(samplerColor,input.Uv);
+    float4 ao = texColor.Sample(samplerColor,float2(input.Uv.x,1.0f - input.Uv.y));
     float3 ViewDir = normalize( ViewData.ViewPos - input.WorldPos.xyz);
     float3 WorldNormal = normalize(input.Normal);
     float NToL = max(0.0f , dot(WorldNormal , LightData.DirectionalLightDir));

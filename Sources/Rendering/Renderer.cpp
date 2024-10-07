@@ -42,7 +42,7 @@ void FRenderer::Initailize()
 	CommandBufferPool = TUniquePtr<FCommandBufferPool>(new FCommandBufferPool());
 
 	FCImgTextureLoader Loader;
-	Texture =  Loader.LoadTexture(FPath::GetApplicationDir() + "/Assets/Textures/phptze1bz.png" );
+	Texture =  Loader.LoadTexture(FPath::GetApplicationDir() + "/Assets/Textures/cloth.png" );
 
     DescriptorPool = TUniquePtr<FDescriptorPool>(
         FUniformBufferDescriptorPool::Create(MaxFrameInFlight,MaxFrameInFlight)
