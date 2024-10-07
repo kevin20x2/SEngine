@@ -5,3 +5,6 @@ bin/**
 cmake-build-debug/**
 bin/Debug/SEngine.exe
 bin/Debug/SEngine.pdb
+*.pdb
+*.exe
+*.exe

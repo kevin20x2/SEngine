@@ -20,9 +20,9 @@ TSharedPtr<FTexture> FCImgTextureLoader::LoadTexture(const FString &Path)
 	ReorderedColor.resize(BufferSize);
 
 	uint32 Spectrum =  Src.spectrum();
-	for(uint32 i = 0 ; i < Height ; ++ i)
+	for(int32 i = 0 ; i < Height ; ++ i)
 	{
-		for(uint32 j = 0 ; j < Width; ++ j)
+		for(int32 j = 0 ; j < Width; ++ j)
 		{
 			ReorderedColor[4 *(i * Width + j) + 0] = Src(i,j,0,0);
 			ReorderedColor[4 *(i * Width + j) + 1] = Src(i,j,0,1);

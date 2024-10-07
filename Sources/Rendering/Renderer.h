@@ -4,6 +4,7 @@
 
 #ifndef RENDERER_H
 #define RENDERER_H
+#include "LightRenderData.h"
 #include "PrimitiveRenderData.h"
 #include "SceneView.h"
 #include "Core/BaseTypes.h"
@@ -46,6 +47,11 @@ public:
 		return PrimitiveData.get();
 	}
 
+	FLightRenderData * GetLightData()
+	{
+		return LightData.get();
+	}
+
 protected:
 
 	TSharedPtr<SActor> Actor;
@@ -64,6 +70,8 @@ protected:
 	TSharedPtr<FSceneView > SceneView;
 
 	TSharedPtr <FPrimitiveRenderData> PrimitiveData;
+
+	TSharedPtr <FLightRenderData> LightData;
 
 	TSharedPtr <FTexture> Texture;
 

@@ -27,12 +27,28 @@ void FShader::GenerateDescriptorSetLayout()
 		VkDescriptorSetLayoutCreateInfo CreateInfo = VertexInfos[i].CreateInfo;
 		for(auto & Binding : VertexInfos[i].Bindings)
 		{
-			Bindings.push_back(Binding);
+			if(Bindings.FindByPredict([&](const VkDescriptorSetLayoutBinding & It )
+			{
+				 return  It.binding == Binding.binding;
+			})== Bindings.end())
+			{
+				Bindings.push_back(Binding);
+			}
 		}
 
 		for(auto & Binding : PixelInfos[i].Bindings)
 		{
-			Bindings.push_back(Binding);
+			if (auto Iter = Bindings.FindByPredict([&](const VkDescriptorSetLayoutBinding& It)
+			{
+				 return  It.binding == Binding.binding;
+			}) ; Iter == Bindings.end())
+			{
+				Bindings.push_back(Binding);
+			}
+			else
+			{
+				Iter->stageFlags |=  Binding.stageFlags;
+			}
 		}
 
 		CreateInfo.bindingCount = Bindings.size();

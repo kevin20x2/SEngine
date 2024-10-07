@@ -57,13 +57,5 @@ protected:
 };
 
 
-template <class Type, typename... ArgTypes>
-TSharedPtr <Type> SNew( ArgTypes... Args )
-{
-	TSharedPtr <Type> Result =
-		TSharedPtr<Type>(new Type(Args...));
-	return Result;
-}
-
 
 #endif //ACTOR_H

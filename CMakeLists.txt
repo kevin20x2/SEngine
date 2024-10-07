@@ -8,13 +8,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 add_subdirectory(ThirdParty)
 
-
-set(Spirv_ReflectSource
-        ThirdParty/SPIRV-Reflect/spirv_reflect.cpp
-)
-
-add_executable(SEngine
-        ${Spirv_ReflectSource}
+set(EngineSources
         Sources/Application.cpp
         Sources/Platform/Window.cpp
         Sources/Platform/Window.h
@@ -112,6 +106,19 @@ add_executable(SEngine
         Sources/Rendering/SceneView.h
         Sources/Rendering/PrimitiveRenderData.cpp
         Sources/Rendering/PrimitiveRenderData.h
+        Sources/Rendering/LightRenderData.cpp
+        Sources/Rendering/LightRenderData.h
+
+)
+
+set(Spirv_ReflectSource
+        ThirdParty/SPIRV-Reflect/spirv_reflect.cpp
+)
+
+add_executable(SEngine
+        ${Spirv_ReflectSource}
+        ${EngineSources}
+
 )
 
 target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES GLM_FORCE_LEFT_HANDED)

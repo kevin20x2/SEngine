@@ -45,6 +45,7 @@ SMaterialInterface::Initialize(VkDescriptorPool Pool, FRenderPass *RenderPass)
 	CreatePipeline(RenderPass);
 	InitMaterialParameters();
 	OnSetupViewData();
+	OnSetupLightData();
 }
 void
 SMaterialInterface::OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,uint32 CurrentFrame)
@@ -93,6 +94,35 @@ void SMaterialInterface::OnSetupViewData()
 
 	}
 
+}
+
+void SMaterialInterface::OnSetupLightData()
+{
+
+	auto LightData = GEngine->GetRenderer()->GetLightData();
+	if(LightData == nullptr) return;
+
+	for(uint32 Idx = 0 ; Idx < DescriptionSets.size() ; ++ Idx)
+	{
+		VkDescriptorBufferInfo BufferInfo =
+			{
+			.buffer = LightData->GetUniformBuffer(Idx)->GetBuffer(),
+			.offset = 0,
+			.range = sizeof(FLightRenderDataShape)
+			};
+		VkWriteDescriptorSet DescriptorWrite{};
+		DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		DescriptorWrite.dstSet = DescriptionSets[Idx];
+		DescriptorWrite.dstBinding = 2;
+		DescriptorWrite.dstArrayElement = 0;
+		DescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		DescriptorWrite.descriptorCount = 1;
+		DescriptorWrite.pBufferInfo = &BufferInfo;
+
+		vkUpdateDescriptorSets(*GRHI->GetDevice(),
+		                       1,&DescriptorWrite ,0, nullptr);
+
+	}
 }
 
 void SMaterialInterface::OnSetupPrimitiveData(FPrimitiveRenderData* InRenderData, uint32 CurrentFrame)

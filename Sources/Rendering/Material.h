@@ -27,7 +27,9 @@ public:
 	void Initialize(VkDescriptorPool Pool ,FRenderPass * RenderPass);
 
 	virtual void OnSetupViewData();
+	virtual void OnSetupLightData();
 	virtual void OnSetupPrimitiveData(FPrimitiveRenderData * InRenderData,uint32 CurrentFrame);
+
 	virtual void CreateDescriptionSets(VkDescriptorPool Pool);
 	virtual void CreatePipeline(FRenderPass * RenderPass);
 	virtual void InitMaterialParameters();

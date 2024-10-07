@@ -7,7 +7,7 @@
 FString ToString(const FVector& Vec)
 {
     char MaxBuffer[256];
-    sprintf(MaxBuffer,"%f %f %f", Vec.x,Vec.y,Vec.z);
+    sprintf_s(MaxBuffer,256,"%f %f %f", Vec.x,Vec.y,Vec.z);
     return MaxBuffer;
 }
 

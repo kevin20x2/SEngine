@@ -37,6 +37,13 @@ public:
 	{
 		return std::find(this->begin(),this->end(),InValue) != this->end();
 	}
+
+	template <class PredictType>
+	typename BaseVectorType::iterator FindByPredict(PredictType && Predict )
+	{
+		return std::find_if(this->begin(),this->end() , Predict );
+	}
+
 	bool Remove(const T& InValue)
 	{
 		return  std::remove_if(this->begin(),this->end(),[&](T & V){

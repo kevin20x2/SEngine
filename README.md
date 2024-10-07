@@ -8,6 +8,7 @@
 3. Texture
 4. Load Model
 5. Camera
+6. sceneComponent 功能　
 
 0 .depthstencil buffer
 1. shader-> GenDescriptionLayout
@@ -19,7 +20,6 @@ TODO:
 
 2. MouseOperation code
 
-3 .sceneComponent 功能　
 
 
 RoadMap:

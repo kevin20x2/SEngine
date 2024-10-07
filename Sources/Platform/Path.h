@@ -12,6 +12,7 @@ class FPath
 public:
 	static FString GetApplicationDir() ;
 
+	static FString GetDirectoryFromPath(const FString & Path);
 
 
 };

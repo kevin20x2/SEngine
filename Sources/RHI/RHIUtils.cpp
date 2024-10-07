@@ -4,15 +4,18 @@
 
 #include "RHIUtils.h"
 
+#include <DirStackFileIncluder.h>
 #include <fstream>
 #include <ResourceLimits.h>
 #include <vector>
+#include <spdlog/spdlog.h>
 
 #include "volk.h"
 #include "glslang/Public/ShaderLang.h"
 #include "SPIRV/GlslangToSpv.h"
 #include "CoreObjects/Engine.h"
 #include "spirv_reflect.h"
+#include "Platform/Path.h"
 
 bool FRHIUtils::IsDeivceSuitable(VkPhysicalDevice Device, VkSurfaceKHR Surface)
 {
@@ -162,9 +165,13 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 	Shader.setEnvClient(glslang::EShClientVulkan, glslang::EShTargetVulkan_1_0);
 	Shader.setEnvTarget(glslang::EshTargetSpv, glslang::EShTargetSpv_1_0);
 
-	if (!Shader.parse(&glslang::DefaultTBuiltInResource, 100, false, Messages))
+	DirStackFileIncluder Includer;
+	Includer.pushExternalLocalDirectory(FPath::GetDirectoryFromPath(FilePath));
+
+	if (!Shader.parse(&glslang::DefaultTBuiltInResource, 100, false, Messages,Includer))
 	{
-		throw std::runtime_error("Fail to parse HLSL Shader");
+		spdlog::critical("Failed to parse HLSL Shader ,Error {} \n  {}", Shader.getInfoLog(), Shader.getInfoDebugLog());
+		//throw std::runtime_error("Fail to parse HLSL Shader");
 	}
 
 	glslang::TProgram Program;

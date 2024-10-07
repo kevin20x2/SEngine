@@ -1,4 +1,6 @@
 
+#include "SCommon.hlsl"
+
 struct VSInput
 {
     [[vk::location(0)]] float3 Pos : POSITION ;
@@ -7,20 +9,6 @@ struct VSInput
     [[vk::location(3)]] float2 Uv : TEXCOORD0;
 };
 
-struct FViewData
-{
-    float4x4 ViewProjection;
-    float3 ViewPos;
-};
-
-struct FPrimitiveData
-{
-    float4x4 Model;
-};
-
-cbuffer ViewBuffer :register(b0) { FViewData ViewData; }
-cbuffer PrimitiveBuffer : register(b1) { FPrimitiveData PrimitiveData; }
-
 
 struct VSOutput
 {
@@ -28,6 +16,7 @@ struct VSOutput
     //[[vk::location(0)]] float4 Color : Color;
     [[vk::location(1)]] float4 Normal : NORMAL0;
     [[vk::location(2)]] float2 Uv : TEXCOORD0;
+    [[vk::location(3)]] float4 WorldPos : TEXCOORD2;
 };
 
 VSOutput main(VSInput input)
@@ -35,7 +24,8 @@ VSOutput main(VSInput input)
     VSOutput output = (VSOutput)0;
     float4 WorldPos = mul(float4(input.Pos.xyz,1.0f) , PrimitiveData.Model);
     output.Pos = mul(WorldPos,ViewData.ViewProjection);
-    output.Normal = input.Normal;
+    output.Normal = mul(float4( input.Normal.xyz,0.0f ) ,PrimitiveData.Model);
+    output.WorldPos = WorldPos;
     output.Uv = input.Uv;
     return output;
 }

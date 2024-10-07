@@ -31,10 +31,11 @@ void FRenderer::Initailize()
 
 	Shader = TSharedPtr<FShader>(new FShader(VertexShader,PixelShader));
 
-
 	SceneView = TSharedPtr<FSceneView>(new FSceneView);
 
 	PrimitiveData = TSharedPtr<FPrimitiveRenderData>(new FPrimitiveRenderData());
+
+	LightData = SNew<FLightRenderData>();
 
     uint32 MaxFrameInFlight = GRHI->GetMaxFrameInFlight();
 
@@ -59,22 +60,16 @@ void FRenderer::Initailize()
 		) );
 	Material->Initialize(DescriptorPool->Pool,RenderPass.get());
 	//Material->SetupViewData(UniformBuffers);
-	Material->SetTexture(2,Texture);
+	Material->SetTexture(3,Texture);
 
 
     CommandBuffers = TUniquePtr<FCommandBuffers>(new FCommandBuffers(MaxFrameInFlight,CommandBufferPool.get()));
 
 	RecreateFrameBuffers();
 
-	//auto Primitive = TSharedPtr<SPrimitiveComponent>(new SPrimitiveComponent(nullptr));
-	//Primitive->SetMaterial(Material);
-	//TSharedPtr< FStaticMesh> StaticMesh = TSharedPtr<FStaticMesh>(new FStaticMesh({},{}));
-	//Primitive->SetStaticMesh(StaticMesh);
 	FFbxMeshImporter Importer;
 	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/gy.fbx",Material.get());
 
-	//Primitive->CreateRHIResource();
-	//Primitive->OnRegister();
 	CreateSyncObjects();
 	Camera = TSharedPtr<SCameraComponent>( new SCameraComponent(nullptr));
 	Camera->SetWorldLocation({-300,0,250});
@@ -133,6 +128,8 @@ void FRenderer::Render()
 
 	SceneView->UpdateViewData(Camera.get());
 	SceneView->SyncData(CurrentFrame);
+
+	LightData->SyncData(CurrentFrame);
 
 	RecordCommandBuffer(CommandBuffers->Buffers[CurrentFrame],ImageIndex);
 
