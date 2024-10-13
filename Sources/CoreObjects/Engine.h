@@ -8,6 +8,7 @@
 #include "Rendering/Renderer.h"
 
 
+class SLocalPlayer;
 class SWorld;
 
 
@@ -36,6 +37,8 @@ protected:
     FInput * Input;
 
     FRenderer * Renderer;
+
+    TSharedPtr<SLocalPlayer> LocalPlayer;
 };
 
 extern FEngine * GEngine;

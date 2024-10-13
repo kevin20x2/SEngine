@@ -118,6 +118,12 @@ set(Spirv_ReflectSource
 add_executable(SEngine
         ${Spirv_ReflectSource}
         ${EngineSources}
+        Sources/CoreObjects/Controller.cpp
+        Sources/CoreObjects/Controller.h
+        Sources/CoreObjects/CameraManager.cpp
+        Sources/CoreObjects/CameraManager.h
+        Sources/CoreObjects/LocalPlayer.cpp
+        Sources/CoreObjects/LocalPlayer.h
 
 )
 
