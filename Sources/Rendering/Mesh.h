@@ -6,7 +6,6 @@
 #define MESH_H
 #include "Core/BaseTypes.h"
 #include "Maths/Math.h"
-#include "RHI/GraphicsPipeline.h"
 #include "RHI/VertexBuffer.h"
 
 

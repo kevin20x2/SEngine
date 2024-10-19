@@ -8,19 +8,13 @@
 int main()
 {
 
-    //GLFWwindow* Window = glfwCreateWindow(800, 600, "Vulkan WIndow", nullptr, nullptr);
-    FWindow * Window = new FWindow(800,600);
+    FWindow * Window = new FWindow(1440,720);
     Window->Init();
 
     InitRHI(Window);
 
     FEngine * Engine = new FEngine;
     Engine->Initialize();
-
-    //FRenderer * Renderer = new FRenderer();
-    //Renderer->Initailize();
-    //KzVkEngine * Engine = new KzVkEngine(Window);
-    //Engine->InitVulkan();
 
     auto Renderer =Engine->GetRenderer();
 
