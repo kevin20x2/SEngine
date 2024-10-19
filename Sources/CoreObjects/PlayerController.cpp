@@ -8,6 +8,8 @@
 
 #include "CameraManager.h"
 #include "Engine.h"
+#include "Core/Log.h"
+#include "RHI/RHI.h"
 
 SPlayerController::SPlayerController()
 {
@@ -17,24 +19,24 @@ SPlayerController::SPlayerController()
 void SPlayerController::InitCameraInput()
 {
 	auto Camera = CameraManager->GetCamera()->AsShared();
-	GEngine->GetInput()->BindKey(GLFW_KEY_W, [WeakCamera = TWeakPtr<SCameraComponent>(Camera)]()
+	GEngine->GetInput()->BindKey(GLFW_KEY_W, [this ,WeakCamera = TWeakPtr<SCameraComponent>(Camera)]()
 	{
 		auto SharedCamera=WeakCamera.lock();
 		if(SharedCamera != nullptr)
 		{
 			auto OldPos = SharedCamera->GetWorldLocation();
-			OldPos.z += 0.1f;
+			OldPos.z += XMoveSensitivity;
 			SharedCamera->SetWorldLocation(OldPos);
 		}
 	});
 
-	GEngine->GetInput()->BindKey(GLFW_KEY_S, [WeakCamera = TWeakPtr<SCameraComponent>(Camera)]()
+	GEngine->GetInput()->BindKey(GLFW_KEY_S, [this, WeakCamera = TWeakPtr<SCameraComponent>(Camera)]()
 	{
 		auto SharedCamera=WeakCamera.lock();
 		if(SharedCamera != nullptr)
 		{
 			auto OldPos = SharedCamera->GetWorldLocation();
-			OldPos.z -= 0.1f;
+			OldPos.z -= XMoveSensitivity;
 			SharedCamera->SetWorldLocation(OldPos);
 		}
 	});
@@ -52,6 +54,38 @@ void SPlayerController::InitCameraInput()
 			SharedCamera->SetWorldLocation(OldPos);
 		}
 	});
+
+	GEngine->GetInput()->RegisterDragBegin([this,
+		WeakCamera = TWeakPtr<SCameraComponent>(Camera)
+		](EMouseType Type)
+	{
+		auto SharedCamera = WeakCamera.lock();
+		if(SharedCamera)
+		{
+			BeginRotation = SharedCamera->GetWorldRotation();
+		}
+	});
+
+	GEngine->GetInput()->RegisterDragging([this,
+		WeakCamera = TWeakPtr<SCameraComponent>(Camera)
+		](EMouseType Type ,float DeltaX ,float DeltaY)
+	{
+		auto SharedCamera = WeakCamera.lock();
+		if(SharedCamera)
+		{
+			auto Size =  GRHI->GetDisplaySize();
+			float XRatio =  DeltaX / Size.width;
+			float YRatio =  DeltaY / Size.height;
+			SLogD(TEXT("XRatio {}, YRatio {}"),XRatio,YRatio);
+
+			// pitch, yaw, roll
+			FVector EulerAngles = FVector(0,
+				  YRotationSensitivity *  YRatio * FMath::PI ,
+				 XRotationSensitivity * XRatio *FMath::PI  ); //0.5f * XRatio *FMath::PI );
+			FQuat NewRotation (EulerAngles);
+			SharedCamera->SetRotation(BeginRotation* NewRotation);
+		}
+	} );
 
 	Camera->SetWorldLocation({-300,0,250});
 }

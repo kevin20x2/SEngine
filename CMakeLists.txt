@@ -126,6 +126,7 @@ add_executable(SEngine
         Sources/CoreObjects/LocalPlayer.h
         Sources/CoreObjects/PlayerController.cpp
         Sources/CoreObjects/PlayerController.h
+        Sources/Core/Log.h
 
 )
 

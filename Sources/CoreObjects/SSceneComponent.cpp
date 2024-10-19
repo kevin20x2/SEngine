@@ -21,7 +21,7 @@ void SSceneComponent::SetWorldTransform(const FTransform& InWorld)
 
 FVector SSceneComponent::GetForward() const
 {
-    auto Dir = FVector(1,0,0)* WorldTransform.Rotation;
+    auto Dir =  WorldTransform.Rotation *FVector(1,0,0);
     return glm::normalize(Dir);
 }
 

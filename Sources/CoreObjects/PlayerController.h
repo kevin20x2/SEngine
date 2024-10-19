@@ -6,6 +6,7 @@
 #define PLAYERCONTROLLER_H
 #include "Controller.h"
 #include "Input/Input.h"
+#include "Maths/Math.h"
 
 
 class SCameraManager;
@@ -22,6 +23,14 @@ public:
     TSharedPtr<SCameraManager> CameraManager;
 
     TWeakPtr <SLocalPlayer > Player;
+
+    float XRotationSensitivity = 0.5f;
+    float YRotationSensitivity = 0.5f;
+    float XMoveSensitivity = 100.0f;
+    float YMoveSensitivity = 100.0f;
+
+    FQuat BeginRotation ;
+
 };
 
 

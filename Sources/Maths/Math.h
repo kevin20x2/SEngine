@@ -45,4 +45,11 @@ struct FTransform
 
 };
 
+
+class FMath
+{
+    public:
+    constexpr static float PI = 3.14159265358979323846f;
+};
+
 #endif //MATH_H

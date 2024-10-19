@@ -36,6 +36,12 @@ public:
     {
         return WorldTransform.Location;
     }
+
+    FQuat GetWorldRotation() const
+    {
+        return WorldTransform.Rotation;
+    }
+
     void SetRotation(const FQuat & Rotation)
     {
         WorldTransform.Rotation = Rotation;
