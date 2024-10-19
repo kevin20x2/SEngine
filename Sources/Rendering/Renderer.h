@@ -56,7 +56,7 @@ protected:
 
 	TSharedPtr<SActor> Actor;
 
-    TSharedPtr< SCameraComponent > Camera;
+    //TSharedPtr< SCameraComponent > Camera;
 
 
 	TArray < TSharedPtr<SPrimitiveComponent> > Primitives;

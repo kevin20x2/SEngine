@@ -14,11 +14,14 @@ class SCameraManager : public SObject
     S_REGISTER_CLASS(SObject)
 
 public:
-    virtual SCameraComponent * GetCamera();
-protected:
-    TSharedPtr<SCameraComponent> CurrentCamera;
+    SCameraManager();
+    virtual SCameraComponent * GetCamera() const
+    {
+        return Camera.get();
+    }
 
-    TArray < TSharedPtr<SCameraComponent> > CameraList;
+protected:
+    TSharedPtr<SCameraComponent> Camera;
 };
 
 

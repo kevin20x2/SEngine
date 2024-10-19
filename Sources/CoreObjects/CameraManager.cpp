@@ -3,3 +3,9 @@
 //
 
 #include "CameraManager.h"
+#include "CameraComponent.h"
+
+SCameraManager::SCameraManager()
+{
+    Camera = SNew<SCameraComponent>(nullptr);
+}

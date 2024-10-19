@@ -30,6 +30,11 @@ public:
         return Renderer;
     }
 
+    SLocalPlayer * GetLocalPlayer() const
+    {
+        return LocalPlayer.get();
+    }
+
     void Tick(float DeltaTime);
 protected:
     SWorld * World;

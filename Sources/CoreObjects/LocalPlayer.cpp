@@ -3,3 +3,8 @@
 //
 
 #include "LocalPlayer.h"
+
+SLocalPlayer::SLocalPlayer()
+{
+    PlayerController = SNew<SPlayerController>();
+}

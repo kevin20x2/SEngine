@@ -8,7 +8,9 @@
 #include <spdlog/spdlog.h>
 
 #include "volk.h"
+#include "CoreObjects/CameraManager.h"
 #include "CoreObjects/Engine.h"
+#include "CoreObjects/LocalPlayer.h"
 #include "Maths/Math.h"
 #include "Platform/FbxMeshImporter.h"
 #include "RHI/RHI.h"
@@ -71,44 +73,7 @@ void FRenderer::Initailize()
 	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/gy.fbx",Material.get());
 
 	CreateSyncObjects();
-	Camera = TSharedPtr<SCameraComponent>( new SCameraComponent(nullptr));
-	Camera->SetWorldLocation({-300,0,250});
-
-	GEngine->GetInput()->BindKey(GLFW_KEY_W, [WeakCamera = TWeakPtr<SCameraComponent>(Camera)]()
-	{
-		auto SharedCamera=WeakCamera.lock();
-		if(SharedCamera != nullptr)
-		{
-			auto OldPos = SharedCamera->GetWorldLocation();
-			OldPos.z += 0.1f;
-			SharedCamera->SetWorldLocation(OldPos);
-		}
-	});
-
-	GEngine->GetInput()->BindKey(GLFW_KEY_S, [WeakCamera = TWeakPtr<SCameraComponent>(Camera)]()
-	{
-		auto SharedCamera=WeakCamera.lock();
-		if(SharedCamera != nullptr)
-		{
-			auto OldPos = SharedCamera->GetWorldLocation();
-			OldPos.z -= 0.1f;
-			SharedCamera->SetWorldLocation(OldPos);
-		}
-	});
-
-	GEngine->GetInput()->BindScrollOperation([WeakCamera = TWeakPtr<SCameraComponent>(Camera)](double Value)
-	{
-		auto SharedCamera=WeakCamera.lock();
-		if(SharedCamera != nullptr)
-		{
-			auto Forward = SharedCamera->GetForward();
-			spdlog::info("dir: {}",ToString(Forward));
-			float Scale = 10.0f;
-			auto OldPos = SharedCamera->GetWorldLocation();
-			OldPos += Scale *(float)(Value)* Forward;
-			SharedCamera->SetWorldLocation(OldPos);
-		}
-	});
+	//Camera = TSharedPtr<SCameraComponent>( new SCameraComponent(nullptr));
 
 
 }
@@ -126,7 +91,9 @@ void FRenderer::Render()
 
 	vkResetFences(Device,1,&InFlightFences[CurrentFrame]);
 
-	SceneView->UpdateViewData(Camera.get());
+	auto Camera = GEngine->GetLocalPlayer()->GetPlayerController()->CameraManager->GetCamera();
+
+	SceneView->UpdateViewData(Camera);
 	SceneView->SyncData(CurrentFrame);
 
 	LightData->SyncData(CurrentFrame);

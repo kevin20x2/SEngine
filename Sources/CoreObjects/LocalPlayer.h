@@ -4,10 +4,10 @@
 
 #ifndef LOCALPLAYER_H
 #define LOCALPLAYER_H
+#include "PlayerController.h"
 #include "SObject.h"
 
 
-class SControllerBase;
 class SCameraManager;
 
 class SLocalPlayer : public SObject
@@ -15,13 +15,14 @@ class SLocalPlayer : public SObject
     S_REGISTER_CLASS(SObject)
 
 public:
-    virtual SCameraManager * GetCameraManager();
+    SLocalPlayer();
 
-    virtual SControllerBase * GetController();
+    virtual SPlayerController * GetPlayerController()
+    {
+        return PlayerController.get();
+    }
 protected:
-
-    TSharedPtr<SCameraManager> CameraManager;
-    TSharedPtr<SControllerBase  > Controller;
+    TSharedPtr<SPlayerController  > PlayerController;
 
 };
 

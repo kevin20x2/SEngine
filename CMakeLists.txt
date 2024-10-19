@@ -124,6 +124,8 @@ add_executable(SEngine
         Sources/CoreObjects/CameraManager.h
         Sources/CoreObjects/LocalPlayer.cpp
         Sources/CoreObjects/LocalPlayer.h
+        Sources/CoreObjects/PlayerController.cpp
+        Sources/CoreObjects/PlayerController.h
 
 )
 
