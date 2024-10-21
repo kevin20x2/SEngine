@@ -17,7 +17,7 @@
 #include "spirv_reflect.h"
 #include "Platform/Path.h"
 
-bool FRHIUtils::IsDeivceSuitable(VkPhysicalDevice Device, VkSurfaceKHR Surface)
+bool FRHIUtils::IsDeivceSuitable(VkPhysicalDevice Device, VkSurfaceKHR Surface,uint32 & OutIndex)
 {
 	auto Indice = FindQueueFamilies(Device,Surface);
 	bool SwapChainAdequate = false;
@@ -26,6 +26,7 @@ bool FRHIUtils::IsDeivceSuitable(VkPhysicalDevice Device, VkSurfaceKHR Surface)
 	SwapChainAdequate = !SwapChainSupportDetail.Formats.empty() &&
 						!SwapChainSupportDetail.PresentModes.empty();
 
+	OutIndex = Indice.GraphicsFamily.value();
 
 	return Indice.IsComplete() && SwapChainAdequate;
 }

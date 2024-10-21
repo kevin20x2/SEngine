@@ -61,6 +61,11 @@ public:
     {
     	DisplaySize = {(uint32)InWidth,(uint32)Height};
     }
+	virtual uint32 GetQueueFamily() override
+    {
+    	return QueueFamily;
+    }
+
 
     void Initialize(FWindow * InWindow);
 
@@ -85,6 +90,8 @@ private:
 	VkQueue PresentQueue;
 
 	VkExtent2D DisplaySize;
+
+	uint32 QueueFamily ;
 
 #pragma endregion
 };
@@ -158,7 +165,7 @@ void FRHIImp::CreatePhysicalDeivce()
 
 	for (const auto& Device : Devices)
 	{
-		if(FRHIUtils::IsDeivceSuitable(Device,Surface))
+		if(FRHIUtils::IsDeivceSuitable(Device,Surface,QueueFamily))
 		{
 			PhysicalDevice = Device;
 			break ;

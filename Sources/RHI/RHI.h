@@ -37,6 +37,8 @@ public:
     virtual VkQueue * GetGraphicsQueue() = 0 ;
     virtual VkQueue * GetPresentQueue() = 0 ;
 
+    virtual uint32 GetQueueFamily() = 0 ;
+
 };
 
 

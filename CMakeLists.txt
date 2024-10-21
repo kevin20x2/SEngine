@@ -109,15 +109,6 @@ set(EngineSources
         Sources/Rendering/LightRenderData.cpp
         Sources/Rendering/LightRenderData.h
 
-)
-
-set(Spirv_ReflectSource
-        ThirdParty/SPIRV-Reflect/spirv_reflect.cpp
-)
-
-add_executable(SEngine
-        ${Spirv_ReflectSource}
-        ${EngineSources}
         Sources/CoreObjects/Controller.cpp
         Sources/CoreObjects/Controller.h
         Sources/CoreObjects/CameraManager.cpp
@@ -127,6 +118,29 @@ add_executable(SEngine
         Sources/CoreObjects/PlayerController.cpp
         Sources/CoreObjects/PlayerController.h
         Sources/Core/Log.h
+        Sources/GUI/ImGUIPort.cpp
+        Sources/GUI/ImGUIPort.h
+
+)
+
+set(Spirv_ReflectSource
+        ThirdParty/SPIRV-Reflect/spirv_reflect.cpp
+)
+set(IMGUI_DIR ThirdParty/imgui)
+
+set(IMGUIFILES
+        ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_vulkan.cpp
+        ${IMGUI_DIR}/imgui.cpp ${IMGUI_DIR}/imgui_draw.cpp
+        ${IMGUI_DIR}/imgui_demo.cpp
+        ${IMGUI_DIR}/imgui_tables.cpp
+        ${IMGUI_DIR}/imgui_widgets.cpp)
+
+add_executable(SEngine
+        ${Spirv_ReflectSource}
+        ${EngineSources}
+        ${IMGUIFILES}
+
 
 )
 
@@ -156,6 +170,7 @@ target_include_directories(SEngine PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/CImg
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/SPIRV-Reflect
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/NanoRtti/Include
+        ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/imgui
  )
 if(WIN32)
 target_link_directories(SEngine PUBLIC

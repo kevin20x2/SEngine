@@ -51,6 +51,10 @@ public:
 	{
 		return LightData.get();
 	}
+	FDescriptorPool * GetDescriptorPool()
+	{
+		return DescriptorPool.get();
+	}
 
 protected:
 

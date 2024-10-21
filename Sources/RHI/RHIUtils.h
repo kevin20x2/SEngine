@@ -17,7 +17,7 @@ class FRHIUtils
     friend class FRHIImp ;
 public:
 
-    static bool IsDeivceSuitable(VkPhysicalDevice Device,VkSurfaceKHR Surface );
+    static bool IsDeivceSuitable(VkPhysicalDevice Device,VkSurfaceKHR Surface, uint32 & OutIndex );
 
     static FQueueFamilyIndices FindQueueFamilies(VkPhysicalDevice Device,VkSurfaceKHR Surface);
 

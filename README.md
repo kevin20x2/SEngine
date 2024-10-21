@@ -24,6 +24,9 @@ TODO:
 
 RoadMap:
 0.ui
-7. PBR
-8 . 海面渲染
-8. 雾
+1. hot reload shader
+1. shadow
+2. PBR
+3. gi
+4 . 海面渲染
+5. 雾
