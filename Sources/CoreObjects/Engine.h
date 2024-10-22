@@ -8,6 +8,8 @@
 #include "Rendering/Renderer.h"
 
 
+class FWindow;
+class FImGUIPort;
 class SLocalPlayer;
 class SWorld;
 
@@ -35,6 +37,16 @@ public:
         return LocalPlayer.get();
     }
 
+    void SetWindow(TSharedPtr<FWindow> InWindow)
+    {
+        Window = InWindow;
+    }
+
+    FImGUIPort * GetGUIPort() const
+    {
+        return ImGUIPort.get() ;
+    }
+
     void Tick(float DeltaTime);
 protected:
     SWorld * World;
@@ -44,6 +56,10 @@ protected:
     FRenderer * Renderer;
 
     TSharedPtr<SLocalPlayer> LocalPlayer;
+
+    TSharedPtr <FImGUIPort> ImGUIPort;
+
+    TSharedPtr<FWindow> Window;
 };
 
 extern FEngine * GEngine;

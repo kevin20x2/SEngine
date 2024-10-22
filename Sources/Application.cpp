@@ -7,16 +7,16 @@
 int main()
 {
 
-    FWindow * Window = new FWindow(1440,720);
+    auto  Window = SNew <FWindow>(1440,720);
     Window->Init();
 
-    InitRHI(Window);
+    InitRHI(Window.get());
 
     FEngine * Engine = new FEngine;
+    Engine->SetWindow(Window);
     Engine->Initialize();
 
-    auto Renderer =Engine->GetRenderer();
-
+    auto Renderer = Engine->GetRenderer();
 
     while (!Window->ShouldClose())
     {
@@ -25,7 +25,7 @@ int main()
         Renderer->Render();
     }
 
-    delete Window;
+    //delete Window;
 
     return 0;
 }

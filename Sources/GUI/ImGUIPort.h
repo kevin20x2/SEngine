@@ -17,10 +17,13 @@ public:
 
     void ShutDown();
 
-    void Render();
-    protected:
+    void OnRecordGUIData();
 
-    ImGui_ImplVulkanH_Window window;
+    void OnRender(VkCommandBuffer CommandBuffer);
+
+protected:
+
+    ImGui_ImplVulkanH_Window Window;
 
     bool show_demo_window = true;
     bool show_another_window = false;

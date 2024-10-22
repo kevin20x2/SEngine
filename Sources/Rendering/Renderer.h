@@ -56,6 +56,11 @@ public:
 		return DescriptorPool.get();
 	}
 
+	FRenderPass * GetRenderPass()
+	{
+		return RenderPass.get();
+	}
+
 protected:
 
 	TSharedPtr<SActor> Actor;

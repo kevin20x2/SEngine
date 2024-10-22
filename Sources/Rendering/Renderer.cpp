@@ -11,7 +11,7 @@
 #include "CoreObjects/CameraManager.h"
 #include "CoreObjects/Engine.h"
 #include "CoreObjects/LocalPlayer.h"
-#include "Maths/Math.h"
+#include "GUI/ImGUIPort.h"
 #include "Platform/FbxMeshImporter.h"
 #include "RHI/RHI.h"
 #include "Platform/Path.h"
@@ -47,7 +47,7 @@ void FRenderer::Initailize()
 	Texture =  Loader.LoadTexture(FPath::GetApplicationDir() + "/Assets/Textures/cloth.png" );
 
     DescriptorPool = TUniquePtr<FDescriptorPool>(
-        FUniformBufferDescriptorPool::Create(MaxFrameInFlight,MaxFrameInFlight)
+        FUniformBufferDescriptorPool::Create(100 * MaxFrameInFlight,200 * MaxFrameInFlight)
         );
 
 	RecreateSwapChains();
@@ -95,8 +95,8 @@ void FRenderer::Render()
 
 	SceneView->UpdateViewData(Camera);
 	SceneView->SyncData(CurrentFrame);
-
 	LightData->SyncData(CurrentFrame);
+	GEngine->GetGUIPort()->OnRecordGUIData();
 
 	RecordCommandBuffer(CommandBuffers->Buffers[CurrentFrame],ImageIndex);
 
@@ -251,6 +251,8 @@ void FRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 			P->OnRecordCommandBuffer(CommandBuffer,CurrentFrame);
 		}
 	}
+
+	GEngine->GetGUIPort()->OnRender(CommandBuffer);
 
 	vkCmdEndRenderPass(CommandBuffer);
 	VK_CHECK(vkEndCommandBuffer(CommandBuffer));

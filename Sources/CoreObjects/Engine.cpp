@@ -4,6 +4,8 @@
 
 #include "Engine.h"
 #include "LocalPlayer.h"
+#include "GUI/ImGUIPort.h"
+#include "Platform/Window.h"
 
 FEngine * GEngine = nullptr;
 
@@ -19,6 +21,11 @@ void FEngine::Initialize()
     Renderer->Initailize();
     LocalPlayer = SNew<SLocalPlayer>();
     LocalPlayer->GetPlayerController()->InitCameraInput();
+    ImGUIPort = SNew<FImGUIPort>();
+    if(Window)
+    {
+        ImGUIPort->InitWindow(Window->GetHandle());
+    }
 }
 
 void FEngine::Tick(float DeltaTime)

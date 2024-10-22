@@ -2,9 +2,9 @@
 // Created by vinkzheng on 2024/10/21.
 //
 
+#include "volk.h"
 #include "ImGUIPort.h"
 #include "imgui.h"
-#include "volk.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_vulkan.h"
 #include "Core/Log.h"
@@ -18,13 +18,13 @@ static void Check_Vk_result(VkResult Err)
     if(Err == 0)
         return ;
 
-    //SLogE("vulkan  Error : VkResult = {}\n",Err);
+    SLogE("vulkan  Error : VkResult = {}\n",(int32)Err);
 }
 
 void FImGUIPort::InitWindow(GLFWwindow *InGLFWwindow)
 {
 
-    ImGui_ImplVulkanH_Window * Wd = &window;
+    ImGui_ImplVulkanH_Window * Wd = &Window;
 
     Wd->Surface = *GRHI->GetCurSurface();
     auto QueueFamily = GRHI->GetQueueFamily();
@@ -38,6 +38,11 @@ void FImGUIPort::InitWindow(GLFWwindow *InGLFWwindow)
         fprintf(stderr, "Error no WSI support on physical device 0\n");
         exit(-1);
     }
+
+    ImGui_ImplVulkan_LoadFunctions([](const char * FunctionName,void * VulkanInstance )
+    {
+        return vkGetInstanceProcAddr(*((VkInstance*)VulkanInstance), FunctionName);
+    }, GRHI->GetInstance());
 
     // Select Surface Format
     const VkFormat requestSurfaceImageFormat[] = { VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_R8G8B8A8_UNORM, VK_FORMAT_B8G8R8_UNORM, VK_FORMAT_R8G8B8_UNORM };
@@ -56,7 +61,7 @@ void FImGUIPort::InitWindow(GLFWwindow *InGLFWwindow)
     auto Width = GRHI->GetDisplaySize().width;
     auto Height = GRHI->GetDisplaySize().height;
     // Create SwapChain, RenderPass, Framebuffer, etc.
-    ImGui_ImplVulkanH_CreateOrResizeWindow(*GRHI->GetInstance(), PhysicalDevice, * GRHI->GetDevice(), Wd, QueueFamily, nullptr, Width, Height, GRHI->GetMaxFrameInFlight());
+    //ImGui_ImplVulkanH_CreateOrResizeWindow(*GRHI->GetInstance(), PhysicalDevice, * GRHI->GetDevice(), Wd, QueueFamily, nullptr, Width, Height, GRHI->GetMaxFrameInFlight());
 
 
     // Setup Dear ImGui context
@@ -80,10 +85,10 @@ void FImGUIPort::InitWindow(GLFWwindow *InGLFWwindow)
     init_info.Queue = *GRHI->GetGraphicsQueue();
     init_info.PipelineCache = VK_NULL_HANDLE;
     init_info.DescriptorPool = GEngine->GetRenderer()->GetDescriptorPool()->Pool;
-    init_info.RenderPass = Wd->RenderPass;
+    init_info.RenderPass = GEngine->GetRenderer()->GetRenderPass()->RenderPass;
     init_info.Subpass = 0;
     init_info.MinImageCount = GRHI->GetMaxFrameInFlight();
-    init_info.ImageCount = Wd->ImageCount;
+    init_info.ImageCount = GRHI->GetMaxFrameInFlight();
     init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
     init_info.Allocator = nullptr;
     init_info.CheckVkResultFn = Check_Vk_result;
@@ -97,7 +102,13 @@ void FImGUIPort::ShutDown()
     ImGui_ImplGlfw_Shutdown();
 }
 
-void FImGUIPort::Render()
+void FImGUIPort::OnRender(VkCommandBuffer CommandBuffer)
+{
+    ImDrawData *draw_data = ImGui::GetDrawData();
+    ImGui_ImplVulkan_RenderDrawData(draw_data , CommandBuffer);
+}
+
+void FImGUIPort::OnRecordGUIData()
 {
     // Start the Dear ImGui frame
     ImGui_ImplVulkan_NewFrame();
@@ -148,6 +159,8 @@ void FImGUIPort::Render()
 
     // Rendering
     ImGui::Render();
-    ImDrawData *draw_data = ImGui::GetDrawData();
-    const bool is_minimized = (draw_data->DisplaySize.x <= 0.0f || draw_data->DisplaySize.y <= 0.0f);
+    //const bool is_minimized = (draw_data->DisplaySize.x <= 0.0f || draw_data->DisplaySize.y <= 0.0f);
+
 }
+
+
