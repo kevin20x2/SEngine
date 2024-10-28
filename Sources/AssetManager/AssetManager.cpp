@@ -3,3 +3,12 @@
 //
 
 #include "AssetManager.h"
+
+#include "CoreObjects/SObject.h"
+#include "Platform/Path.h"
+#include "AssetManager/ShaderFileWatcher.h"
+
+FAssetManager::FAssetManager()
+{
+    ShaderFileWatcher = SNew<FShaderFileWatcher>(FPath::GetEngineShaderDir());
+}

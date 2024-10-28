@@ -159,7 +159,7 @@ VkImageView* FSwapChainImp::GetView(int32 Idx)
 
 void FSwapChainImp::CleanUp()
 {
-	for(int32 i = 0 ; i < ImageViews.size() ; ++ i)
+	for(uint32 i = 0 ; i < ImageViews.size() ; ++ i)
 	{
 		vkDestroyImageView(*GRHI->GetDevice(),ImageViews[i],nullptr);
 	}

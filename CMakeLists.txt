@@ -120,6 +120,11 @@ set(EngineSources
         Sources/Core/Log.h
         Sources/GUI/ImGUIPort.cpp
         Sources/GUI/ImGUIPort.h
+        Sources/Core/Delegate.h
+        Sources/AssetManager/DirWatcherBase.cpp
+        Sources/AssetManager/DirWatcherBase.h
+        Sources/AssetManager/ShaderFileWatcher.cpp
+        Sources/AssetManager/ShaderFileWatcher.h
 
 )
 
@@ -171,6 +176,7 @@ target_include_directories(SEngine PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/SPIRV-Reflect
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/NanoRtti/Include
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/imgui
+        ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/filewatch
  )
 if(WIN32)
 target_link_directories(SEngine PUBLIC

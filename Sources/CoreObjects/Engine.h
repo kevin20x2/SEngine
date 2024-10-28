@@ -8,6 +8,7 @@
 #include "Rendering/Renderer.h"
 
 
+class FAssetManager;
 class FWindow;
 class FImGUIPort;
 class SLocalPlayer;
@@ -60,6 +61,8 @@ protected:
     TSharedPtr <FImGUIPort> ImGUIPort;
 
     TSharedPtr<FWindow> Window;
+
+    TSharedPtr<FAssetManager> AssetManager;
 };
 
 extern FEngine * GEngine;

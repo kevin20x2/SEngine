@@ -4,6 +4,9 @@
 
 #ifndef ASSETMANAGER_H
 #define ASSETMANAGER_H
+#include "Core/BaseTypes.h"
+
+class FShaderFileWatcher;
 
 enum class EAssetType
 {
@@ -15,7 +18,11 @@ enum class EAssetType
 
 class FAssetManager
 {
+	public:
 
+	FAssetManager() ;
+
+	TSharedPtr<FShaderFileWatcher> ShaderFileWatcher;
 };
 
 

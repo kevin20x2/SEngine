@@ -6,6 +6,7 @@
 #include "LocalPlayer.h"
 #include "GUI/ImGUIPort.h"
 #include "Platform/Window.h"
+#include "AssetManager/AssetManager.h"
 
 FEngine * GEngine = nullptr;
 
@@ -26,6 +27,8 @@ void FEngine::Initialize()
     {
         ImGUIPort->InitWindow(Window->GetHandle());
     }
+
+   AssetManager = SNew<FAssetManager>();
 }
 
 void FEngine::Tick(float DeltaTime)

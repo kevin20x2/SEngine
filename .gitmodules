@@ -19,3 +19,6 @@
 [submodule "ThirdParty/imgui"]
 	path = ThirdParty/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "ThirdParty/filewatch"]
+	path = ThirdParty/filewatch
+	url = https://github.com/ThomasMonkman/filewatch.git
