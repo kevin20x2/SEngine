@@ -5,6 +5,7 @@
 #ifndef ASSETMANAGER_H
 #define ASSETMANAGER_H
 #include "Core/BaseTypes.h"
+#include "CoreObjects/EngineModuleBase.h"
 
 class FShaderFileWatcher;
 
@@ -16,11 +17,11 @@ enum class EAssetType
 	Texture,
 };
 
-class FAssetManager
+class SAssetManager : public SEngineModuleBase
 {
 	public:
 
-	FAssetManager() ;
+	SAssetManager() ;
 
 	TSharedPtr<FShaderFileWatcher> ShaderFileWatcher;
 };

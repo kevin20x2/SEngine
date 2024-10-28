@@ -3,6 +3,8 @@
 //
 
 #include "Engine.h"
+
+#include "EngineModuleBase.h"
 #include "LocalPlayer.h"
 #include "GUI/ImGUIPort.h"
 #include "Platform/Window.h"
@@ -28,9 +30,17 @@ void FEngine::Initialize()
         ImGUIPort->InitWindow(Window->GetHandle());
     }
 
-   AssetManager = SNew<FAssetManager>();
+    auto AssetManager = SNew<SAssetManager>();
+    Modules.Add(AssetManager);
 }
 
 void FEngine::Tick(float DeltaTime)
 {
+    for(auto Module : Modules)
+    {
+        if(Module->IsTickable())
+        {
+            Module->Tick(DeltaTime);
+        }
+    }
 }

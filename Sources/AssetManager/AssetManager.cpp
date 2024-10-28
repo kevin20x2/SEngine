@@ -8,7 +8,7 @@
 #include "Platform/Path.h"
 #include "AssetManager/ShaderFileWatcher.h"
 
-FAssetManager::FAssetManager()
+SAssetManager::SAssetManager()
 {
     ShaderFileWatcher = SNew<FShaderFileWatcher>(FPath::GetEngineShaderDir());
 }

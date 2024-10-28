@@ -125,6 +125,8 @@ set(EngineSources
         Sources/AssetManager/DirWatcherBase.h
         Sources/AssetManager/ShaderFileWatcher.cpp
         Sources/AssetManager/ShaderFileWatcher.h
+        Sources/CoreObjects/EngineModuleBase.cpp
+        Sources/CoreObjects/EngineModuleBase.h
 
 )
 
@@ -177,6 +179,7 @@ target_include_directories(SEngine PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/NanoRtti/Include
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/imgui
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/filewatch
+        ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/cereal
  )
 if(WIN32)
 target_link_directories(SEngine PUBLIC

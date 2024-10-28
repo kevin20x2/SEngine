@@ -22,3 +22,6 @@
 [submodule "ThirdParty/filewatch"]
 	path = ThirdParty/filewatch
 	url = https://github.com/ThomasMonkman/filewatch.git
+[submodule "ThirdParty/cereal"]
+	path = ThirdParty/cereal
+	url = https://github.com/USCiLab/cereal.git

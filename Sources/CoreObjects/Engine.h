@@ -8,7 +8,8 @@
 #include "Rendering/Renderer.h"
 
 
-class FAssetManager;
+class SAssetManager;
+class SEngineModuleBase;
 class FWindow;
 class FImGUIPort;
 class SLocalPlayer;
@@ -48,6 +49,20 @@ public:
         return ImGUIPort.get() ;
     }
 
+    template <typename ModuleType>
+    ModuleType * GetModuleByClass() const
+    {
+        for( auto Module : Modules )
+        {
+            if(Module && Module->IsA<ModuleType>())
+            {
+                return Module.get();
+            }
+        }
+        return nullptr;
+    }
+
+
     void Tick(float DeltaTime);
 protected:
     SWorld * World;
@@ -58,11 +73,16 @@ protected:
 
     TSharedPtr<SLocalPlayer> LocalPlayer;
 
-    TSharedPtr <FImGUIPort> ImGUIPort;
+    TSharedPtr<FImGUIPort> ImGUIPort;
 
     TSharedPtr<FWindow> Window;
 
-    TSharedPtr<FAssetManager> AssetManager;
+   // TSharedPtr<SAssetManager> AssetManager;
+    TArray <TSharedPtr <SEngineModuleBase > > Modules;
+
+
+    float CurrentTimeInSeconds;
+
 };
 
 extern FEngine * GEngine;
