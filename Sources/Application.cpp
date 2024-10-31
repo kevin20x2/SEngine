@@ -21,6 +21,8 @@ int main()
     while (!Window->ShouldClose())
     {
         Window->LoopFrame();
+        Engine->UpdateTime();
+        Engine->Tick();
         //Engine->Render();
         Renderer->Render();
     }

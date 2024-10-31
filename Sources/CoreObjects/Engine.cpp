@@ -9,8 +9,15 @@
 #include "GUI/ImGUIPort.h"
 #include "Platform/Window.h"
 #include "AssetManager/AssetManager.h"
+#include <chrono>
+
+#include "Core/Log.h"
+
+using namespace std::chrono;
 
 FEngine * GEngine = nullptr;
+
+static high_resolution_clock::time_point EngineInitTime;
 
 FEngine::FEngine()
 {
@@ -19,6 +26,7 @@ FEngine::FEngine()
 
 void FEngine::Initialize()
 {
+    EngineInitTime = high_resolution_clock::now();
     Input = new FInput;
     Renderer = new FRenderer;
     Renderer->Initailize();
@@ -34,7 +42,19 @@ void FEngine::Initialize()
     Modules.Add(AssetManager);
 }
 
-void FEngine::Tick(float DeltaTime)
+void FEngine::UpdateTime()
+{
+    high_resolution_clock::time_point Current = high_resolution_clock::now();
+    duration<double ,std::micro> TimeElapsed =  Current - EngineInitTime;
+    float CurrentTime = (TimeElapsed.count() / 1000000.0f );
+
+    float LastTime = CurrentTimeInSeconds;
+    DeltaTime = CurrentTime - LastTime;
+    CurrentTimeInSeconds = CurrentTime;
+    //SLogD("Update Time: {} DeltaTime : {}", CurrentTime,DeltaTime);
+}
+
+void FEngine::Tick()
 {
     for(auto Module : Modules)
     {

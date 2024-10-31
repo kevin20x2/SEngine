@@ -63,7 +63,9 @@ public:
     }
 
 
-    void Tick(float DeltaTime);
+    void UpdateTime();
+
+    void Tick();
 protected:
     SWorld * World;
 
@@ -80,7 +82,7 @@ protected:
    // TSharedPtr<SAssetManager> AssetManager;
     TArray <TSharedPtr <SEngineModuleBase > > Modules;
 
-
+    float DeltaTime ;
     float CurrentTimeInSeconds;
 
 };
