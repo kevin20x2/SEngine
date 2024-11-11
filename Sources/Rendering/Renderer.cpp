@@ -17,6 +17,7 @@
 #include "Platform/Path.h"
 #include "Platform/CImgTextureLoader.h"
 #include "RHI/DepthTexture.h"
+#include "Systems/ShaderManager/ShaderManager.h"
 
 void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
 {
@@ -31,7 +32,7 @@ void FRenderer::Initailize()
 	auto VertexShader = std::make_shared<FVertexShaderProgram>(FPath::GetApplicationDir()+  "/shaders/test.vert");
 	auto PixelShader = std::make_shared<FPixelShaderProgram>(FPath::GetApplicationDir() + "/shaders/test.frag");
 
-	Shader = TSharedPtr<FShader>(new FShader(VertexShader,PixelShader));
+	Shader = SShaderManager::CreateShader(VertexShader, PixelShader);
 
 	SceneView = TSharedPtr<FSceneView>(new FSceneView);
 

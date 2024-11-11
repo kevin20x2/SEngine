@@ -9,6 +9,7 @@
 #include "GUI/ImGUIPort.h"
 #include "Platform/Window.h"
 #include "AssetManager/AssetManager.h"
+#include "Systems/ShaderManager/ShaderManager.h"
 #include <chrono>
 
 #include "Core/Log.h"
@@ -26,7 +27,11 @@ FEngine::FEngine()
 
 void FEngine::Initialize()
 {
+
     EngineInitTime = high_resolution_clock::now();
+
+    Modules.Add(SNew<SShaderManager>());
+
     Input = new FInput;
     Renderer = new FRenderer;
     Renderer->Initailize();

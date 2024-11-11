@@ -54,9 +54,10 @@ public:
     {
         for( auto Module : Modules )
         {
-            if(Module && Module->IsA<ModuleType>())
+            if(Module != nullptr &&
+                NanoRtti::DynCast<ModuleType*>(Module.get()) != nullptr)
             {
-                return Module.get();
+                return (ModuleType *)Module.get();
             }
         }
         return nullptr;

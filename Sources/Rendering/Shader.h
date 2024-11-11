@@ -8,12 +8,15 @@
 
 class FShader
 {
-public:
+protected:
+	friend class SShaderManager;
+
 	FShader(TSharedPtr<FVertexShaderProgram> InVert , TSharedPtr<FPixelShaderProgram> InPixel) :
 		VertexShaderProgram(InVert),PixelShaderProgram(InPixel)
 	{
 		GenerateDescriptorSetLayout();
 	}
+public:
 
 	VkDescriptorSetLayout GetDescriptorSetLayout()
 	{

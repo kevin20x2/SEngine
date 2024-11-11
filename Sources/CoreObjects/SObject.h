@@ -36,7 +36,7 @@ public:
 	template <class T>
 	bool IsA() const
 	{
-		auto To =  NanoRtti::TypeId<T>;
+		auto To =  NanoRtti::TypeId<T>();
 		auto From = GetType();
 		return NanoRtti::Detail::IsDynConvertible(From, To);
 	}

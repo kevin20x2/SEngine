@@ -127,6 +127,8 @@ set(EngineSources
         Sources/AssetManager/ShaderFileWatcher.h
         Sources/CoreObjects/EngineModuleBase.cpp
         Sources/CoreObjects/EngineModuleBase.h
+        Sources/Systems/ShaderManager/ShaderManager.cpp
+        Sources/Systems/ShaderManager/ShaderManager.h
 
 )
 
