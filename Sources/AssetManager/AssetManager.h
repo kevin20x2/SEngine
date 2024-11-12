@@ -20,6 +20,7 @@ enum class EAssetType
 class SAssetManager : public SEngineModuleBase
 {
 	public:
+	S_REGISTER_CLASS(SEngineModuleBase);
 
 	SAssetManager() ;
 

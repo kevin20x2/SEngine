@@ -6,6 +6,8 @@
 #define DELEGATE_H
 
 
+#include "Delegates.h"
+/*
 struct FDelegateContainer
 {
 
@@ -24,6 +26,7 @@ class TDelegate<InRetValue (Args...)> : public FDelegateContainer
     using FuncType = InRetValue (Args...);
 
 };
+*/
 
 
 #endif //DELEGATE_H

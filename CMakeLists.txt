@@ -182,6 +182,7 @@ target_include_directories(SEngine PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/imgui
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/filewatch
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/cereal
+        ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/CppDelegates
  )
 if(WIN32)
 target_link_directories(SEngine PUBLIC

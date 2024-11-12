@@ -22,7 +22,7 @@ struct FVertexInputInfo
 	TArray <VkVertexInputAttributeDescription> AttributeDescription;
 };
 
-class FShaderProgram
+class FShaderProgram : public std::enable_shared_from_this<FShaderProgram>
 {
 public:
     VkShaderModule GetShaderModule() const
@@ -33,10 +33,18 @@ public:
 	{
 		return DescriptorSetLayoutInfos;
 	}
+
+	const FString & GetShaderFilePath() const
+    {
+    	return ShaderFilePath;
+    }
+
 protected:
     VkShaderModule ShaderModule;
 
 	TArray <FDescriptorSetLayoutInfo> DescriptorSetLayoutInfos;
+
+	FString ShaderFilePath;
 };
 
 class FVertexShaderProgram : public FShaderProgram

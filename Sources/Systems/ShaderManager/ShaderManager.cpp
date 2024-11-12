@@ -12,7 +12,25 @@ TSharedPtr<FShader> SShaderManager::CreateShader(TSharedPtr<FVertexShaderProgram
     auto This = GetEngineModule<SShaderManager>();
     if(This)
     {
-        This->Shaders.Add(Result);
+        This->AddShader(Result);
     }
     return Result;
+}
+
+void SShaderManager::AddShader(TSharedPtr<FShader> InShader)
+{
+    Shaders.Add(InShader);
+
+    if(InShader)
+    {
+        if(auto VertexShader = InShader->GetVertexShader())
+        {
+            ShaderProgramsMap[VertexShader->GetShaderFilePath()] = VertexShader->weak_from_this() ;
+        }
+
+        if(auto PixelShader = InShader->GetPixelShader())
+        {
+            ShaderProgramsMap[PixelShader->GetShaderFilePath()] = PixelShader->weak_from_this() ;
+        }
+    }
 }

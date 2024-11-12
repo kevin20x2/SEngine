@@ -8,6 +8,7 @@
 
 FVertexShaderProgram::FVertexShaderProgram(const char* FilePath)
 {
+	ShaderFilePath = FilePath;
     ShaderModule = FRHIUtils::LoadHlslShaderByFilePath(FilePath, VK_SHADER_STAGE_VERTEX_BIT,DescriptorSetLayoutInfos,VertexInputInfo);
 }
 FVertexShaderProgram::FVertexShaderProgram(const FString &FilePath) :
@@ -18,6 +19,7 @@ FVertexShaderProgram::FVertexShaderProgram(const FString &FilePath) :
 
 FPixelShaderProgram::FPixelShaderProgram(const char* FilePath)
 {
+	ShaderFilePath = FilePath;
 	FVertexInputInfo Invalid;
     ShaderModule = FRHIUtils::LoadHlslShaderByFilePath(FilePath,VK_SHADER_STAGE_FRAGMENT_BIT,DescriptorSetLayoutInfos,Invalid);
 }

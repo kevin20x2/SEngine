@@ -5,6 +5,7 @@
 #ifndef SHADERFILEWATCHER_H
 #define SHADERFILEWATCHER_H
 #include "DirWatcherBase.h"
+#include "Delegates.h"
 
 
 class FShaderFileWatcher  : public FDirWatcherBase
@@ -14,6 +15,10 @@ class FShaderFileWatcher  : public FDirWatcherBase
     FShaderFileWatcher(const FString & InPath) : FDirWatcherBase(InPath) {} ;
 
     virtual void OnFileModified(const FString &InPath) override;
+
+    using FOnShaderFileChanged = MulticastDelegate<const FString & >;
+
+    FOnShaderFileChanged OnShaderFileChanged;
 };
 
 

@@ -18,7 +18,12 @@ public:
     static TSharedPtr<FShader> CreateShader(TSharedPtr<FVertexShaderProgram> InVertex,
         TSharedPtr <FPixelShaderProgram> InPixel );
 
+    void AddShader(TSharedPtr <FShader> InShader);
+
+protected:
+
     TArray <TSharedPtr<FShader>>  Shaders;
+    TMap <FString, TWeakPtr <FShaderProgram> > ShaderProgramsMap;
 };
 
 
