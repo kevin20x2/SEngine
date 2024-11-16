@@ -92,10 +92,21 @@ private:
 	VkExtent2D DisplaySize;
 
 	uint32 QueueFamily ;
+	VkDebugReportCallbackEXT DebugReport ;
 
 #pragma endregion
 };
 
+
+#ifdef APP_USE_VULKAN_DEBUG
+
+static VKAPI_ATTR VkBool32 VKAPI_CALL DebugReportFunc(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64_t object, size_t location, int32_t messageCode, const char* pLayerPrefix, const char* pMessage, void* pUserData)
+{
+    (void)flags; (void)object; (void)location; (void)messageCode; (void)pUserData; (void)pLayerPrefix; // Unused arguments
+    fprintf(stderr, "[vulkan] Debug report from ObjectType: %i\nMessage: %s\n\n", objectType, pMessage);
+    return VK_FALSE;
+}
+#endif
 
 
 void FRHIImp::Initialize(FWindow * InWindow)
@@ -118,6 +129,9 @@ void FRHIImp::CreateInstance()
 	{
 		Extensions.push_back(RequiredExtensions[i]);
 	}
+
+
+
 #ifdef  VK_USE_PLATFORM_METAL_EXT
 	Extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
 #endif
@@ -131,6 +145,17 @@ void FRHIImp::CreateInstance()
 
 	VkInstanceCreateInfo createInfo{};
 
+	// not enable validationLayers
+#ifdef APP_USE_VULKAN_DEBUG
+	const char * Layers[] = { "VK_LAYER_KHRONOS_validation"};
+	createInfo.enabledLayerCount = 1;
+	createInfo.ppEnabledLayerNames = Layers;
+	Extensions.push_back("VK_EXT_debug_report");
+#else
+	createInfo.enabledLayerCount = 0;
+	createInfo.pNext = nullptr;
+#endif
+
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	createInfo.pApplicationInfo = &AppInfo;
 	createInfo.enabledExtensionCount = Extensions.size();// RequiredExtensions.size();
@@ -140,9 +165,6 @@ void FRHIImp::CreateInstance()
 	createInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
 	#endif
 
-	// not enable validationLayers
-	createInfo.enabledLayerCount = 0;
-	createInfo.pNext = nullptr;
 
 	VkResult result = vkCreateInstance(&createInfo, nullptr, &Instance);
 	if (result != VK_SUCCESS)
@@ -151,6 +173,19 @@ void FRHIImp::CreateInstance()
 	}
 
 	volkLoadInstance(Instance);
+
+#ifdef APP_USE_VULKAN_DEBUG
+        auto f_vkCreateDebugReportCallbackEXT = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(Instance, "vkCreateDebugReportCallbackEXT");
+        assert(f_vkCreateDebugReportCallbackEXT != nullptr);
+        VkDebugReportCallbackCreateInfoEXT debug_report_ci = {};
+        debug_report_ci.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
+        debug_report_ci.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
+        debug_report_ci.pfnCallback = DebugReportFunc;
+        debug_report_ci.pUserData = nullptr;
+        auto Error = f_vkCreateDebugReportCallbackEXT(Instance, &debug_report_ci, nullptr, &DebugReport);
+
+#endif
+
 }
 
 

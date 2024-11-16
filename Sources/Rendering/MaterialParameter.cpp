@@ -5,6 +5,8 @@
 #include "MaterialParameter.h"
 #include "RHI/RHI.h"
 #include "volk.h"
+#include "CoreObjects/SObject.h"
+
 TArray<VkWriteDescriptorSet>
 FMaterialParameterTexture::GenerateWriteDescriptorSets(VkDescriptorSet DescriptorSet)
 {
@@ -30,15 +32,21 @@ FMaterialParameterTexture::GenerateWriteDescriptorSets(VkDescriptorSet Descripto
 
 	return {ImageWrite};
 }
+
+FMaterialParameterSampler::FMaterialParameterSampler()
+{
+	Sampler = SNew<FSampler>();
+}
+
 TArray<VkWriteDescriptorSet>
 FMaterialParameterSampler::GenerateWriteDescriptorSets(VkDescriptorSet DescriptorSet)
 {
-	if(Texture == nullptr) return {} ;
+	//if(Texture == nullptr) return {} ;
 
 	CachedImageInfo =
 		{
-			.sampler = Texture->GetSampler(),
-			.imageView = Texture->GetImageView(),
+			.sampler = Sampler->Sampler,
+			.imageView = VK_NULL_HANDLE,
 			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL ,
 		};
 

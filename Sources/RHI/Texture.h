@@ -57,5 +57,15 @@ protected:
 	VkSampler Sampler;
 };
 
+class FSampler
+{
+public:
+	FSampler();
+	void Initalize();
+	virtual ~FSampler();
+
+	VkSampler Sampler;
+};
+
 
 #endif //TEXTURE_H

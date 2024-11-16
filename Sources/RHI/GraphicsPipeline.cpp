@@ -22,14 +22,14 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
 		VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	VertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
 	VertShaderStageInfo.module = Info.Shader->GetVertexShader()->GetShaderModule();
-	VertShaderStageInfo.pName = "main";
+	VertShaderStageInfo.pName = Info.Shader->GetVertexShader()->GetEntryPointName();
 
 	VkPipelineShaderStageCreateInfo FragShaderStageInfo{};
 	FragShaderStageInfo.sType =
 		VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	FragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
 	FragShaderStageInfo.module = Info.Shader->GetPixelShader()->GetShaderModule();
-	FragShaderStageInfo.pName = "main";
+	FragShaderStageInfo.pName = Info.Shader->GetPixelShader()->GetEntryPointName();
 
 	VkPipelineShaderStageCreateInfo ShaderStages[] = { VertShaderStageInfo , FragShaderStageInfo };
 

@@ -103,6 +103,7 @@ protected:
 
     void CreateSyncObjects();
 
+	void PreRecordCommandBuffer(uint32 ImageIndex);
     void RecordCommandBuffer(VkCommandBuffer CommandBuffer , uint32 ImageIndex);
 
     TArray <VkSemaphore> ImageAvailableSems;

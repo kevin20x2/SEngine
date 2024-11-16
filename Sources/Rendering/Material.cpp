@@ -50,12 +50,13 @@ SMaterialInterface::Initialize(VkDescriptorPool Pool, FRenderPass *RenderPass)
 void
 SMaterialInterface::OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,uint32 CurrentFrame)
 {
-	vkCmdBindPipeline(CommandBuffer,VK_PIPELINE_BIND_POINT_GRAPHICS,
-					  GraphicPipeline->GetHandle()
-					  );
+
 	vkCmdBindDescriptorSets(CommandBuffer,VK_PIPELINE_BIND_POINT_GRAPHICS,
 							GraphicPipeline->GetLayout(),0,1,&DescriptionSets[CurrentFrame],
 							0,nullptr );
+	vkCmdBindPipeline(CommandBuffer,VK_PIPELINE_BIND_POINT_GRAPHICS,
+					  GraphicPipeline->GetHandle()
+					  );
 
 }
 void

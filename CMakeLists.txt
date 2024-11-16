@@ -153,7 +153,7 @@ add_executable(SEngine
 
 )
 
-target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES GLM_FORCE_LEFT_HANDED)
+target_compile_definitions(SEngine PUBLIC VK_NO_PROTOTYPES GLM_FORCE_LEFT_HANDED APP_USE_VULKAN_DEBUG)
 target_compile_definitions(SEngine PUBLIC ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_definitions(SEngine PUBLIC cimg_display=0)
 

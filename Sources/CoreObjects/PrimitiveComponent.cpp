@@ -20,14 +20,21 @@ void SPrimitiveComponent::CreateRHIResource()
 
 }
 
-void SPrimitiveComponent::OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,uint32 CurrentFrame)
+void SPrimitiveComponent::OnPreRecordCommandBuffer(uint32 CurrentFrame)
 {
 	RenderData->UpdateModelMatrix( GetWorldTransform().ToMatrix() );
 	RenderData->SyncData(CurrentFrame);
 	if(Material)
 	{
-		Material->OnRecordCommandBuffer(CommandBuffer,CurrentFrame);
 		Material->OnSetupPrimitiveData(RenderData.get(),CurrentFrame);
+	}
+}
+
+void SPrimitiveComponent::OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,uint32 CurrentFrame)
+{
+	if(Material)
+	{
+		Material->OnRecordCommandBuffer(CommandBuffer,CurrentFrame);
 	}
 
     VkBuffer VertexBuffers[] = {VB->GetHandle()};

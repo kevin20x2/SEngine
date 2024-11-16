@@ -49,19 +49,7 @@ FTexture::Initialize(const FTextureCreateParams &Params)
 	FRHIUtils::CopyBufferToImage(ImageHandle,BufferHandle,Params.Height,Params.Width);
 
 	auto Device = *GRHI->GetDevice();
-/*	VkImageViewCreateInfo viewInfo{};
-	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-	viewInfo.image = ImageHandle;
-	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-	viewInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
-	viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	viewInfo.subresourceRange.baseMipLevel = 0;
-	viewInfo.subresourceRange.levelCount = 1;
-	viewInfo.subresourceRange.baseArrayLayer = 0;
-	viewInfo.subresourceRange.layerCount = 1;
 
-
-	VK_CHECK(vkCreateImageView(Device,&viewInfo,nullptr,&ImageView));*/
 
 	FRHIUtils::CreateImageView(ImageHandle,VK_FORMAT_R8G8B8A8_SRGB,VK_IMAGE_ASPECT_COLOR_BIT,ImageView);
 
@@ -88,9 +76,53 @@ FTexture::Initialize(const FTextureCreateParams &Params)
 
 	vkCreateSampler(Device,&samplerInfo,nullptr,&Sampler);
 
+	FRHIUtils::TransitionImageLayout(ImageHandle,
+	                                 VK_FORMAT_R8G8B8A8_SRGB,
+	                                 VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+	                                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
 }
+
+
 FTexture::~FTexture()
 {
 	vkDestroyImage( * GRHI->GetDevice(),ImageHandle,nullptr);
 	vkDestroyImageView(*GRHI->GetDevice(),ImageView,nullptr);
 }
+
+FSampler::FSampler()
+{
+	Initalize();
+}
+
+void FSampler::Initalize()
+{
+	VkSamplerCreateInfo samplerInfo{};
+	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+	samplerInfo.magFilter = VK_FILTER_LINEAR;
+	samplerInfo.minFilter = VK_FILTER_LINEAR;
+	samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+
+	samplerInfo.anisotropyEnable = VK_FALSE;
+
+	samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+	samplerInfo.unnormalizedCoordinates = VK_FALSE;
+
+	samplerInfo.compareEnable = VK_FALSE;
+	samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+
+	samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+	samplerInfo.mipLodBias = 0.0f;
+	samplerInfo.minLod = 0.0f;
+	samplerInfo.maxLod = 0.0f;
+
+	vkCreateSampler(*GRHI->GetDevice(),&samplerInfo,nullptr,&Sampler);
+}
+
+FSampler::~FSampler()
+{
+	vkDestroySampler(*GRHI->GetDevice(),Sampler,nullptr);
+}
+

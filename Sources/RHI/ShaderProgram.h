@@ -38,9 +38,15 @@ public:
     {
     	return ShaderFilePath;
     }
+	const char * GetEntryPointName() const
+    {
+    	return EntryPointName.c_str();
+    }
 
 protected:
     VkShaderModule ShaderModule;
+
+	FString EntryPointName ;
 
 	TArray <FDescriptorSetLayoutInfo> DescriptorSetLayoutInfos;
 

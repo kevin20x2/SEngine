@@ -32,8 +32,10 @@ public:
 class FMaterialParameterSampler : public FMaterialParameterBase
 {
 public:
+	FMaterialParameterSampler();
+
 	TArray < VkWriteDescriptorSet > GenerateWriteDescriptorSets(VkDescriptorSet DescriptorSet) override;
-	TSharedPtr <FTexture > Texture;
+	TSharedPtr <FSampler > Sampler;
 	VkDescriptorImageInfo CachedImageInfo;
 };
 

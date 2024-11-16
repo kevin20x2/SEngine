@@ -129,6 +129,7 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 	auto Messages = static_cast<EShMessages>(EShMsgReadHlsl | EShMsgDefault | EShMsgVulkanRules | EShMsgSpvRules);
 
 	EShLanguage Language{};
+	FString ShaderEntryName = GetShaderEntryPointByShaderStage(Stage);
 
 	switch (Stage)
 	{
@@ -143,9 +144,6 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 	}
 
 
-
-
-	//Shader.setStringsWithLengths()
 	std::ifstream ifs(FilePath);
 
 	if (!ifs.is_open())
@@ -161,8 +159,8 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 	glslang::TShader Shader(Language);
 	Shader.setStringsWithLengths(&ShaderSource,nullptr ,1);
 	Shader.setEnvInput(glslang::EShSourceHlsl, Language, glslang::EShClientVulkan, 1);
-	Shader.setEntryPoint("main");
-	Shader.setSourceEntryPoint("main");
+	Shader.setEntryPoint(ShaderEntryName.c_str());
+	Shader.setSourceEntryPoint(ShaderEntryName.c_str());
 	Shader.setEnvClient(glslang::EShClientVulkan, glslang::EShTargetVulkan_1_0);
 	Shader.setEnvTarget(glslang::EshTargetSpv, glslang::EShTargetSpv_1_0);
 
@@ -277,6 +275,25 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 
 	return ShaderModule;
 }
+
+FString FRHIUtils::GetShaderEntryPointByShaderStage(VkShaderStageFlagBits Stage)
+{
+	FString ShaderEntryName = "";
+
+	switch (Stage)
+	{
+	case VK_SHADER_STAGE_VERTEX_BIT:
+		ShaderEntryName = "VertexMain";
+		break;
+	case VK_SHADER_STAGE_FRAGMENT_BIT:
+		ShaderEntryName = "FragmentMain";
+		break;
+	default:
+		break;
+	}
+	return ShaderEntryName;
+}
+
 void
 FRHIUtils::CreateBuffer(VkBufferUsageFlagBits Usage,
                         uint32 BufferSize,

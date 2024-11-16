@@ -29,8 +29,8 @@ void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
 void FRenderer::Initailize()
 {
 
-	auto VertexShader = std::make_shared<FVertexShaderProgram>(FPath::GetApplicationDir()+  "/shaders/test.vert");
-	auto PixelShader = std::make_shared<FPixelShaderProgram>(FPath::GetApplicationDir() + "/shaders/test.frag");
+	auto VertexShader = std::make_shared<FVertexShaderProgram>(FPath::GetApplicationDir()+  "/shaders/test.sshader");
+	auto PixelShader = std::make_shared<FPixelShaderProgram>(FPath::GetApplicationDir() + "/shaders/test.sshader");
 
 	Shader = SShaderManager::CreateShader(VertexShader, PixelShader);
 
@@ -99,6 +99,7 @@ void FRenderer::Render()
 	LightData->SyncData(CurrentFrame);
 	GEngine->GetGUIPort()->OnRecordGUIData();
 
+	PreRecordCommandBuffer(ImageIndex);
 	RecordCommandBuffer(CommandBuffers->Buffers[CurrentFrame],ImageIndex);
 
 	// Submit
@@ -109,7 +110,9 @@ void FRenderer::Render()
 		VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 	submitInfo.waitSemaphoreCount = 1;
 	submitInfo.pWaitSemaphores = waitSemaphores;
+	submitInfo.pWaitDstStageMask = waitStages;
 	submitInfo.commandBufferCount = 1;
+
 	submitInfo.pCommandBuffers = &CommandBuffers->Buffers[CurrentFrame];
 
 	VkSemaphore SignalSemaphores[] = { RenderFinishSems[CurrentFrame]};
@@ -156,7 +159,7 @@ void FRenderer::OnResize(GLFWwindow* Window, int32 Width, int32 Height)
 		}
 	}
 	//RecreatePipeline();
-	CommandBuffers->FreeCommandBuffer();
+	//CommandBuffers->FreeCommandBuffer();
 }
 
 
@@ -198,6 +201,17 @@ void FRenderer::CreateSyncObjects()
 		VK_CHECK(vkCreateSemaphore(Device, &SemaphoreInfo,nullptr, &RenderFinishSems[i]));
 
 		VK_CHECK(vkCreateFence(Device,&FenceInfo,nullptr,&InFlightFences[i]));
+	}
+}
+
+void FRenderer::PreRecordCommandBuffer(uint32 ImageIndex)
+{
+	for(auto P : Primitives)
+	{
+		if(P)
+		{
+			P->OnPreRecordCommandBuffer(CurrentFrame);
+		}
 	}
 }
 

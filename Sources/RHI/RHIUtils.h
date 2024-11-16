@@ -30,6 +30,7 @@ public:
 												   TArray <FDescriptorSetLayoutInfo> & Infos,
 												   FVertexInputInfo & OutVertexInputInfo
 												   );
+	static FString GetShaderEntryPointByShaderStage(VkShaderStageFlagBits State);
 
 
 	static FVertexInputInfo GenerateVertexInputStateCreateInfo(TArray <SpvReflectInterfaceVariable *> InputVars);
