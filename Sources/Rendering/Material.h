@@ -8,9 +8,9 @@
 #include "Shader.h"
 #include "CoreObjects/SObject.h"
 #include "RHI/GraphicsPipeline.h"
-#include "RHI/UniformBuffer.h"
 
 
+struct FPreRecordBufferContext;
 class FPrimitiveRenderData;
 
 class SMaterialInterface : public SObject
@@ -22,6 +22,9 @@ public:
 	{
 	}
 
+	virtual void OnPreRecordCommandBuffer(FPrimitiveRenderData * InRenderData,uint32 CurrentFrame,
+		FPreRecordBufferContext & Context
+		);
 	virtual void OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,uint32 CurrentFrame);
 
 	void Initialize(VkDescriptorPool Pool ,FRenderPass * RenderPass);
@@ -35,13 +38,23 @@ public:
 	virtual void InitMaterialParameters();
 
 	void SetTexture(uint32 Binding , TSharedPtr <FTexture> InTexture );
-protected:
 
+	void MarkDirty()
+	{
+		bDirty = true;
+	}
+	bool IsDirty() const
+	{
+		return bDirty;
+	}
+
+protected:
 
 	TSharedPtr <FShader> Shader;
 	TArray <VkDescriptorSet> DescriptionSets;
 	FMaterialParameters MaterialParameters;
 	TSharedPtr <FGraphicsPipeline> GraphicPipeline;
+	bool bDirty = false;
 };
 
 

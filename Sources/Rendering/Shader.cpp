@@ -3,9 +3,40 @@
 //
 
 #include "Shader.h"
+
+#include "Material.h"
 #include "volk.h"
 #include "RHI/RHI.h"
 
+
+void FShader::AddUsedMaterial(SMaterialInterface* MaterialInterface)
+{
+	UsedMaterials.AddUnique(MaterialInterface->AsShared());
+}
+
+void FShader::RemoveUsedMaterial(SMaterialInterface* MaterialInterace)
+{
+	UsedMaterials.Remove(MaterialInterace->AsShared());
+}
+
+void FShader::OnReCompile()
+{
+	if(VertexShaderProgram)
+	{
+		VertexShaderProgram->ReCompile();
+	}
+	if(PixelShaderProgram)
+	{
+		PixelShaderProgram->ReCompile();
+	}
+	for(auto Material : UsedMaterials)
+	{
+		if(Material)
+		{
+			Material->MarkDirty();
+		}
+	}
+}
 
 void FShader::GenerateDescriptorSetLayout()
 {

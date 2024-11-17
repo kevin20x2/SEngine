@@ -26,10 +26,15 @@ public:
 
     void OnShaderFileChanged(const FString & FilePath);
 
+    virtual bool IsTickable() const override { return true;}
+
+    virtual void Tick(float DeltaTime) override;
+
 protected:
 
     TArray <TSharedPtr<FShader>>  Shaders;
     TMap <FString, TWeakPtr <FShader> > ShaderFileMap;
+    TMap <FString , bool> ShaderDirtyStates;
 };
 
 

@@ -6,6 +6,8 @@
 #include "MaterialParameter.h"
 
 
+class SMaterialInterface;
+
 class FShader
 {
 protected:
@@ -52,6 +54,11 @@ public:
 		return ShaderPath;
 	}
 
+	void AddUsedMaterial(SMaterialInterface * MaterialInterface);
+	void RemoveUsedMaterial(SMaterialInterface * MaterialInterace);
+
+	virtual void OnReCompile();
+
 protected:
 
 	void GenerateDescriptorSetLayout();
@@ -64,5 +71,7 @@ protected:
 	TSharedPtr <FVertexShaderProgram> VertexShaderProgram;
 	TSharedPtr <FPixelShaderProgram> PixelShaderProgram;
 	VkDescriptorSetLayout DescriptorSetLayout;
+
+	TArray <TSharedPtr <SMaterialInterface > > UsedMaterials;
 };
 

@@ -12,10 +12,25 @@ FVertexShaderProgram::FVertexShaderProgram(const char* FilePath)
     ShaderModule = FRHIUtils::LoadHlslShaderByFilePath(FilePath, VK_SHADER_STAGE_VERTEX_BIT,DescriptorSetLayoutInfos,VertexInputInfo);
 	EntryPointName = FRHIUtils::GetShaderEntryPointByShaderStage(VK_SHADER_STAGE_VERTEX_BIT);
 }
+
+void FVertexShaderProgram::ReCompile()
+{
+	FShaderProgram::ReCompile();
+    ShaderModule = FRHIUtils::LoadHlslShaderByFilePath(ShaderFilePath,
+    	VK_SHADER_STAGE_VERTEX_BIT,DescriptorSetLayoutInfos,VertexInputInfo);
+}
+
 FVertexShaderProgram::FVertexShaderProgram(const FString &FilePath) :
 	FVertexShaderProgram(FilePath.c_str())
 {
 	//ShaderModule = FRHIUtils::LoadHlslShaderByFilePath(FilePath, VK_SHADER_STAGE_VERTEX_BIT,DescriptorSetLayoutInfos);
+}
+
+void FPixelShaderProgram::ReCompile()
+{
+	FShaderProgram::ReCompile();
+	FVertexInputInfo Invalid;
+    ShaderModule = FRHIUtils::LoadHlslShaderByFilePath(ShaderFilePath,VK_SHADER_STAGE_FRAGMENT_BIT,DescriptorSetLayoutInfos,Invalid);
 }
 
 FPixelShaderProgram::FPixelShaderProgram(const char* FilePath)

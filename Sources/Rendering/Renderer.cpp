@@ -32,7 +32,7 @@ void FRenderer::Initailize()
 	//auto VertexShader = std::make_shared<FVertexShaderProgram>(FPath::GetApplicationDir()+  "/shaders/test.sshader");
 	//auto PixelShader = std::make_shared<FPixelShaderProgram>(FPath::GetApplicationDir() + "/shaders/test.sshader");
 
-	Shader = SShaderManager::CreateShader(FPath::GetApplicationDir()+  "/shaders/test.sshader");
+	Shader = SShaderManager::CreateShader(FPath::GetApplicationDir()+  "/Shaders/test.sshader");
 
 	SceneView = TSharedPtr<FSceneView>(new FSceneView);
 
@@ -206,11 +206,14 @@ void FRenderer::CreateSyncObjects()
 
 void FRenderer::PreRecordCommandBuffer(uint32 ImageIndex)
 {
+	FPreRecordBufferContext Context = {
+		.RenderPass = RenderPass.get()
+	};
 	for(auto P : Primitives)
 	{
 		if(P)
 		{
-			P->OnPreRecordCommandBuffer(CurrentFrame);
+			P->OnPreRecordCommandBuffer(CurrentFrame,Context);
 		}
 	}
 }

@@ -4,7 +4,7 @@
 
 #include "DirWatcherBase.h"
 
-
+#include "Platform/Path.h"
 
 
 FDirWatcherBase::FDirWatcherBase(const FString &InDirPath) :
@@ -13,7 +13,7 @@ WatchDir(InDirPath) , FileWatch(WatchDir,
 {
         if(ChangeType == filewatch::Event::modified)
         {
-            this->OnFileModified(Path);
+            this->OnFileModified(FPath::JoinPath(WatchDir,Path));
         }
 } )
 {

@@ -23,6 +23,12 @@
 
 void OnRawWindowResize(GLFWwindow * Window, int Width, int Height);
 
+struct FPreRecordBufferContext
+{
+	FRenderPass * RenderPass;
+
+};
+
 class FRenderer
 {
 public:
@@ -64,8 +70,6 @@ public:
 protected:
 
 	TSharedPtr<SActor> Actor;
-
-    //TSharedPtr< SCameraComponent > Camera;
 
 
 	TArray < TSharedPtr<SPrimitiveComponent> > Primitives;

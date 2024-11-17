@@ -11,6 +11,7 @@
 #include "RHI/VertexBuffer.h"
 #include "Rendering/Material.h"
 
+struct FPreRecordBufferContext;
 class FPrimitiveRenderData;
 
 class SPrimitiveComponent : public SSceneComponent
@@ -26,7 +27,7 @@ public:
         Mesh = InMesh;
     }
     void CreateRHIResource();
-	virtual void OnPreRecordCommandBuffer(uint32 CurrentFrame);
+	virtual void OnPreRecordCommandBuffer(uint32 CurrentFrame, FPreRecordBufferContext & Context);
 
     virtual void OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,uint32 CurrentFrame);
 

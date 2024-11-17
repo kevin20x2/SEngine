@@ -46,7 +46,7 @@ public:
 
 	bool Remove(const T& InValue)
 	{
-		return  std::remove_if(this->begin(),this->end(),[&](T & V){
+		return  std::remove_if(this->begin(),this->end(),[&](const T & V){
 			return V == InValue;
 		}) != this->end();
 	}

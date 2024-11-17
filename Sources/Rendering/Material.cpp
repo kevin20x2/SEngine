@@ -41,12 +41,28 @@ SMaterialInterface::InitMaterialParameters()
 void
 SMaterialInterface::Initialize(VkDescriptorPool Pool, FRenderPass *RenderPass)
 {
+	if(Shader)
+	{
+		Shader->AddUsedMaterial(this);
+	}
 	CreateDescriptionSets(Pool);
 	CreatePipeline(RenderPass);
 	InitMaterialParameters();
 	OnSetupViewData();
 	OnSetupLightData();
 }
+
+void SMaterialInterface::OnPreRecordCommandBuffer(FPrimitiveRenderData* InRenderData, uint32 CurrentFrame,
+	FPreRecordBufferContext& Context)
+{
+	if(bDirty)
+	{
+		CreatePipeline(Context.RenderPass);
+		bDirty = false;
+	}
+	OnSetupPrimitiveData(InRenderData,CurrentFrame);
+}
+
 void
 SMaterialInterface::OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,uint32 CurrentFrame)
 {

@@ -43,6 +43,8 @@ public:
     	return EntryPointName.c_str();
     }
 
+	virtual void ReCompile() {} ;
+
 protected:
     VkShaderModule ShaderModule;
 
@@ -56,6 +58,8 @@ protected:
 class FVertexShaderProgram : public FShaderProgram
 {
 public:
+	virtual void ReCompile() override;
+
 	explicit FVertexShaderProgram(const FString & FilePath);
     explicit FVertexShaderProgram(const char * FilePath );
 	FVertexInputInfo VertexInputInfo;
@@ -64,6 +68,7 @@ public:
 class FPixelShaderProgram : public FShaderProgram
 {
 public:
+	virtual void ReCompile() override;
     explicit FPixelShaderProgram(const char * FilePath);
 	explicit FPixelShaderProgram(const FString & FilePath);
 };

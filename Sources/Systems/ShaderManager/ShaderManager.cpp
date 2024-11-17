@@ -65,6 +65,23 @@ void SShaderManager::OnPostInit()
 void SShaderManager::OnShaderFileChanged(const FString& FilePath)
 {
     SLogD(TEXT("ShaderFileChanged .. {}"),FilePath);
+    if(ShaderFileMap.find(FilePath ) !=ShaderFileMap.end())
+    {
+        ShaderDirtyStates[FilePath] = true;
+    }
+}
+
+void SShaderManager::Tick(float DeltaTime)
+{
+    SEngineModuleBase::Tick(DeltaTime);
+    for(auto &[Path , State  ] : ShaderDirtyStates)
+    {
+        if(auto Shader = ShaderFileMap[Path].lock(); Shader && State)
+        {
+            Shader->OnReCompile();
+            State = false;
+        }
+    }
 }
 
 
