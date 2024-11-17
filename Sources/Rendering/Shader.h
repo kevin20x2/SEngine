@@ -43,6 +43,15 @@ public:
 
 	void GenerateDefaultMaterialParams(FMaterialParameters & MaterialParams );
 
+	void SetShaderPath(const FString & Path )
+	{
+		ShaderPath = Path;
+	}
+	const FString & GetShaderPath() const
+	{
+		return ShaderPath;
+	}
+
 protected:
 
 	void GenerateDescriptorSetLayout();

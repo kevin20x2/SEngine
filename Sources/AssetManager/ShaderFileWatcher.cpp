@@ -9,4 +9,5 @@
 void FShaderFileWatcher::OnFileModified(const FString &InPath)
 {
     SLogD("FShaderFileWatcher::OnFileModified {}",InPath);
+    OnShaderFileChanged.Broadcast(InPath);
 }

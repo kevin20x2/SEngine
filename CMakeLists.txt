@@ -129,6 +129,7 @@ set(EngineSources
         Sources/CoreObjects/EngineModuleBase.h
         Sources/Systems/ShaderManager/ShaderManager.cpp
         Sources/Systems/ShaderManager/ShaderManager.h
+        Sources/Interfaces/TickableInterface.h
 
 )
 
@@ -144,12 +145,14 @@ set(IMGUIFILES
         ${IMGUI_DIR}/imgui_demo.cpp
         ${IMGUI_DIR}/imgui_tables.cpp
         ${IMGUI_DIR}/imgui_widgets.cpp)
+set(CppDelegateFiles
+    ThirdParty/CppDelegates/Delegates.cpp)
 
 add_executable(SEngine
         ${Spirv_ReflectSource}
         ${EngineSources}
         ${IMGUIFILES}
-
+        ${CppDelegateFiles}
 
 )
 

@@ -45,6 +45,31 @@ void FEngine::Initialize()
 
     auto AssetManager = SNew<SAssetManager>();
     Modules.Add(AssetManager);
+
+    OnInitialize();
+    OnPostInit();
+}
+
+void FEngine::OnInitialize()
+{
+    for(auto Module : Modules)
+    {
+        if(Module)
+        {
+            Module->OnInitialize();
+        }
+    }
+}
+
+void FEngine::OnPostInit()
+{
+    for(auto Module : Modules)
+    {
+        if(Module)
+        {
+            Module->OnPostInit();
+        }
+    }
 }
 
 void FEngine::UpdateTime()

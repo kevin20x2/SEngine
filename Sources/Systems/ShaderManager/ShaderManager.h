@@ -15,15 +15,21 @@ class SShaderManager : public SEngineModuleBase
 {
     S_REGISTER_CLASS(SEngineModuleBase)
 public:
+    static TSharedPtr <FShader> CreateShader(const FString & ShaderFilePath);
+
     static TSharedPtr<FShader> CreateShader(TSharedPtr<FVertexShaderProgram> InVertex,
         TSharedPtr <FPixelShaderProgram> InPixel );
 
     void AddShader(TSharedPtr <FShader> InShader);
 
+    virtual void OnPostInit() override;
+
+    void OnShaderFileChanged(const FString & FilePath);
+
 protected:
 
     TArray <TSharedPtr<FShader>>  Shaders;
-    TMap <FString, TWeakPtr <FShaderProgram> > ShaderProgramsMap;
+    TMap <FString, TWeakPtr <FShader> > ShaderFileMap;
 };
 
 

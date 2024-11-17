@@ -4,8 +4,28 @@
 
 #include "ShaderManager.h"
 
+#include "AssetManager/AssetManager.h"
+#include "AssetManager/ShaderFileWatcher.h"
+#include "Core/Log.h"
+
+TSharedPtr<FShader> SShaderManager::CreateShader(const FString& ShaderFilePath)
+{
+    auto VertexShader = SNew<FVertexShaderProgram>(ShaderFilePath);
+    auto PixelShader = SNew<FPixelShaderProgram>(ShaderFilePath);
+    auto Shader = TSharedPtr<FShader>(new FShader( VertexShader,PixelShader));
+
+    Shader->SetShaderPath(ShaderFilePath);
+    auto This = GetEngineModule<SShaderManager>();
+    if(This)
+    {
+        This->AddShader(Shader);
+    }
+    return Shader;
+
+}
+
 TSharedPtr<FShader> SShaderManager::CreateShader(TSharedPtr<FVertexShaderProgram> InVertex,
-    TSharedPtr<FPixelShaderProgram> InPixel)
+                                                 TSharedPtr<FPixelShaderProgram> InPixel)
 {
     auto Result = TSharedPtr <FShader> (new FShader(InVertex, InPixel));
 
@@ -23,14 +43,28 @@ void SShaderManager::AddShader(TSharedPtr<FShader> InShader)
 
     if(InShader)
     {
-        if(auto VertexShader = InShader->GetVertexShader())
-        {
-            ShaderProgramsMap[VertexShader->GetShaderFilePath()] = VertexShader->weak_from_this() ;
-        }
+        ShaderFileMap[InShader->GetShaderPath()] = InShader;
+    }
+}
 
-        if(auto PixelShader = InShader->GetPixelShader())
+void SShaderManager::OnPostInit()
+{
+    SEngineModuleBase::OnPostInit();
+
+    auto AssetManager = GEngine->GetModuleByClass<SAssetManager>();
+    if(AssetManager)
+    {
+        if(AssetManager->ShaderFileWatcher)
         {
-            ShaderProgramsMap[PixelShader->GetShaderFilePath()] = PixelShader->weak_from_this() ;
+            AssetManager->ShaderFileWatcher->OnShaderFileChanged.AddSP(AsShared(),
+                &SShaderManager::OnShaderFileChanged );
         }
     }
 }
+
+void SShaderManager::OnShaderFileChanged(const FString& FilePath)
+{
+    SLogD(TEXT("ShaderFileChanged .. {}"),FilePath);
+}
+
+

@@ -29,10 +29,10 @@ void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
 void FRenderer::Initailize()
 {
 
-	auto VertexShader = std::make_shared<FVertexShaderProgram>(FPath::GetApplicationDir()+  "/shaders/test.sshader");
-	auto PixelShader = std::make_shared<FPixelShaderProgram>(FPath::GetApplicationDir() + "/shaders/test.sshader");
+	//auto VertexShader = std::make_shared<FVertexShaderProgram>(FPath::GetApplicationDir()+  "/shaders/test.sshader");
+	//auto PixelShader = std::make_shared<FPixelShaderProgram>(FPath::GetApplicationDir() + "/shaders/test.sshader");
 
-	Shader = SShaderManager::CreateShader(VertexShader, PixelShader);
+	Shader = SShaderManager::CreateShader(FPath::GetApplicationDir()+  "/shaders/test.sshader");
 
 	SceneView = TSharedPtr<FSceneView>(new FSceneView);
 

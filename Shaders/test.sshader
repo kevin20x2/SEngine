@@ -32,6 +32,7 @@ SamplerState samplerColor : register(s4,space0);
 
 
 
+
 float4 FragmentMain(VSOutput input) :SV_TARGET
 {
     float4 ao = texColor.Sample(samplerColor,float2(input.Uv.x,1.0f - input.Uv.y));

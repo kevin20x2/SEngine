@@ -12,3 +12,4 @@ SAssetManager::SAssetManager()
 {
     ShaderFileWatcher = SNew<FShaderFileWatcher>(FPath::GetEngineShaderDir());
 }
+

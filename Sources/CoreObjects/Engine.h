@@ -24,6 +24,9 @@ public:
 
     void Initialize();
 
+    void OnInitialize();
+    void OnPostInit();
+
     FInput * GetInput() const
     {
         return Input;

@@ -6,9 +6,10 @@
 #define ENGINEMODULEBASE_H
 #include "Engine.h"
 #include "SObject.h"
+#include "Interfaces/TickableInterface.h"
 
 
-class SEngineModuleBase : public SObject
+class SEngineModuleBase : public SObject , public ITickable
 {
     S_REGISTER_CLASS( SObject);
 public:
@@ -23,14 +24,12 @@ public:
         return nullptr;
     }
 
-    virtual void Tick(float DeltaTime) {} ;
 
-    bool IsTickable()const
-    {
-        return bTickable;
-    }
+    virtual void OnInitialize() {} ;
+    virtual void OnPostInit() {};
+
+
 protected:
-    bool bTickable = false;
 };
 
 
