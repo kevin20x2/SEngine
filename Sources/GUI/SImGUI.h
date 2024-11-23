@@ -6,11 +6,13 @@
 #define IMGUIPORT_H
 #include <backends/imgui_impl_vulkan.h>
 
+#include "CoreObjects/EngineModuleBase.h"
 #include "GLFW/glfw3.h"
 
 
-class FImGUIPort
+class SImGUI : public SEngineModuleBase
 {
+    S_REGISTER_CLASS(SEngineModuleBase)
 
 public:
     void InitWindow( GLFWwindow* InGLFWwindow   );

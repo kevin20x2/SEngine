@@ -3,12 +3,13 @@
 //
 
 #include "volk.h"
-#include "ImGUIPort.h"
+#include "SImGUI.h"
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_vulkan.h"
 #include "Core/Log.h"
 #include "CoreObjects/Engine.h"
+#include "Rendering/Renderer.h"
 #include "RHI/RHI.h"
 
 
@@ -21,7 +22,7 @@ static void Check_Vk_result(VkResult Err)
     SLogE("vulkan  Error : VkResult = {}\n",(int32)Err);
 }
 
-void FImGUIPort::InitWindow(GLFWwindow *InGLFWwindow)
+void SImGUI::InitWindow(GLFWwindow *InGLFWwindow)
 {
 
     ImGui_ImplVulkanH_Window * Wd = &Window;
@@ -96,19 +97,19 @@ void FImGUIPort::InitWindow(GLFWwindow *InGLFWwindow)
 
 }
 
-void FImGUIPort::ShutDown()
+void SImGUI::ShutDown()
 {
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
 }
 
-void FImGUIPort::OnRender(VkCommandBuffer CommandBuffer)
+void SImGUI::OnRender(VkCommandBuffer CommandBuffer)
 {
     ImDrawData *draw_data = ImGui::GetDrawData();
     ImGui_ImplVulkan_RenderDrawData(draw_data , CommandBuffer);
 }
 
-void FImGUIPort::OnRecordGUIData()
+void SImGUI::OnRecordGUIData()
 {
     // Start the Dear ImGui frame
     ImGui_ImplVulkan_NewFrame();

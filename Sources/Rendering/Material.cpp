@@ -3,6 +3,9 @@
 //
 
 #include "Material.h"
+
+#include "LightRenderData.h"
+#include "Renderer.h"
 #include "RHI/RHI.h"
 #include "volk.h"
 #include "CoreObjects/Engine.h"

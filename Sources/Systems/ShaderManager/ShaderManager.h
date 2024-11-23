@@ -20,7 +20,11 @@ public:
     static TSharedPtr<FShader> CreateShader(TSharedPtr<FVertexShaderProgram> InVertex,
         TSharedPtr <FPixelShaderProgram> InPixel );
 
+    static FShader * GetShaderFromName(const FString & Name);
+
     void AddShader(TSharedPtr <FShader> InShader);
+
+    virtual void OnInitialize() override;
 
     virtual void OnPostInit() override;
 
@@ -30,11 +34,15 @@ public:
 
     virtual void Tick(float DeltaTime) override;
 
+
 protected:
+
+    void InitShaders();
 
     TArray <TSharedPtr<FShader>>  Shaders;
     TMap <FString, TWeakPtr <FShader> > ShaderFileMap;
     TMap <FString , bool> ShaderDirtyStates;
+    TMap <FString, TWeakPtr <FShader> > ShaderNameMap;
 };
 
 

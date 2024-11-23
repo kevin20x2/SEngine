@@ -16,6 +16,7 @@
 #include "CoreObjects/Engine.h"
 #include "spirv_reflect.h"
 #include "Platform/Path.h"
+#include "Rendering/Renderer.h"
 
 bool FRHIUtils::IsDeivceSuitable(VkPhysicalDevice Device, VkSurfaceKHR Surface,uint32 & OutIndex)
 {

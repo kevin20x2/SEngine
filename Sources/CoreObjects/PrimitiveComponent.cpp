@@ -6,6 +6,8 @@
 
 #include "volk.h"
 #include "Engine.h"
+#include "Rendering/PrimitiveRenderData.h"
+#include "Rendering/Renderer.h"
 
 void SPrimitiveComponent::CreateRHIResource()
 {

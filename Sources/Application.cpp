@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include "CoreObjects/Engine.h"
 #include "Platform/Window.h"
+#include "Rendering/Renderer.h"
 #include "RHI/RHI.h"
 
 int main()
@@ -23,7 +24,6 @@ int main()
         Window->LoopFrame();
         Engine->UpdateTime();
         Engine->Tick();
-        //Engine->Render();
         Renderer->Render();
     }
 

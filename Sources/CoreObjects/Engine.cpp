@@ -6,10 +6,11 @@
 
 #include "EngineModuleBase.h"
 #include "LocalPlayer.h"
-#include "GUI/ImGUIPort.h"
+#include "GUI/SImGUI.h"
 #include "Platform/Window.h"
 #include "AssetManager/AssetManager.h"
 #include "Systems/ShaderManager/ShaderManager.h"
+#include "Rendering/Renderer.h"
 #include <chrono>
 
 #include "Core/Log.h"
@@ -33,21 +34,23 @@ void FEngine::Initialize()
     Modules.Add(SNew<SShaderManager>());
 
     Input = new FInput;
-    Renderer = new FRenderer;
-    Renderer->Initailize();
+    Renderer = SNew<FRenderer>();
+    Modules.Add(Renderer);
+
     LocalPlayer = SNew<SLocalPlayer>();
     LocalPlayer->GetPlayerController()->InitCameraInput();
-    ImGUIPort = SNew<FImGUIPort>();
+
+    auto AssetManager = SNew<SAssetManager>();
+    Modules.Add(AssetManager);
+    OnInitialize();
+    OnPostInit();
+
+    ImGUIPort = SNew<SImGUI>();
+    Modules.Add(ImGUIPort);
     if(Window)
     {
         ImGUIPort->InitWindow(Window->GetHandle());
     }
-
-    auto AssetManager = SNew<SAssetManager>();
-    Modules.Add(AssetManager);
-
-    OnInitialize();
-    OnPostInit();
 }
 
 void FEngine::OnInitialize()

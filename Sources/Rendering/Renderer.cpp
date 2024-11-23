@@ -11,7 +11,7 @@
 #include "CoreObjects/CameraManager.h"
 #include "CoreObjects/Engine.h"
 #include "CoreObjects/LocalPlayer.h"
-#include "GUI/ImGUIPort.h"
+#include "GUI/SImGUI.h"
 #include "Platform/FbxMeshImporter.h"
 #include "RHI/RHI.h"
 #include "Platform/Path.h"
@@ -26,13 +26,25 @@ void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
 	Renderer->OnResize(Window,Width,Height);
 }
 
-void FRenderer::Initailize()
+void FRenderer::OnPostInit()
 {
 
-	//auto VertexShader = std::make_shared<FVertexShaderProgram>(FPath::GetApplicationDir()+  "/shaders/test.sshader");
-	//auto PixelShader = std::make_shared<FPixelShaderProgram>(FPath::GetApplicationDir() + "/shaders/test.sshader");
+	FCImgTextureLoader Loader;
+	Texture =  Loader.LoadTexture(FPath::GetApplicationDir() + "/Assets/Textures/cloth.png" );
+	SEngineModuleBase::OnPostInit();
+	auto Shader = SShaderManager::GetShaderFromName("test");
+	auto Material = TSharedPtr<SMaterialInterface>(new SMaterialInterface( Shader->AsShared() ) );
+	Material->Initialize(DescriptorPool->Pool,RenderPass.get());
+	Material->SetTexture(3,Texture);
+	FFbxMeshImporter Importer;
+	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/gy.fbx",Material.get());
+}
 
-	Shader = SShaderManager::CreateShader(FPath::GetApplicationDir()+  "/Shaders/test.sshader");
+void FRenderer::OnInitialize()
+{
+
+
+	//Shader = SShaderManager::CreateShader(FPath::GetApplicationDir()+  "/Shaders/test.sshader");
 
 	SceneView = TSharedPtr<FSceneView>(new FSceneView);
 
@@ -43,9 +55,6 @@ void FRenderer::Initailize()
     uint32 MaxFrameInFlight = GRHI->GetMaxFrameInFlight();
 
 	CommandBufferPool = TUniquePtr<FCommandBufferPool>(new FCommandBufferPool());
-
-	FCImgTextureLoader Loader;
-	Texture =  Loader.LoadTexture(FPath::GetApplicationDir() + "/Assets/Textures/cloth.png" );
 
     DescriptorPool = TUniquePtr<FDescriptorPool>(
         FUniformBufferDescriptorPool::Create(100 * MaxFrameInFlight,200 * MaxFrameInFlight)
@@ -58,26 +67,27 @@ void FRenderer::Initailize()
         FRenderPass::Create(SwapChain.get())
         );
 
-	auto Material = TSharedPtr<SMaterialInterface>(new SMaterialInterface(
+	/*auto Material = TSharedPtr<SMaterialInterface>(new SMaterialInterface(
 		Shader
 		) );
 	Material->Initialize(DescriptorPool->Pool,RenderPass.get());
-	//Material->SetupViewData(UniformBuffers);
-	Material->SetTexture(3,Texture);
+	Material->SetTexture(3,Texture);*/
 
 
     CommandBuffers = TUniquePtr<FCommandBuffers>(new FCommandBuffers(MaxFrameInFlight,CommandBufferPool.get()));
 
 	RecreateFrameBuffers();
 
+	/*
 	FFbxMeshImporter Importer;
 	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/gy.fbx",Material.get());
 
+	*/
 	CreateSyncObjects();
-	//Camera = TSharedPtr<SCameraComponent>( new SCameraComponent(nullptr));
-
 
 }
+
+
 
 void FRenderer::Render()
 {

@@ -8,17 +8,16 @@
 #include "PrimitiveRenderData.h"
 #include "SceneView.h"
 #include "Core/BaseTypes.h"
-#include "CoreObjects/CameraComponent.h"
 #include "CoreObjects/PrimitiveComponent.h"
 #include "GLFW/glfw3.h"
 #include "RHI/CommandBuffer.h"
 #include "RHI/DescriptorPool.h"
 #include "RHI/SwapChain.h"
-#include "RHI/UniformBuffer.h"
 #include "RHI/FrameBuffer.h"
 #include "RHI/RenderPass.h"
 #include "RHI/Texture.h"
 #include "Shader.h"
+#include "CoreObjects/EngineModuleBase.h"
 
 
 void OnRawWindowResize(GLFWwindow * Window, int Width, int Height);
@@ -29,12 +28,12 @@ struct FPreRecordBufferContext
 
 };
 
-class FRenderer
+class FRenderer : public SEngineModuleBase
 {
 public:
-    void Initailize();
-
-
+	virtual void OnPostInit() override;
+	virtual void OnInitialize() override;
+    //void Initailize();
     void Render();
 
     void OnResize(GLFWwindow * Window,int32 Width, int32 Height);

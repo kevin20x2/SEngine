@@ -125,7 +125,7 @@ TSharedPtr<FVertexBuffer> FStaticMesh::CreateVertexBuffer()
 	Buffer.resize(BufferSize);
 	char * pBuffer = Buffer.data();
 
-	for(int32 Idx = 0 ; Idx < Positions.size();  ++Idx)
+	for(uint32 Idx = 0 ; Idx < Positions.size();  ++Idx)
 	{
 		memcpy(pBuffer, &Positions[Idx],sizeof(FVector));
 		pBuffer += sizeof(FVector);

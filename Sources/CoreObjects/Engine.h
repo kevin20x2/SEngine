@@ -5,15 +5,16 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 #include "Input/Input.h"
-#include "Rendering/Renderer.h"
+#include "SObject.h"
 
 
 class SAssetManager;
 class SEngineModuleBase;
 class FWindow;
-class FImGUIPort;
+class SImGUI;
 class SLocalPlayer;
 class SWorld;
+class FRenderer;
 
 
 class FEngine
@@ -34,7 +35,7 @@ public:
 
     FRenderer * GetRenderer() const
     {
-        return Renderer;
+        return Renderer.get();
     }
 
     SLocalPlayer * GetLocalPlayer() const
@@ -47,7 +48,7 @@ public:
         Window = InWindow;
     }
 
-    FImGUIPort * GetGUIPort() const
+    SImGUI * GetGUIPort() const
     {
         return ImGUIPort.get() ;
     }
@@ -75,11 +76,11 @@ protected:
 
     FInput * Input;
 
-    FRenderer * Renderer;
+    TSharedPtr<FRenderer>  Renderer;
 
     TSharedPtr<SLocalPlayer> LocalPlayer;
 
-    TSharedPtr<FImGUIPort> ImGUIPort;
+    TSharedPtr<SImGUI> ImGUIPort;
 
     TSharedPtr<FWindow> Window;
 

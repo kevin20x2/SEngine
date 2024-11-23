@@ -118,8 +118,8 @@ set(EngineSources
         Sources/CoreObjects/PlayerController.cpp
         Sources/CoreObjects/PlayerController.h
         Sources/Core/Log.h
-        Sources/GUI/ImGUIPort.cpp
-        Sources/GUI/ImGUIPort.h
+        Sources/GUI/SImGUI.cpp
+        Sources/GUI/SImGUI.h
         Sources/Core/Delegate.h
         Sources/AssetManager/DirWatcherBase.cpp
         Sources/AssetManager/DirWatcherBase.h
@@ -130,6 +130,7 @@ set(EngineSources
         Sources/Systems/ShaderManager/ShaderManager.cpp
         Sources/Systems/ShaderManager/ShaderManager.h
         Sources/Interfaces/TickableInterface.h
+        Sources/Core/Macros.h
 
 )
 

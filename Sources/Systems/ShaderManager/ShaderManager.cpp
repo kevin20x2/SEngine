@@ -4,17 +4,27 @@
 
 #include "ShaderManager.h"
 
+#include <filesystem>
+
 #include "AssetManager/AssetManager.h"
 #include "AssetManager/ShaderFileWatcher.h"
 #include "Core/Log.h"
+#include "Platform/Path.h"
+#include "Rendering/Shader.h"
 
 TSharedPtr<FShader> SShaderManager::CreateShader(const FString& ShaderFilePath)
 {
+    if(!ShaderFilePath.ends_with(".sshader")) return nullptr;
+
     auto VertexShader = SNew<FVertexShaderProgram>(ShaderFilePath);
     auto PixelShader = SNew<FPixelShaderProgram>(ShaderFilePath);
     auto Shader = TSharedPtr<FShader>(new FShader( VertexShader,PixelShader));
 
     Shader->SetShaderPath(ShaderFilePath);
+    auto NameWithExt =  FPath::GetFileNameFromPath(ShaderFilePath);
+    auto Name =NameWithExt.substr(0, NameWithExt.find_last_of('.'));
+    Shader->SetName(Name);
+
     auto This = GetEngineModule<SShaderManager>();
     if(This)
     {
@@ -37,6 +47,16 @@ TSharedPtr<FShader> SShaderManager::CreateShader(TSharedPtr<FVertexShaderProgram
     return Result;
 }
 
+FShader* SShaderManager::GetShaderFromName(const FString& Name)
+{
+    auto This = GetEngineModule<SShaderManager>();
+    if(This && This->ShaderNameMap.find(Name) != This->ShaderNameMap.end())
+    {
+        return This->ShaderNameMap[Name].lock().get();
+    }
+    return nullptr;
+}
+
 void SShaderManager::AddShader(TSharedPtr<FShader> InShader)
 {
     Shaders.Add(InShader);
@@ -44,7 +64,14 @@ void SShaderManager::AddShader(TSharedPtr<FShader> InShader)
     if(InShader)
     {
         ShaderFileMap[InShader->GetShaderPath()] = InShader;
+        ShaderNameMap[InShader->GetName()] = InShader;
     }
+}
+
+void SShaderManager::OnInitialize()
+{
+    SEngineModuleBase::OnInitialize();
+    InitShaders();
 }
 
 void SShaderManager::OnPostInit()
@@ -81,6 +108,15 @@ void SShaderManager::Tick(float DeltaTime)
             Shader->OnReCompile();
             State = false;
         }
+    }
+}
+
+void SShaderManager::InitShaders()
+{
+    for(auto const & DirEntry : std::filesystem::recursive_directory_iterator{FPath::GetEngineShaderDir()})
+    {
+        SLogD(TEXT("Init Shader path : {} "),DirEntry.path().string());
+        CreateShader(DirEntry.path().string());
     }
 }
 

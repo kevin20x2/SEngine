@@ -21,6 +21,12 @@ FString FPath::GetDirectoryFromPath(const FString& Path)
 	return stdpath.parent_path().string();
 }
 
+FString FPath::GetFileNameFromPath(const FString& Path)
+{
+	std::filesystem::path stdPath = Path;
+	return stdPath.filename().string();
+}
+
 FString FPath::GetEngineShaderDir()
 {
 	return JoinPath(ROOT_DIR, "Shaders");

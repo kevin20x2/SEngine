@@ -6,5 +6,6 @@
 #define CORE_H
 
 #include "BaseTypes.h"
+#include "Macros.h"
 
 #endif //CORE_H

@@ -6,6 +6,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include "CameraComponent.h"
 #include "CameraManager.h"
 #include "Engine.h"
 #include "Core/Log.h"

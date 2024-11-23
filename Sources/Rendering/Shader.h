@@ -4,12 +4,15 @@
 #pragma once
 #include "RHI/ShaderProgram.h"
 #include "MaterialParameter.h"
+#include "Core/Macros.h"
+#include "CoreObjects/SObject.h"
 
 
 class SMaterialInterface;
 
-class FShader
+class FShader : public SObject
 {
+	S_REGISTER_CLASS(SObject)
 protected:
 	friend class SShaderManager;
 
@@ -45,14 +48,6 @@ public:
 
 	void GenerateDefaultMaterialParams(FMaterialParameters & MaterialParams );
 
-	void SetShaderPath(const FString & Path )
-	{
-		ShaderPath = Path;
-	}
-	const FString & GetShaderPath() const
-	{
-		return ShaderPath;
-	}
 
 	void AddUsedMaterial(SMaterialInterface * MaterialInterface);
 	void RemoveUsedMaterial(SMaterialInterface * MaterialInterace);
@@ -66,7 +61,9 @@ protected:
 	using DescriptorSetLayoutBindingList = TArray <VkDescriptorSetLayoutBinding>;
 	TArray <DescriptorSetLayoutBindingList> GenerateLayoutBindings();
 
-	FString ShaderPath;
+	SPROPERTY(FString, ShaderPath);
+
+	SPROPERTY(FString, Name);
 
 	TSharedPtr <FVertexShaderProgram> VertexShaderProgram;
 	TSharedPtr <FPixelShaderProgram> PixelShaderProgram;
