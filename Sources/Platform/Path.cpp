@@ -27,6 +27,26 @@ FString FPath::GetFileNameFromPath(const FString& Path)
 	return stdPath.filename().string();
 }
 
+static void StringReplaceAll(FString & Str, const FString & From ,const FString & To)
+{
+	if(From.empty()) return ;
+
+	size_t StartPos = 0;
+
+	while((StartPos = Str.find(From ,StartPos )) != std::string::npos)
+	{
+		Str.replace(StartPos,From.length(),To);
+		StartPos += To.length();
+	}
+}
+
+FString FPath::NormalizePath(const FString& Path)
+{
+	auto Result = Path;
+	StringReplaceAll(Result, "\\","/" );
+	return Result;
+}
+
 FString FPath::GetEngineShaderDir()
 {
 	return JoinPath(ROOT_DIR, "Shaders");

@@ -15,8 +15,10 @@
 #include "SPIRV/GlslangToSpv.h"
 #include "CoreObjects/Engine.h"
 #include "spirv_reflect.h"
+#include "Core/Log.h"
 #include "Platform/Path.h"
 #include "Rendering/Renderer.h"
+#include "Systems/ShaderManager/ShaderManager.h"
 
 bool FRHIUtils::IsDeivceSuitable(VkPhysicalDevice Device, VkSurfaceKHR Surface,uint32 & OutIndex)
 {
@@ -131,14 +133,18 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 
 	EShLanguage Language{};
 	FString ShaderEntryName = GetShaderEntryPointByShaderStage(Stage);
+	auto ErrorShader = GEngine->GetModuleByClass<SShaderManager>()->GetShaderFromName("Error");
+	VkShaderModule ErrorShaderModule;
 
 	switch (Stage)
 	{
 	case VK_SHADER_STAGE_VERTEX_BIT:
 		Language = EShLangVertex;
+		if(ErrorShader) ErrorShaderModule = ErrorShader->GetVertexShader()->GetShaderModule();
 		break;
 	case VK_SHADER_STAGE_FRAGMENT_BIT:
 		Language = EShLangFragment;
+		if(ErrorShader) ErrorShaderModule = ErrorShader->GetPixelShader()->GetShaderModule();
 		break;
 	default:
 		break;
@@ -170,7 +176,8 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 
 	if (!Shader.parse(&glslang::DefaultTBuiltInResource, 100, false, Messages,Includer))
 	{
-		spdlog::critical("Failed to parse HLSL Shader ,Error {} \n  {}", Shader.getInfoLog(), Shader.getInfoDebugLog());
+		SLogW("Failed to parse HLSL Shader ,Error {} \n  {}", Shader.getInfoLog(), Shader.getInfoDebugLog());
+		return ErrorShaderModule;
 		//throw std::runtime_error("Fail to parse HLSL Shader");
 	}
 
@@ -180,8 +187,9 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 
 	if (!Program.link(Messages))
 	{
-		printf("Failed to parse HLSL Shader ,Error %s \n  %s", Shader.getInfoDebugLog(), Shader.getInfoDebugLog());
-		throw std::runtime_error("Fail to parse HLSL Shader");
+		SLogE("Failed to parse HLSL Shader ,Error {} \n {}", Shader.getInfoDebugLog(), Shader.getInfoDebugLog());
+		//throw std::runtime_error("Fail to parse HLSL Shader");
+		return ErrorShaderModule;
 	}
 
 

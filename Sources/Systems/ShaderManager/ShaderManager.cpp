@@ -115,8 +115,10 @@ void SShaderManager::InitShaders()
 {
     for(auto const & DirEntry : std::filesystem::recursive_directory_iterator{FPath::GetEngineShaderDir()})
     {
-        SLogD(TEXT("Init Shader path : {} "),DirEntry.path().string());
-        CreateShader(DirEntry.path().string());
+        auto PathString = DirEntry.path().string();
+        SLogD(TEXT("Init Shader path : {} "),PathString);
+        PathString = FPath::NormalizePath(PathString);
+        CreateShader(PathString);
     }
 }
 

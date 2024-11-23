@@ -35,11 +35,5 @@ SamplerState samplerColor : register(s4,space0);
 
 float4 FragmentMain(VSOutput input) :SV_TARGET
 {
-    float4 ao = texColor.Sample(samplerColor,float2(input.Uv.x,1.0f - input.Uv.y));
-    float3 ViewDir = normalize( ViewData.ViewPos - input.WorldPos.xyz);
-    float3 WorldNormal = normalize(input.Normal);
-    float NToL = max(0.0f , dot(WorldNormal , LightData.DirectionalLightDir));
-    float3 LambertDiffuse = pow(NToL * 0.5f + 0.5f,2.0f) * ao;
-    float3 FinalColor = LambertDiffuse * LightData.DirectionalLightColorAndOpacity.xyz ;
-    return float4(FinalColor, 1.0f) ;
+    return float4(1.0f,0.0f,1.0f,1.0f) ;
 }

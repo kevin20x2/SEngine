@@ -18,6 +18,8 @@ public:
 
 	static FString GetFileNameFromPath(const FString & Path);
 
+	static FString NormalizePath(const FString & Path);
+
 	static FString GetEngineShaderDir();
 
 	static FString GetAssetsDir();

@@ -60,17 +60,25 @@ class FVertexShaderProgram : public FShaderProgram
 public:
 	virtual void ReCompile() override;
 
+
+	virtual ~FVertexShaderProgram();
+
 	explicit FVertexShaderProgram(const FString & FilePath);
     explicit FVertexShaderProgram(const char * FilePath );
 	FVertexInputInfo VertexInputInfo;
+protected:
+	void Destroy();
 };
 
 class FPixelShaderProgram : public FShaderProgram
 {
 public:
 	virtual void ReCompile() override;
+	virtual ~FPixelShaderProgram();
     explicit FPixelShaderProgram(const char * FilePath);
 	explicit FPixelShaderProgram(const FString & FilePath);
+protected:
+	void Destroy();
 };
 
 #endif //SHADERPROGRAM_H
