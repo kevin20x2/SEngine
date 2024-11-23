@@ -131,6 +131,7 @@ set(EngineSources
         Sources/Systems/ShaderManager/ShaderManager.h
         Sources/Interfaces/TickableInterface.h
         Sources/Core/Macros.h
+        Sources/Core/Map.h
 
 )
 

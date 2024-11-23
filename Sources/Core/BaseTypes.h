@@ -9,8 +9,8 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <unordered_map>
 #include "Array.h"
+#include "Map.h"
 
 using uint8 = unsigned char;
 using int8 = char;
@@ -32,8 +32,8 @@ template <typename T>
 using TFunction = std::function<T>;
 
 
-template <typename Key, typename Value>
-using TMap  = std::unordered_map<Key,Value>;
+//template <typename Key, typename Value>
+//using TMap  = std::unordered_map<Key,Value>;
 
 using FString = std::string;
 

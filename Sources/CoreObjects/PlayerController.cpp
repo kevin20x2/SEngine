@@ -20,22 +20,32 @@ SPlayerController::SPlayerController()
 void SPlayerController::InitCameraInput()
 {
 	auto Camera = CameraManager->GetCamera()->AsShared();
-	GEngine->GetInput()->GetOnKeyPressed().AddLambda([this ,WeakCamera = TWeakPtr<SCameraComponent>(Camera)]
+	GEngine->GetInput()->GetOnKeyPressing().AddLambda([this ,WeakCamera = TWeakPtr<SCameraComponent>(Camera)]
 		(int32 Key)
 	{
+		auto SharedCamera = WeakCamera.lock();
+		if (SharedCamera == nullptr) return ;
+		auto OldPos = SharedCamera->GetWorldLocation();
 		if(Key  == GLFW_KEY_W)
 		{
-			auto SharedCamera=WeakCamera.lock();
-			if(SharedCamera != nullptr)
-			{
-				auto OldPos = SharedCamera->GetWorldLocation();
-				OldPos.z += MoveSensitivity;
-				SharedCamera->SetWorldLocation(OldPos);
-			}
+			OldPos += SharedCamera->GetUp()* MoveSensitivity;
 		}
+		else if(Key == GLFW_KEY_S)
+		{
+			OldPos += -1.0f* SharedCamera->GetUp()* MoveSensitivity;
+		}
+		else if(Key == GLFW_KEY_A)
+		{
+			OldPos += -1.0f* SharedCamera->GetRight() * MoveSensitivity;
+		}
+		else if(Key == GLFW_KEY_D)
+		{
+			OldPos += SharedCamera->GetRight()* MoveSensitivity;
+		}
+		SharedCamera->SetWorldLocation(OldPos);
 	});
 
-	GEngine->GetInput()->BindKey(GLFW_KEY_S, [this, WeakCamera = TWeakPtr<SCameraComponent>(Camera)]()
+	/*GEngine->GetInput()->BindKey(GLFW_KEY_S, [this, WeakCamera = TWeakPtr<SCameraComponent>(Camera)]()
 	{
 		auto SharedCamera=WeakCamera.lock();
 		if(SharedCamera != nullptr)
@@ -65,7 +75,7 @@ void SPlayerController::InitCameraInput()
 			OldPos.y += MoveSensitivity;
 			SharedCamera->SetWorldLocation(OldPos);
 		}
-	});
+	});*/
 
 
 	GEngine->GetInput()->BindScrollOperation([WeakCamera = TWeakPtr<SCameraComponent>(Camera)](double Value)

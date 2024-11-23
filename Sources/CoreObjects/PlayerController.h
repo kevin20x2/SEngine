@@ -26,7 +26,7 @@ public:
 
     float XRotationSensitivity = 0.5f;
     float YRotationSensitivity = 0.5f;
-    float MoveSensitivity = 100.0f;
+    float MoveSensitivity = 2.0f;
 
     FQuat BeginRotation ;
 

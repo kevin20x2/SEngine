@@ -25,8 +25,20 @@ FVector SSceneComponent::GetForward() const
     return glm::normalize(Dir);
 }
 
+FVector SSceneComponent::GetRight() const
+{
+    auto Dir = WorldTransform.Rotation * FVector(0,1,0);
+    return glm::normalize(Dir);
+}
+
+FVector SSceneComponent::GetUp() const
+{
+    auto Dir = WorldTransform.Rotation * FVector(0,0,1);
+    return glm::normalize(Dir);
+}
+
 bool SSceneComponent::AttachToParent(SSceneComponent* InParent,
-    ESceneComponentAttachmentRule AttachmentRule)
+                                     ESceneComponentAttachmentRule AttachmentRule)
 {
     if(!InParent) return false;
     if(Parent.get() == InParent)

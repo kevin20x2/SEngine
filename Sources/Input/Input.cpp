@@ -25,7 +25,7 @@ void RawInputEvent(GLFWwindow* window, int k, int s, int action, int mods)
 #define INPUT_BROADCAST_CASE(KEY) \
     case GLFW_KEY_##KEY : \
         if(action == GLFW_PRESS) Input->BroadCastKeyPress(GLFW_KEY_##KEY);\
-        if(action == GLFW_RELEASE) Input->BroadCastKeyPress(GLFW_KEY_##KEY);\
+        if(action == GLFW_RELEASE) Input->BroadCastKeyRelease(GLFW_KEY_##KEY);\
         break;
 
     switch (k)
@@ -117,6 +117,14 @@ void RawCursorPositionCallback(GLFWwindow* Window, double x, double y)
 void SInput::BroadCastKeyPress(int32 Key)
 {
     OnKeyPressed.Broadcast(Key);
+    if(!KeyPressingMap.Contains(Key))
+    {
+        KeyPressingMap[Key] = true;
+    }
+    else
+    {
+        KeyPressingMap[Key] = true;
+    }
     if(KeyBindingMaps.find(Key) != KeyBindingMaps.end())
     {
         for(auto & Func : KeyBindingMaps[Key])
@@ -129,6 +137,7 @@ void SInput::BroadCastKeyPress(int32 Key)
 void SInput::BroadCastKeyRelease(int32 Key)
 {
     OnKeyReleased.Broadcast(Key);
+    KeyPressingMap[Key] = false;
 }
 
 void SInput::BindScrollOperation(FScrollCallFuncType&& Func)
@@ -249,6 +258,23 @@ void SInput::RegisterDragEnd(FDragEndFuncType&& Func)
 void SInput::RegisterDragging(FDraggingFuncType&& Func)
 {
 	DraggingBindings.emplace_back(Func);
+}
+
+bool SInput::IsTickable() const
+{
+    return true;
+}
+
+void SInput::Tick(float DeltaTime)
+{
+    SEngineModuleBase::Tick(DeltaTime);
+    for(auto & [Key , IsPressing] : KeyPressingMap)
+    {
+        if(IsPressing)
+        {
+            OnKeyPressing.Broadcast(Key);
+        }
+    }
 }
 
 void SInput::BindKey(int key, FKeyCallFuncType && Func)

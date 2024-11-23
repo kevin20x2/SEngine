@@ -34,6 +34,9 @@ public:
 
     using FMouseCallFuncType = TFunction<void ()>;
 
+    virtual bool IsTickable() const override;
+    virtual void Tick(float DeltaTime) override;
+
     void BindKey(int32 key , FKeyCallFuncType && Func );
     void BroadCastKeyPress(int32 Key);
     void BroadCastKeyRelease(int32 Key);

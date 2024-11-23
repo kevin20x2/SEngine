@@ -47,6 +47,8 @@ public:
         WorldTransform.Rotation = Rotation;
     }
     FVector GetForward() const ;
+    FVector GetRight() const;
+    FVector GetUp() const;
 
     SSceneComponent * GetParent() const
     {
