@@ -33,9 +33,9 @@ void FEngine::Initialize()
 
     Modules.Add(SNew<SShaderManager>());
 
-    Input = new FInput;
-    Renderer = SNew<SRenderer>();
-    Modules.Add(Renderer);
+    Input = SNew<SInput>(); Modules.Add(Input);
+
+    Renderer = SNew<SRenderer>(); Modules.Add(Renderer);
 
     LocalPlayer = SNew<SLocalPlayer>();
     LocalPlayer->GetPlayerController()->InitCameraInput();

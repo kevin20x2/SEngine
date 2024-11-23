@@ -4,10 +4,10 @@
 
 #ifndef ENGINE_H
 #define ENGINE_H
-#include "Input/Input.h"
 #include "SObject.h"
 
 
+class SInput;
 class SAssetManager;
 class SEngineModuleBase;
 class FWindow;
@@ -15,6 +15,7 @@ class SImGUI;
 class SLocalPlayer;
 class SWorld;
 class SRenderer;
+
 
 
 class FEngine
@@ -28,9 +29,9 @@ public:
     void OnInitialize();
     void OnPostInit();
 
-    FInput * GetInput() const
+    SInput * GetInput() const
     {
-        return Input;
+        return Input.get();
     }
 
     SRenderer * GetRenderer() const
@@ -74,7 +75,7 @@ public:
 protected:
     SWorld * World;
 
-    FInput * Input;
+    TSharedPtr <SInput> Input;
 
     TSharedPtr<SRenderer>  Renderer;
 

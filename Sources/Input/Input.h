@@ -5,6 +5,8 @@
 #ifndef INPUT_H
 #define INPUT_H
 #include "Core/BaseTypes.h"
+#include "Core/Delegate.h"
+#include "CoreObjects/EngineModuleBase.h"
 #include "GLFW/glfw3.h"
 
 
@@ -22,8 +24,9 @@ enum class EMouseType
     Right
 };
 
-class FInput
+class SInput : public SEngineModuleBase
 {
+    S_REGISTER_CLASS(SEngineModuleBase)
 public:
     using FKeyCallFuncType = TFunction<void ()>;
 
@@ -33,6 +36,7 @@ public:
 
     void BindKey(int32 key , FKeyCallFuncType && Func );
     void BroadCastKeyPress(int32 Key);
+    void BroadCastKeyRelease(int32 Key);
 
     void BindScrollOperation(FScrollCallFuncType && Func);
     void BroadCastScrollOperation(double x , double y);
@@ -56,12 +60,23 @@ public:
     void RegisterDragEnd(FDragEndFuncType && Func);
     void RegisterDragging(FDraggingFuncType && Func);
 
+    auto & GetOnKeyPressed() {return OnKeyPressed;}
+    auto & GetOnKeyReleased() {return OnKeyReleased;}
+    auto & GetOnKeyPressing() { return OnKeyPressing;}
+
 protected:
     TArray <FDragBeginFuncType> DragBeginBindings ;
     TArray <FDraggingFuncType> DraggingBindings ;
     TArray <FDragEndFuncType> DragEndBindings ;
 
 protected:
+
+    MulticastDelegate<int32> OnKeyPressed;
+    MulticastDelegate<int32> OnKeyReleased;
+    MulticastDelegate<int32> OnKeyPressing;
+
+    TMap <int32, bool> KeyPressingMap ;
+
     TMap <int32, TArray <FKeyCallFuncType> > KeyBindingMaps;
 
     TArray <FScrollCallFuncType> ScrollBindings;

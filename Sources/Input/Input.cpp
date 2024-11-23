@@ -13,9 +13,9 @@
 
 void RawInputEvent(GLFWwindow* window, int k, int s, int action, int mods)
 {
-    if(action != GLFW_PRESS) return;
+    if(action != GLFW_PRESS && action != GLFW_RELEASE) return;
 
-    FInput * Input = nullptr;
+    SInput * Input = nullptr;
     if(GEngine)
     {
         Input = GEngine->GetInput();
@@ -24,7 +24,8 @@ void RawInputEvent(GLFWwindow* window, int k, int s, int action, int mods)
 
 #define INPUT_BROADCAST_CASE(KEY) \
     case GLFW_KEY_##KEY : \
-        Input->BroadCastKeyPress(GLFW_KEY_##KEY);\
+        if(action == GLFW_PRESS) Input->BroadCastKeyPress(GLFW_KEY_##KEY);\
+        if(action == GLFW_RELEASE) Input->BroadCastKeyPress(GLFW_KEY_##KEY);\
         break;
 
     switch (k)
@@ -62,7 +63,7 @@ void RawScrollCallback(GLFWwindow* Window, double x, double y)
 {
     //spdlog::info("Scroll :  {} {}\n",x,y);
 
-    FInput * Input = nullptr;
+    SInput * Input = nullptr;
     if(GEngine)
     {
         Input = GEngine->GetInput();
@@ -73,7 +74,7 @@ void RawScrollCallback(GLFWwindow* Window, double x, double y)
 
 void RawMouseButtonCallback(GLFWwindow* Window, int button, int action, int mods)
 {
-    FInput* Input = nullptr;
+    SInput* Input = nullptr;
     if(GEngine)
     {
         Input = GEngine->GetInput();
@@ -103,7 +104,7 @@ void RawCursorPositionCallback(GLFWwindow* Window, double x, double y)
 {
     //spdlog::info("cursor moved {} {}",x,y);
 
-    FInput* Input = nullptr;
+    SInput* Input = nullptr;
     if(GEngine)
     {
         Input = GEngine->GetInput();
@@ -113,8 +114,9 @@ void RawCursorPositionCallback(GLFWwindow* Window, double x, double y)
     Input->OnCursorPosition(x,y);
 }
 
-void FInput::BroadCastKeyPress(int32 Key)
+void SInput::BroadCastKeyPress(int32 Key)
 {
+    OnKeyPressed.Broadcast(Key);
     if(KeyBindingMaps.find(Key) != KeyBindingMaps.end())
     {
         for(auto & Func : KeyBindingMaps[Key])
@@ -124,12 +126,17 @@ void FInput::BroadCastKeyPress(int32 Key)
     }
 }
 
-void FInput::BindScrollOperation(FScrollCallFuncType&& Func)
+void SInput::BroadCastKeyRelease(int32 Key)
+{
+    OnKeyReleased.Broadcast(Key);
+}
+
+void SInput::BindScrollOperation(FScrollCallFuncType&& Func)
 {
     ScrollBindings.push_back(Func);
 }
 
-void FInput::BroadCastScrollOperation(double x, double y)
+void SInput::BroadCastScrollOperation(double x, double y)
 {
     for(auto & Func : ScrollBindings)
     {
@@ -137,7 +144,7 @@ void FInput::BroadCastScrollOperation(double x, double y)
     }
 }
 
-void FInput::BroadCastMousePressed(EMouseType Type)
+void SInput::BroadCastMousePressed(EMouseType Type)
 {
     if(MousePressBindings.find(Type) != MousePressBindings.end())
     {
@@ -148,7 +155,7 @@ void FInput::BroadCastMousePressed(EMouseType Type)
     }
 }
 
-void FInput::BroadCastMouseReleased(EMouseType Type)
+void SInput::BroadCastMouseReleased(EMouseType Type)
 {
     if(MouseReleaseBindings.find(Type) != MouseReleaseBindings.end())
     {
@@ -159,13 +166,13 @@ void FInput::BroadCastMouseReleased(EMouseType Type)
     }
 }
 
-void FInput::OnMousePressed(EMouseType Type, double X, double Y)
+void SInput::OnMousePressed(EMouseType Type, double X, double Y)
 {
     MousePressStates[Type] = {true,false, X,Y } ;
     BroadCastMousePressed(Type);
 }
 
-void FInput::OnMouseReleased(EMouseType Type, double X, double Y)
+void SInput::OnMouseReleased(EMouseType Type, double X, double Y)
 {
     if(MousePressStates[Type].bDragBegin )
     {
@@ -175,7 +182,7 @@ void FInput::OnMouseReleased(EMouseType Type, double X, double Y)
     BroadCastMouseReleased(Type);
 }
 
-void FInput::OnCursorPosition(double x, double y)
+void SInput::OnCursorPosition(double x, double y)
 {
     constexpr double DragDisThreasHold = 1.5;
     for(auto & [Type , State] : MousePressStates)
@@ -202,7 +209,7 @@ void FInput::OnCursorPosition(double x, double y)
 
 }
 
-void FInput::OnDragBegin(EMouseType Type)
+void SInput::OnDragBegin(EMouseType Type)
 {
     spdlog::info("Drag begin ");
     for(auto & Func : DragBeginBindings)
@@ -211,7 +218,7 @@ void FInput::OnDragBegin(EMouseType Type)
     }
 }
 
-void FInput::OnDragging(EMouseType Type, float DeltaX, float DeltaY)
+void SInput::OnDragging(EMouseType Type, float DeltaX, float DeltaY)
 {
     spdlog::info("Draging {} {} ",DeltaX,DeltaY);
     for(auto & Func : DraggingBindings)
@@ -220,7 +227,7 @@ void FInput::OnDragging(EMouseType Type, float DeltaX, float DeltaY)
     }
 }
 
-void FInput::OnDragEnd(EMouseType Type)
+void SInput::OnDragEnd(EMouseType Type)
 {
     spdlog::info("Drag end");
     for(auto & Func : DragEndBindings)
@@ -229,22 +236,22 @@ void FInput::OnDragEnd(EMouseType Type)
     }
 }
 
-void FInput::RegisterDragBegin(FDragBeginFuncType&& Func)
+void SInput::RegisterDragBegin(FDragBeginFuncType&& Func)
 {
 	DragBeginBindings.emplace_back(Func);
 }
 
-void FInput::RegisterDragEnd(FDragEndFuncType&& Func)
+void SInput::RegisterDragEnd(FDragEndFuncType&& Func)
 {
 	DragEndBindings.emplace_back(Func);
 }
 
-void FInput::RegisterDragging(FDraggingFuncType&& Func)
+void SInput::RegisterDragging(FDraggingFuncType&& Func)
 {
 	DraggingBindings.emplace_back(Func);
 }
 
-void FInput::BindKey(int key, FKeyCallFuncType && Func)
+void SInput::BindKey(int key, FKeyCallFuncType && Func)
 {
     if(KeyBindingMaps.find(key) != KeyBindingMaps.end())
     {

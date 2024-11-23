@@ -20,14 +20,18 @@ SPlayerController::SPlayerController()
 void SPlayerController::InitCameraInput()
 {
 	auto Camera = CameraManager->GetCamera()->AsShared();
-	GEngine->GetInput()->BindKey(GLFW_KEY_W, [this ,WeakCamera = TWeakPtr<SCameraComponent>(Camera)]()
+	GEngine->GetInput()->GetOnKeyPressed().AddLambda([this ,WeakCamera = TWeakPtr<SCameraComponent>(Camera)]
+		(int32 Key)
 	{
-		auto SharedCamera=WeakCamera.lock();
-		if(SharedCamera != nullptr)
+		if(Key  == GLFW_KEY_W)
 		{
-			auto OldPos = SharedCamera->GetWorldLocation();
-			OldPos.z += MoveSensitivity;
-			SharedCamera->SetWorldLocation(OldPos);
+			auto SharedCamera=WeakCamera.lock();
+			if(SharedCamera != nullptr)
+			{
+				auto OldPos = SharedCamera->GetWorldLocation();
+				OldPos.z += MoveSensitivity;
+				SharedCamera->SetWorldLocation(OldPos);
+			}
 		}
 	});
 
