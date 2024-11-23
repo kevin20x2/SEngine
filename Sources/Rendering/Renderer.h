@@ -93,7 +93,7 @@ protected:
 
 	TArray <TSharedPtr <FDepthTexture> >  DepthTextures;
 
-	TSharedPtr <FShader> Shader;
+	TSharedPtr <SShader> Shader;
 
     TUniquePtr<FCommandBufferPool> CommandBufferPool;
 

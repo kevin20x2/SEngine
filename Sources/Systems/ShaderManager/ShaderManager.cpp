@@ -12,13 +12,13 @@
 #include "Platform/Path.h"
 #include "Rendering/Shader.h"
 
-TSharedPtr<FShader> SShaderManager::CreateShader(const FString& ShaderFilePath)
+TSharedPtr<SShader> SShaderManager::CreateShader(const FString& ShaderFilePath)
 {
     if(!ShaderFilePath.ends_with(".sshader")) return nullptr;
 
     auto VertexShader = SNew<FVertexShaderProgram>(ShaderFilePath);
     auto PixelShader = SNew<FPixelShaderProgram>(ShaderFilePath);
-    auto Shader = TSharedPtr<FShader>(new FShader( VertexShader,PixelShader));
+    auto Shader = TSharedPtr<SShader>(new SShader( VertexShader,PixelShader));
 
     Shader->SetShaderPath(ShaderFilePath);
     auto NameWithExt =  FPath::GetFileNameFromPath(ShaderFilePath);
@@ -34,10 +34,10 @@ TSharedPtr<FShader> SShaderManager::CreateShader(const FString& ShaderFilePath)
 
 }
 
-TSharedPtr<FShader> SShaderManager::CreateShader(TSharedPtr<FVertexShaderProgram> InVertex,
+TSharedPtr<SShader> SShaderManager::CreateShader(TSharedPtr<FVertexShaderProgram> InVertex,
                                                  TSharedPtr<FPixelShaderProgram> InPixel)
 {
-    auto Result = TSharedPtr <FShader> (new FShader(InVertex, InPixel));
+    auto Result = TSharedPtr <SShader> (new SShader(InVertex, InPixel));
 
     auto This = GetEngineModule<SShaderManager>();
     if(This)
@@ -47,7 +47,7 @@ TSharedPtr<FShader> SShaderManager::CreateShader(TSharedPtr<FVertexShaderProgram
     return Result;
 }
 
-FShader* SShaderManager::GetShaderFromName(const FString& Name)
+SShader* SShaderManager::GetShaderFromName(const FString& Name)
 {
     auto This = GetEngineModule<SShaderManager>();
     if(This && This->ShaderNameMap.find(Name) != This->ShaderNameMap.end())
@@ -57,7 +57,7 @@ FShader* SShaderManager::GetShaderFromName(const FString& Name)
     return nullptr;
 }
 
-void SShaderManager::AddShader(TSharedPtr<FShader> InShader)
+void SShaderManager::AddShader(TSharedPtr<SShader> InShader)
 {
     Shaders.Add(InShader);
 

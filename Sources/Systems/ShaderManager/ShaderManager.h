@@ -9,20 +9,20 @@
 
 class FPixelShaderProgram;
 class FVertexShaderProgram;
-class FShader;
+class SShader;
 
 class SShaderManager : public SEngineModuleBase
 {
     S_REGISTER_CLASS(SEngineModuleBase)
 public:
-    static TSharedPtr <FShader> CreateShader(const FString & ShaderFilePath);
+    static TSharedPtr <SShader> CreateShader(const FString & ShaderFilePath);
 
-    static TSharedPtr<FShader> CreateShader(TSharedPtr<FVertexShaderProgram> InVertex,
+    static TSharedPtr<SShader> CreateShader(TSharedPtr<FVertexShaderProgram> InVertex,
         TSharedPtr <FPixelShaderProgram> InPixel );
 
-    static FShader * GetShaderFromName(const FString & Name);
+    static SShader * GetShaderFromName(const FString & Name);
 
-    void AddShader(TSharedPtr <FShader> InShader);
+    void AddShader(TSharedPtr <SShader> InShader);
 
     virtual void OnInitialize() override;
 
@@ -39,10 +39,10 @@ protected:
 
     void InitShaders();
 
-    TArray <TSharedPtr<FShader>>  Shaders;
-    TMap <FString, TWeakPtr <FShader> > ShaderFileMap;
+    TArray <TSharedPtr<SShader>>  Shaders;
+    TMap <FString, TWeakPtr <SShader> > ShaderFileMap;
     TMap <FString , bool> ShaderDirtyStates;
-    TMap <FString, TWeakPtr <FShader> > ShaderNameMap;
+    TMap <FString, TWeakPtr <SShader> > ShaderNameMap;
 };
 
 

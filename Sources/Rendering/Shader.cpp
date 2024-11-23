@@ -9,17 +9,17 @@
 #include "RHI/RHI.h"
 
 
-void FShader::AddUsedMaterial(SMaterialInterface* MaterialInterface)
+void SShader::AddUsedMaterial(SMaterialInterface* MaterialInterface)
 {
 	UsedMaterials.AddUnique(MaterialInterface->AsShared());
 }
 
-void FShader::RemoveUsedMaterial(SMaterialInterface* MaterialInterace)
+void SShader::RemoveUsedMaterial(SMaterialInterface* MaterialInterace)
 {
 	UsedMaterials.Remove(MaterialInterace->AsShared());
 }
 
-void FShader::OnReCompile()
+void SShader::OnReCompile()
 {
 	if(VertexShaderProgram)
 	{
@@ -38,7 +38,7 @@ void FShader::OnReCompile()
 	}
 }
 
-void FShader::GenerateDescriptorSetLayout()
+void SShader::GenerateDescriptorSetLayout()
 {
 	if(VertexShaderProgram == nullptr || PixelShaderProgram == nullptr)
 	{
@@ -90,7 +90,7 @@ void FShader::GenerateDescriptorSetLayout()
 	}
 }
 void
-FShader::GenerateDefaultMaterialParams(FMaterialParameters &MaterialParams)
+SShader::GenerateDefaultMaterialParams(FMaterialParameters &MaterialParams)
 {
 	auto BindingListList = GenerateLayoutBindings();
 	uint32 DescriptorIdx = 0 ;
@@ -118,8 +118,8 @@ FShader::GenerateDefaultMaterialParams(FMaterialParameters &MaterialParams)
 		DescriptorIdx ++ ;
 	}
 }
-TArray<FShader::DescriptorSetLayoutBindingList>
-FShader::GenerateLayoutBindings()
+TArray<SShader::DescriptorSetLayoutBindingList>
+SShader::GenerateLayoutBindings()
 {
 
 	if(VertexShaderProgram == nullptr || PixelShaderProgram == nullptr)
@@ -134,7 +134,7 @@ FShader::GenerateLayoutBindings()
 		return {};
 	}
 
-	TArray<FShader::DescriptorSetLayoutBindingList> Results;
+	TArray<SShader::DescriptorSetLayoutBindingList> Results;
 
 	for(uint32 i = 0 ; i < VertexInfos.size(); ++ i)
 	{

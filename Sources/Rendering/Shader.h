@@ -10,13 +10,13 @@
 
 class SMaterialInterface;
 
-class FShader : public SObject
+class SShader : public SObject
 {
 	S_REGISTER_CLASS(SObject)
 protected:
 	friend class SShaderManager;
 
-	FShader(TSharedPtr<FVertexShaderProgram> InVert , TSharedPtr<FPixelShaderProgram> InPixel) :
+	SShader(TSharedPtr<FVertexShaderProgram> InVert , TSharedPtr<FPixelShaderProgram> InPixel) :
 		VertexShaderProgram(InVert),PixelShaderProgram(InPixel)
 	{
 		GenerateDescriptorSetLayout();

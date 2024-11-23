@@ -17,7 +17,7 @@ class SMaterialInterface : public SObject
 {
 	S_REGISTER_CLASS(SObject)
 public:
-	explicit SMaterialInterface(TSharedPtr<FShader> InShader) :
+	explicit SMaterialInterface(TSharedPtr<SShader> InShader) :
 		Shader(InShader)
 	{
 	}
@@ -50,7 +50,7 @@ public:
 
 protected:
 
-	TSharedPtr <FShader> Shader;
+	TSharedPtr <SShader> Shader;
 	TArray <VkDescriptorSet> DescriptionSets;
 	FMaterialParameters MaterialParameters;
 	TSharedPtr <FGraphicsPipeline> GraphicPipeline;

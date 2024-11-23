@@ -14,7 +14,7 @@
 
 struct FGrpahicsPipelineCreateInfo
 {
-	FShader * Shader;
+	SShader * Shader;
     FRenderPass * RenderPass;
 };
 
