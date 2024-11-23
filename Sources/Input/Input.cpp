@@ -4,7 +4,8 @@
 
 #include "Input.h"
 
-#include <cstdio>
+#include <imgui.h>
+
 
 #include "CoreObjects/Engine.h"
 #include "Maths/Math.h"
@@ -81,6 +82,12 @@ void RawMouseButtonCallback(GLFWwindow* Window, int button, int action, int mods
     }
     if(!Input) return ;
 
+    auto & io = ImGui::GetIO();
+    if(io.WantCaptureMouse)
+    {
+        return ;
+    }
+
     double X , Y;
 
     glfwGetCursorPos(Window,&X,&Y);
@@ -125,13 +132,7 @@ void SInput::BroadCastKeyPress(int32 Key)
     {
         KeyPressingMap[Key] = true;
     }
-    if(KeyBindingMaps.find(Key) != KeyBindingMaps.end())
-    {
-        for(auto & Func : KeyBindingMaps[Key])
-        {
-            Func();
-        }
-    }
+
 }
 
 void SInput::BroadCastKeyRelease(int32 Key)
@@ -277,14 +278,4 @@ void SInput::Tick(float DeltaTime)
     }
 }
 
-void SInput::BindKey(int key, FKeyCallFuncType && Func)
-{
-    if(KeyBindingMaps.find(key) != KeyBindingMaps.end())
-    {
-        KeyBindingMaps[key].push_back(Func);
-    }
-    else
-    {
-        KeyBindingMaps[key] = {Func};
-    }
-}
+

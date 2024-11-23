@@ -95,6 +95,7 @@ void SImGUI::InitWindow(GLFWwindow *InGLFWwindow)
     init_info.CheckVkResultFn = Check_Vk_result;
     ImGui_ImplVulkan_Init(&init_info);
 
+
 }
 
 void SImGUI::ShutDown()
@@ -114,9 +115,9 @@ void SImGUI::OnRecordGUIData()
     // Start the Dear ImGui frame
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
+    ImGuiIO & io = ImGui::GetIO();
     ImGui::NewFrame();
 
-    ImGuiIO & io = ImGui::GetIO();
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).

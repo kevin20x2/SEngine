@@ -28,7 +28,6 @@ class SInput : public SEngineModuleBase
 {
     S_REGISTER_CLASS(SEngineModuleBase)
 public:
-    using FKeyCallFuncType = TFunction<void ()>;
 
     using FScrollCallFuncType = TFunction<void (double)>;
 
@@ -37,7 +36,6 @@ public:
     virtual bool IsTickable() const override;
     virtual void Tick(float DeltaTime) override;
 
-    void BindKey(int32 key , FKeyCallFuncType && Func );
     void BroadCastKeyPress(int32 Key);
     void BroadCastKeyRelease(int32 Key);
 
@@ -80,7 +78,7 @@ protected:
 
     TMap <int32, bool> KeyPressingMap ;
 
-    TMap <int32, TArray <FKeyCallFuncType> > KeyBindingMaps;
+    //TMap <int32, TArray <FKeyCallFuncType> > KeyBindingMaps;
 
     TArray <FScrollCallFuncType> ScrollBindings;
 
