@@ -34,7 +34,7 @@ void FEngine::Initialize()
     Modules.Add(SNew<SShaderManager>());
 
     Input = new FInput;
-    Renderer = SNew<FRenderer>();
+    Renderer = SNew<SRenderer>();
     Modules.Add(Renderer);
 
     LocalPlayer = SNew<SLocalPlayer>();

@@ -26,7 +26,7 @@ void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
 	Renderer->OnResize(Window,Width,Height);
 }
 
-void FRenderer::OnPostInit()
+void SRenderer::OnPostInit()
 {
 
 	FCImgTextureLoader Loader;
@@ -40,11 +40,9 @@ void FRenderer::OnPostInit()
 	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/gy.fbx",Material.get());
 }
 
-void FRenderer::OnInitialize()
+void SRenderer::OnInitialize()
 {
 
-
-	//Shader = SShaderManager::CreateShader(FPath::GetApplicationDir()+  "/Shaders/test.sshader");
 
 	SceneView = TSharedPtr<FSceneView>(new FSceneView);
 
@@ -67,29 +65,18 @@ void FRenderer::OnInitialize()
         FRenderPass::Create(SwapChain.get())
         );
 
-	/*auto Material = TSharedPtr<SMaterialInterface>(new SMaterialInterface(
-		Shader
-		) );
-	Material->Initialize(DescriptorPool->Pool,RenderPass.get());
-	Material->SetTexture(3,Texture);*/
-
 
     CommandBuffers = TUniquePtr<FCommandBuffers>(new FCommandBuffers(MaxFrameInFlight,CommandBufferPool.get()));
 
 	RecreateFrameBuffers();
 
-	/*
-	FFbxMeshImporter Importer;
-	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/gy.fbx",Material.get());
-
-	*/
 	CreateSyncObjects();
 
 }
 
 
 
-void FRenderer::Render()
+void SRenderer::Render()
 {
 
 	auto Device = *GRHI->GetDevice();
@@ -153,7 +140,7 @@ void FRenderer::Render()
 	CurrentFrame = (CurrentFrame + 1) % GRHI->GetMaxFrameInFlight();
 }
 
-void FRenderer::OnResize(GLFWwindow* Window, int32 Width, int32 Height)
+void SRenderer::OnResize(GLFWwindow* Window, int32 Width, int32 Height)
 {
 	printf("Resize %d %d",Width,Height);
 	RecreateSwapChains();
@@ -174,7 +161,7 @@ void FRenderer::OnResize(GLFWwindow* Window, int32 Width, int32 Height)
 
 
 
-void FRenderer::RecreateFrameBuffers()
+void SRenderer::RecreateFrameBuffers()
 {
 	FrameBuffers.clear();
     uint32 MaxFrameInFlight = GRHI->GetMaxFrameInFlight();
@@ -189,7 +176,7 @@ void FRenderer::RecreateFrameBuffers()
     }
 }
 
-void FRenderer::CreateSyncObjects()
+void SRenderer::CreateSyncObjects()
 {
     int32 Count = GRHI->GetMaxFrameInFlight();
 	ImageAvailableSems.resize(Count);
@@ -214,7 +201,7 @@ void FRenderer::CreateSyncObjects()
 	}
 }
 
-void FRenderer::PreRecordCommandBuffer(uint32 ImageIndex)
+void SRenderer::PreRecordCommandBuffer(uint32 ImageIndex)
 {
 	FPreRecordBufferContext Context = {
 		.RenderPass = RenderPass.get()
@@ -228,7 +215,7 @@ void FRenderer::PreRecordCommandBuffer(uint32 ImageIndex)
 	}
 }
 
-void FRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageIndex)
+void SRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageIndex)
 {
 	if(ImageIndex >= FrameBuffers.size()) return;
 	VkCommandBufferBeginInfo beginInfo{};
@@ -286,12 +273,12 @@ void FRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 	VK_CHECK(vkEndCommandBuffer(CommandBuffer));
 }
 FCommandBufferPool *
-FRenderer::GetCommandBufferPool() const
+SRenderer::GetCommandBufferPool() const
 {
 	return CommandBufferPool.get();
 }
 
-void FRenderer::RecreateSwapChains()
+void SRenderer::RecreateSwapChains()
 {
 	if(SwapChain)
 	{
@@ -310,7 +297,7 @@ void FRenderer::RecreateSwapChains()
 			                                       });
 	}
 }
-bool FRenderer::OnAddPrimitive(SPrimitiveComponent *InComp)
+bool SRenderer::OnAddPrimitive(SPrimitiveComponent *InComp)
 {
 	if(InComp == nullptr) return false;
 
@@ -322,7 +309,7 @@ bool FRenderer::OnAddPrimitive(SPrimitiveComponent *InComp)
 	Primitives.Add(InComp->AsShared());
 	return true;
 }
-bool FRenderer::OnRemovePrimitive(SPrimitiveComponent *InComp)
+bool SRenderer::OnRemovePrimitive(SPrimitiveComponent *InComp)
 {
 	if(InComp == nullptr) return false;
 

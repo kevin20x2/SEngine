@@ -14,7 +14,7 @@ class FWindow;
 class SImGUI;
 class SLocalPlayer;
 class SWorld;
-class FRenderer;
+class SRenderer;
 
 
 class FEngine
@@ -33,7 +33,7 @@ public:
         return Input;
     }
 
-    FRenderer * GetRenderer() const
+    SRenderer * GetRenderer() const
     {
         return Renderer.get();
     }
@@ -76,7 +76,7 @@ protected:
 
     FInput * Input;
 
-    TSharedPtr<FRenderer>  Renderer;
+    TSharedPtr<SRenderer>  Renderer;
 
     TSharedPtr<SLocalPlayer> LocalPlayer;
 

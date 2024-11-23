@@ -28,9 +28,11 @@ struct FPreRecordBufferContext
 
 };
 
-class FRenderer : public SEngineModuleBase
+class SRenderer : public SEngineModuleBase
 {
 public:
+	S_REGISTER_CLASS(SEngineModuleBase)
+
 	virtual void OnPostInit() override;
 	virtual void OnInitialize() override;
     //void Initailize();
