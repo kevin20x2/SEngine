@@ -20,6 +20,7 @@
 #include "CoreObjects/EngineModuleBase.h"
 
 
+class FRenderTargetGroup;
 void OnRawWindowResize(GLFWwindow * Window, int Width, int Height);
 
 struct FPreRecordBufferContext
@@ -91,7 +92,10 @@ protected:
 
     TSharedPtr<FRenderPass> RenderPass;
 
-	TArray <TSharedPtr <FDepthTexture> >  DepthTextures;
+
+	TArray <TSharedPtr <FDepthTexture>>  DepthTextures;
+
+
 
 	TSharedPtr <SShader> Shader;
 
@@ -105,6 +109,8 @@ protected:
     TArray <
         TSharedPtr <FFrameBuffer >
         > FrameBuffers;
+
+	TSharedPtr <FRenderTargetGroup>  ShadowRTG;
 
     void CreateSyncObjects();
 

@@ -16,12 +16,12 @@
 6. Material -> PipelineObject
 0.ui
 1. hot reload shader
+2. MouseOperation code
+1. shader dynamic binding uniform buffer
 
 TODO:
-1. shader dynamic binding uniform buffer 
 
-2. MouseOperation code
-
+Material GUI 
 
 
 RoadMap:

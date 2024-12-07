@@ -20,6 +20,9 @@ public:
     FFrameBuffer(int32 ViewIdx ,
 				 FRenderPass * InRenderPass,FSwapChain * InSwapChain, TArray < TSharedPtr <FDepthTexture >>  InDepthTexList);
 
+    FFrameBuffer(FRenderPass* InRenderPass,
+        uint32 Width , uint32 Height ,VkImageView ColorView,VkImageView DepthView);
+
     virtual ~FFrameBuffer();
     void Destroy();
 

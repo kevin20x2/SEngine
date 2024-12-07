@@ -17,6 +17,7 @@
 #include "Platform/Path.h"
 #include "Platform/CImgTextureLoader.h"
 #include "RHI/DepthTexture.h"
+#include "RHI/RenderTargetGroup.h"
 #include "Systems/ShaderManager/ShaderManager.h"
 
 void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
@@ -43,7 +44,6 @@ void SRenderer::OnPostInit()
 void SRenderer::OnInitialize()
 {
 
-
 	SceneView = TSharedPtr<FSceneView>(new FSceneView);
 
 	PrimitiveData = TSharedPtr<FPrimitiveRenderData>(new FPrimitiveRenderData());
@@ -62,13 +62,24 @@ void SRenderer::OnInitialize()
 
 
     RenderPass = TSharedPtr<FRenderPass>(
-        FRenderPass::Create(SwapChain.get())
+        FRenderPass::Create(SwapChain->GetFormat())
         );
 
 
     CommandBuffers = TUniquePtr<FCommandBuffers>(new FCommandBuffers(MaxFrameInFlight,CommandBufferPool.get()));
 
 	RecreateFrameBuffers();
+
+	ShadowRTG = TSharedPtr<FRenderTargetGroup>(new FRenderTargetGroup());
+
+	FRenderTargetGroupCreateParams CreateParams =
+		{
+		.Width = SwapChain->GetExtent().width,
+		.Height = SwapChain->GetExtent().height
+		};
+
+	ShadowRTG->Initialize( CreateParams );
+
 
 	CreateSyncObjects();
 
@@ -145,7 +156,7 @@ void SRenderer::OnResize(GLFWwindow* Window, int32 Width, int32 Height)
 	printf("Resize %d %d",Width,Height);
 	RecreateSwapChains();
     RenderPass = TSharedPtr<FRenderPass>(
-        FRenderPass::Create(SwapChain.get())
+        FRenderPass::Create(SwapChain->GetFormat())
         );
 	RecreateFrameBuffers();
 	for(auto Primitive  : Primitives)
@@ -155,6 +166,11 @@ void SRenderer::OnResize(GLFWwindow* Window, int32 Width, int32 Height)
 			Primitive->GetMaterial()->CreatePipeline(RenderPass.get());
 		}
 	}
+	FRenderTargetGroupCreateParams Params = {
+		.Width= (uint32)Width,
+		.Height = (uint32)Height
+	};
+	ShadowRTG->Initialize(Params);
 	//RecreatePipeline();
 	//CommandBuffers->FreeCommandBuffer();
 }
@@ -291,11 +307,12 @@ void SRenderer::RecreateSwapChains()
 	for(auto & DepthTexture : DepthTextures) {
 		DepthTexture =
 			FTexture::CreateTexture<FDepthTexture>({
-				                                       0,
-				                                       SwapChain->GetExtent().height,
-				                                       SwapChain->GetExtent().width
-			                                       });
+													   0,
+													   SwapChain->GetExtent().height,
+													   SwapChain->GetExtent().width
+												   });
 	}
+
 }
 bool SRenderer::OnAddPrimitive(SPrimitiveComponent *InComp)
 {

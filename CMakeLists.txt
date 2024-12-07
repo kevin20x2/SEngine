@@ -132,6 +132,14 @@ set(EngineSources
         Sources/Interfaces/TickableInterface.h
         Sources/Core/Macros.h
         Sources/Core/Map.h
+        Sources/RHI/RenderTexture.cpp
+        Sources/RHI/RenderTexture.h
+        Sources/RHI/RenderTargetGroup.cpp
+        Sources/RHI/RenderTargetGroup.h
+        Sources/Rendering/PostProcessManager.cpp
+        Sources/Rendering/PostProcessManager.h
+        Sources/Rendering/PostProcess.cpp
+        Sources/Rendering/PostProcess.h
 
 )
 

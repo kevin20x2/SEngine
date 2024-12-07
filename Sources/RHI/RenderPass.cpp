@@ -8,11 +8,11 @@
 #include "volk.h"
 #include "RHIUtils.h"
 
-FRenderPass* FRenderPass::Create(FSwapChain* SwapChain)
+FRenderPass* FRenderPass::Create(VkFormat InFormat)
 {
 	FRenderPass * Result = new FRenderPass;
 	VkAttachmentDescription colorAttachment{};
-	colorAttachment.format = SwapChain->GetFormat();
+	colorAttachment.format = InFormat;
 	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 
 	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;

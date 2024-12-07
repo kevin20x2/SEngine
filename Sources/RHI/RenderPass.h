@@ -13,7 +13,7 @@ class FRenderPass
 {
 
 public:
-    static FRenderPass * Create(FSwapChain * SwapChain );
+    static FRenderPass * Create(VkFormat InFormat );
 
     virtual ~FRenderPass();
 

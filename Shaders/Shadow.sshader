@@ -1,0 +1,40 @@
+#include "SCommon.hlsl"
+
+
+struct VSInput
+{
+    [[vk::location(0)]] float3 Pos : POSITION ;
+    [[vk::location(2)]] float4 Normal : NORMAL0;
+    [[vk::location(3)]] float2 Uv : TEXCOORD0;
+};
+
+
+struct VSOutput
+{
+    float4 Pos : SV_POSITION;
+    [[vk::location(1)]] float4 Normal : NORMAL0;
+    [[vk::location(2)]] float2 Uv : TEXCOORD0;
+    [[vk::location(3)]] float4 WorldPos : TEXCOORD2;
+};
+
+VSOutput VertexMain(VSInput input)
+{
+    VSOutput output = (VSOutput)0;
+    float4 WorldPos = mul(float4(input.Pos.xyz,1.0f) , PrimitiveData.Model);
+    output.Pos = mul(WorldPos,ViewData.ViewProjection);
+    output.Normal = mul(float4( input.Normal.xyz,0.0f ) ,PrimitiveData.Model);
+    output.WorldPos = WorldPos;
+    output.Uv = input.Uv;
+    return output;
+}
+Texture2D texColor : register(t3 ,space0);
+SamplerState samplerColor : register(s4,space0);
+
+
+
+
+float4 FragmentMain(VSOutput input) :SV_TARGET
+{
+    float Depth = input.Pos.z / input.Pos.w;
+    return float4(Depth,0,0,0);
+}
