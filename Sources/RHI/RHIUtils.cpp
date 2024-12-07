@@ -253,21 +253,22 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 			for(uint32 BindingIdx = 0 ; BindingIdx < ReflectSet.binding_count ; ++ BindingIdx )
 			{
 				const auto & RefBinding = *ReflectSet.bindings[BindingIdx];
-				VkDescriptorSetLayoutBinding & Binding = LayoutInfo.Bindings[BindingIdx];
-				Binding.binding = RefBinding.binding;
-				Binding.descriptorType = static_cast<VkDescriptorType>(RefBinding.descriptor_type);
-				Binding.descriptorCount = 1;
+				auto & Binding = LayoutInfo.Bindings[BindingIdx];
+				Binding.Name = RefBinding.name;
+				Binding.Binding.binding = RefBinding.binding;
+				Binding.Binding.descriptorType = static_cast<VkDescriptorType>(RefBinding.descriptor_type);
+				Binding.Binding.descriptorCount = 1;
 
 				for(uint32 Dim = 0 ; Dim < RefBinding.array.dims_count ; ++ Dim)
 				{
-					Binding.descriptorCount += RefBinding.array.dims[Dim];
+					Binding.Binding.descriptorCount += RefBinding.array.dims[Dim];
 				}
-				Binding.stageFlags = static_cast<VkShaderStageFlagBits>(ReflectShaderModule.shader_stage);
+				Binding.Binding.stageFlags = static_cast<VkShaderStageFlagBits>(ReflectShaderModule.shader_stage);
 			}
 			LayoutInfo.SetNumber = ReflectSet.set;
-			LayoutInfo.CreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-			LayoutInfo.CreateInfo.bindingCount = ReflectSet.binding_count;
-			LayoutInfo.CreateInfo.pBindings = LayoutInfo.Bindings.data();
+			//LayoutInfo.CreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+			//LayoutInfo.CreateInfo.bindingCount = ReflectSet.binding_count;
+			//LayoutInfo.CreateInfo.pBindings = LayoutInfo.Bindings.data();
 		}
 		spvReflectDestroyShaderModule(&ReflectShaderModule);
 	}
@@ -275,6 +276,7 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 	VkShaderModule ShaderModule;
 	VkShaderModuleCreateInfo ModuleCreateInfo;
 	ModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	ModuleCreateInfo.flags = 0;
 	ModuleCreateInfo.codeSize = Spirv.size() * sizeof(uint32_t);
 	ModuleCreateInfo.pCode = Spirv.data();
 	ModuleCreateInfo.pNext = nullptr;

@@ -16,7 +16,6 @@
 #include "RHI/RHI.h"
 #include "Platform/Path.h"
 #include "Platform/CImgTextureLoader.h"
-#include "RHI/DepthTexture.h"
 #include "RHI/RenderTargetGroup.h"
 #include "Systems/ShaderManager/ShaderManager.h"
 
@@ -29,7 +28,6 @@ void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
 
 void SRenderer::OnPostInit()
 {
-
 	FCImgTextureLoader Loader;
 	auto Texture =  Loader.LoadTexture(FPath::GetApplicationDir() + "/Assets/Textures/cloth.png" );
 	SEngineModuleBase::OnPostInit();
@@ -63,6 +61,7 @@ void SRenderer::OnInitialize()
     CommandBuffers = TUniquePtr<FCommandBuffers>(new FCommandBuffers(MaxFrameInFlight,CommandBufferPool.get()));
 
 	ShadowRTG = TSharedPtr<FRenderTargetGroup>(new FRenderTargetGroup());
+	BaseRTG = TSharedPtr<FRenderTargetGroup>(new FRenderTargetGroup());
 
 	FRenderTargetGroupCreateParams CreateParams =
 		{
@@ -71,14 +70,17 @@ void SRenderer::OnInitialize()
 		};
 
 	ShadowRTG->Initialize( CreateParams );
+	BaseRTG->Initialize(CreateParams);
 
 	SwapChainRTG = TSharedPtr <FRenderTargetGroup>(new FRenderTargetGroup());
 	SwapChainRTG->InitializeBySwapChain(SwapChain.get());
+
+	PostProcessManager.reset(new FPostProcessManager);
+	PostProcessManager->InitRenderResource();
+
 	CreateSyncObjects();
 
 }
-
-
 
 void SRenderer::Render()
 {
@@ -163,7 +165,7 @@ void SRenderer::OnResize(GLFWwindow* Window, int32 Width, int32 Height)
 		.Height = (uint32)Height
 	};
 	ShadowRTG->Initialize(Params);
-
+	BaseRTG->Initialize(Params);
 }
 
 
@@ -204,12 +206,21 @@ void SRenderer::PreRecordCommandBuffer(uint32 ImageIndex)
 			P->OnPreRecordCommandBuffer(CurrentFrame,Context);
 		}
 	}
+
+	PostProcessManager->OnPreRecordCommandBuffer(ImageIndex,BaseRTG.get(),SwapChainRTG.get());
 }
 
 void SRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageIndex)
 {
 
-	SwapChainRTG->BeginRenderTargetGroup(CommandBuffer,ImageIndex, FVector4(0.5,0.5,0.5,1.0f));
+
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags = 0;
+	beginInfo.pInheritanceInfo = nullptr;
+	VK_CHECK(vkBeginCommandBuffer(CommandBuffer, &beginInfo));
+
+	BaseRTG->BeginRenderTargetGroup(CommandBuffer,ImageIndex, FVector4(0.5,0.5,0.5,1.0f));
 
 	for(auto P : Primitives)
 	{
@@ -219,10 +230,14 @@ void SRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 		}
 	}
 
-	GEngine->GetGUIPort()->OnRender(CommandBuffer);
+	BaseRTG->EndRenderTargetGroup(CommandBuffer);
 
-	//vkCmdEndRenderPass(CommandBuffer);
+	SwapChainRTG->BeginRenderTargetGroup(CommandBuffer,ImageIndex,FVector4(0,0,0,1));
+
+	PostProcessManager->BeginPostProcess(CurrentFrame,CommandBuffer,BaseRTG.get(),SwapChainRTG.get());
+	GEngine->GetGUIPort()->OnRender(CommandBuffer);
 	SwapChainRTG->EndRenderTargetGroup(CommandBuffer);
+
 	VK_CHECK(vkEndCommandBuffer(CommandBuffer));
 }
 FCommandBufferPool *

@@ -18,7 +18,7 @@ class SMaterialInterface : public SObject
 	S_REGISTER_CLASS(SObject)
 public:
 	explicit SMaterialInterface(TSharedPtr<SShader> InShader) :
-		Shader(InShader)
+		Shader(InShader),bNeedViewData(true)
 	{
 	}
 
@@ -39,6 +39,8 @@ public:
 
 	void SetTexture(uint32 Binding , TSharedPtr <FTexture> InTexture );
 
+	void SetTexture(const FString & Name, TSharedPtr <FTexture>  InTexture);
+
 	void MarkDirty()
 	{
 		bDirty = true;
@@ -49,12 +51,12 @@ public:
 	}
 
 protected:
-
 	TSharedPtr <SShader> Shader;
 	TArray <VkDescriptorSet> DescriptionSets;
 	FMaterialParameters MaterialParameters;
 	TSharedPtr <FGraphicsPipeline> GraphicPipeline;
 	bool bDirty = false;
+	SPROPERTY(bool,bNeedViewData);
 };
 
 

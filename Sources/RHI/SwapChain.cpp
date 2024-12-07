@@ -112,7 +112,7 @@ void FSwapChainImp::CreateSwapChain(VkExtent2D DisplaySize)
 		CreateInfo.queueFamilyIndexCount = 0 ;
 		CreateInfo.pQueueFamilyIndices = nullptr;
 	}
-	CreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR;
+	CreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	CreateInfo.presentMode = PresentMode;
 	CreateInfo.clipped = VK_TRUE;
 	CreateInfo.oldSwapchain = VK_NULL_HANDLE;

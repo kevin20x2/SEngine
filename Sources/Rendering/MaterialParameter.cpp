@@ -33,9 +33,9 @@ FMaterialParameterTexture::GenerateWriteDescriptorSets(VkDescriptorSet Descripto
 	return {ImageWrite};
 }
 
-FMaterialParameterSampler::FMaterialParameterSampler()
+FMaterialParameterSampler::FMaterialParameterSampler(VkFilter Filter)
 {
-	Sampler = SNew<FSampler>();
+	Sampler = SNew<FSampler>(Filter);
 }
 
 TArray<VkWriteDescriptorSet>
@@ -96,6 +96,27 @@ FMaterialParameters::SetTexture(uint32 Binding, TSharedPtr<FTexture> InTexture)
 		}
 		return false;
 	});
+	if(ParamIter != Parameters.end())
+	{
+		if(auto TextureParam = std::static_pointer_cast<FMaterialParameterTexture>(*ParamIter))
+		{
+			TextureParam->Texture = InTexture;
+		}
+	}
+}
+
+void FMaterialParameters::SetTexture(const FString& Name, TSharedPtr<FTexture> InTexture)
+{
+
+	auto ParamIter =  std::find_if(Parameters.begin(), Parameters.end(),
+					   [&] (TSharedPtr <FMaterialParameterBase> Param){
+		if(auto TexturePtr =  std::static_pointer_cast<FMaterialParameterTexture>(Param))
+		{
+			return TexturePtr->Name == Name;
+		}
+		return false;
+	});
+
 	if(ParamIter != Parameters.end())
 	{
 		if(auto TextureParam = std::static_pointer_cast<FMaterialParameterTexture>(*ParamIter))

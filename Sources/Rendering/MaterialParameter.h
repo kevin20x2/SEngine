@@ -32,7 +32,7 @@ public:
 class FMaterialParameterSampler : public FMaterialParameterBase
 {
 public:
-	FMaterialParameterSampler();
+	FMaterialParameterSampler(VkFilter InFilter = VK_FILTER_LINEAR);
 
 	TArray < VkWriteDescriptorSet > GenerateWriteDescriptorSets(VkDescriptorSet DescriptorSet) override;
 	TSharedPtr <FSampler > Sampler;
@@ -45,6 +45,8 @@ public:
 	void BindParametersToDescriptorSet(VkDescriptorSet DescriptorSet);
 
 	void SetTexture(uint32 Binding , TSharedPtr <FTexture> InTexture);
+
+	void SetTexture(const FString & Name, TSharedPtr <FTexture> InTexture);
 
 protected:
 	TArray <VkWriteDescriptorSet> GenerateWriteDescriptorSet(VkDescriptorSet DescriptorSet);

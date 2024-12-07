@@ -61,10 +61,12 @@ class FSampler
 {
 public:
 	FSampler();
+	FSampler(VkFilter InFilter);
 	void Initalize();
 	virtual ~FSampler();
 
 	VkSampler Sampler;
+	VkFilter Filter = VK_FILTER_LINEAR;
 };
 
 

@@ -1,4 +1,3 @@
-#include "SCommon.hlsl"
 
 struct VSInput
 {
@@ -21,9 +20,10 @@ VSOutput VertexMain(VSInput input)
     return output;
 }
 Texture2D texColor : register(t3 ,space0);
-SamplerState samplerColor : register(s4,space0);
+SamplerState pointSampler : register(s4,space0);
 
 float4 FragmentMain(VSOutput input) :SV_TARGET
 {
-    return float4(input.Uv.xy,0.0f, 1.0f) ;
+    float4 Color = texColor.Sample(pointSampler,input.Uv);
+    return float4(Color.xyz, 1.0f) ;
 }

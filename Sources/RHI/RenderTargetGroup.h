@@ -34,6 +34,11 @@ public:
         return RenderPass.get();
     }
 
+    TSharedPtr< FRenderTexture > GetRenderTexture(uint32 Idx) const
+    {
+        return RenderTexture[Idx];
+    }
+
 protected:
     TSharedPtr <FRenderPass> RenderPass;
 

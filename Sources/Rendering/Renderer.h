@@ -5,6 +5,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 #include "LightRenderData.h"
+#include "PostProcessManager.h"
 #include "PrimitiveRenderData.h"
 #include "SceneView.h"
 #include "Core/BaseTypes.h"
@@ -67,7 +68,16 @@ public:
 
 	FRenderPass * GetRenderPass()
 	{
+		return BaseRTG->GetRenderPass();
+	}
+
+	FRenderPass * GetSwapChainRenderPass()
+	{
 		return SwapChainRTG->GetRenderPass();
+	}
+	FRenderTargetGroup * GetBaseRenderTargetGroup()
+	{
+		return BaseRTG.get();
 	}
 
 protected:
@@ -94,8 +104,10 @@ protected:
 	void RecreateSwapChains();
 
 	TSharedPtr <FRenderTargetGroup> SwapChainRTG;
-
 	TSharedPtr <FRenderTargetGroup>  ShadowRTG;
+	TSharedPtr <FRenderTargetGroup> BaseRTG;
+
+	TSharedPtr <FPostProcessManager> PostProcessManager;
 
     void CreateSyncObjects();
 

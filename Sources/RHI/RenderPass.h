@@ -13,7 +13,7 @@ class FRenderPass
 {
 
 public:
-    static FRenderPass * Create(VkFormat InFormat );
+    static FRenderPass * Create(VkFormat InFormat,VkImageLayout ImageLayout  );
 
     virtual ~FRenderPass();
 

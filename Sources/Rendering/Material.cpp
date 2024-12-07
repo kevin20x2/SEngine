@@ -51,8 +51,11 @@ SMaterialInterface::Initialize(VkDescriptorPool Pool, FRenderPass *RenderPass)
 	CreateDescriptionSets(Pool);
 	CreatePipeline(RenderPass);
 	InitMaterialParameters();
-	OnSetupViewData();
-	OnSetupLightData();
+	if(bNeedViewData)
+	{
+		OnSetupViewData();
+		OnSetupLightData();
+	}
 }
 
 void SMaterialInterface::OnPreRecordCommandBuffer(FPrimitiveRenderData* InRenderData, uint32 CurrentFrame,
@@ -87,6 +90,16 @@ SMaterialInterface::SetTexture(uint32 Binding, TSharedPtr<FTexture> InTexture)
 		MaterialParameters.BindParametersToDescriptorSet(DescriptionSet);
 	}
 }
+
+void SMaterialInterface::SetTexture(const FString& Name, TSharedPtr<FTexture> InTexture)
+{
+	MaterialParameters.SetTexture(Name,InTexture);
+	for(auto & DescriptionSet :DescriptionSets)
+	{
+		MaterialParameters.BindParametersToDescriptorSet(DescriptionSet);
+	}
+}
+
 void SMaterialInterface::OnSetupViewData()
 {
 	auto SceneView = GEngine->GetRenderer()->GetSceneView();

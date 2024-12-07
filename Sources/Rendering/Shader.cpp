@@ -55,15 +55,22 @@ void SShader::GenerateDescriptorSetLayout()
 	for(uint32 i = 0 ; i < VertexInfos.size(); ++ i)
 	{
 		TArray <VkDescriptorSetLayoutBinding> Bindings;
-		VkDescriptorSetLayoutCreateInfo CreateInfo = VertexInfos[i].CreateInfo;
+		TArray <VkDescriptorBindingFlags > BindingFlags;
+		VkDescriptorSetLayoutCreateInfo CreateInfo = {};// = VertexInfos[i].CreateInfo;
+		CreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		VkDescriptorSetLayoutBindingFlagsCreateInfo BindingFlagCreateInfo = {
+			.sType =  VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO,
+		};
+		//CreateInfo.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT;
 		for(auto & Binding : VertexInfos[i].Bindings)
 		{
 			if(Bindings.FindByPredict([&](const VkDescriptorSetLayoutBinding & It )
 			{
-				 return  It.binding == Binding.binding;
+				 return  It.binding == Binding.Binding.binding;
 			})== Bindings.end())
 			{
-				Bindings.push_back(Binding);
+				Bindings.push_back(Binding.Binding);
+				BindingFlags.push_back(VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT);
 			}
 		}
 
@@ -71,17 +78,22 @@ void SShader::GenerateDescriptorSetLayout()
 		{
 			if (auto Iter = Bindings.FindByPredict([&](const VkDescriptorSetLayoutBinding& It)
 			{
-				 return  It.binding == Binding.binding;
+				 return  It.binding == Binding.Binding.binding;
 			}) ; Iter == Bindings.end())
 			{
-				Bindings.push_back(Binding);
+				Bindings.push_back(Binding.Binding);
+				BindingFlags.push_back(VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT);
 			}
 			else
 			{
-				Iter->stageFlags |=  Binding.stageFlags;
+				Iter->stageFlags |=  Binding.Binding.stageFlags;
 			}
 		}
 
+		BindingFlagCreateInfo.bindingCount = BindingFlags.size();
+		BindingFlagCreateInfo.pBindingFlags = BindingFlags.data();
+
+		CreateInfo.pNext = &BindingFlagCreateInfo;
 		CreateInfo.bindingCount = Bindings.size();
 		CreateInfo.pBindings = Bindings.data();
 
@@ -98,21 +110,30 @@ SShader::GenerateDefaultMaterialParams(FMaterialParameters &MaterialParams)
 	{
 		for(auto & Binding : BindingList )
 		{
-			if(Binding.descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE)
+			if(Binding.Binding.descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE)
 			{
 				auto & Texture = MaterialParams.Parameters.emplace_back(TSharedPtr<FMaterialParameterTexture>(
 					new FMaterialParameterTexture()
 					));
+				Texture->Name = Binding.Name;
 				Texture->DescriptorIdx = DescriptorIdx;
-				Texture->BindingSlotIdx = Binding.binding;
+				Texture->BindingSlotIdx = Binding.Binding.binding;
 			}
-			if(Binding.descriptorType == VK_DESCRIPTOR_TYPE_SAMPLER)
+			if(Binding.Binding.descriptorType == VK_DESCRIPTOR_TYPE_SAMPLER)
 			{
+				VkFilter FilterType = VK_FILTER_LINEAR;
+				auto Name = Binding.Name;
+				std::transform(Name.begin(),Name.end(),Name.begin(),std::toupper);
+				if(Name.find("POINT") != std::string::npos)
+				{
+					FilterType = VK_FILTER_NEAREST;
+				}
 				auto & Sampler = MaterialParams.Parameters.emplace_back(TSharedPtr <FMaterialParameterSampler>(
-					new FMaterialParameterSampler()
+					new FMaterialParameterSampler(FilterType)
 					));
+				Sampler->Name = Binding.Name;
 				Sampler->DescriptorIdx = DescriptorIdx;
-				Sampler->BindingSlotIdx = Binding.binding;
+				Sampler->BindingSlotIdx = Binding.Binding.binding;
 			}
 		}
 		DescriptorIdx ++ ;
@@ -138,7 +159,7 @@ SShader::GenerateLayoutBindings()
 
 	for(uint32 i = 0 ; i < VertexInfos.size(); ++ i)
 	{
-		TArray <VkDescriptorSetLayoutBinding> Bindings;
+		TArray <FDescriptorSetLayoutBinding> Bindings;
 		for(auto & Binding : VertexInfos[i].Bindings)
 		{
 			Bindings.push_back(Binding);

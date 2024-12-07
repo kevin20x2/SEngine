@@ -86,7 +86,7 @@ void SImGUI::InitWindow(GLFWwindow *InGLFWwindow)
     init_info.Queue = *GRHI->GetGraphicsQueue();
     init_info.PipelineCache = VK_NULL_HANDLE;
     init_info.DescriptorPool = GEngine->GetRenderer()->GetDescriptorPool()->Pool;
-    init_info.RenderPass = GEngine->GetRenderer()->GetRenderPass()->RenderPass;
+    init_info.RenderPass = GEngine->GetRenderer()->GetSwapChainRenderPass()->RenderPass;
     init_info.Subpass = 0;
     init_info.MinImageCount = GRHI->GetMaxFrameInFlight();
     init_info.ImageCount = GRHI->GetMaxFrameInFlight();

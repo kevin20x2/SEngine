@@ -58,7 +58,7 @@ protected:
 
 	void GenerateDescriptorSetLayout();
 
-	using DescriptorSetLayoutBindingList = TArray <VkDescriptorSetLayoutBinding>;
+	using DescriptorSetLayoutBindingList = TArray <FDescriptorSetLayoutBinding>;
 	TArray <DescriptorSetLayoutBindingList> GenerateLayoutBindings();
 
 	SPROPERTY(FString, ShaderPath);

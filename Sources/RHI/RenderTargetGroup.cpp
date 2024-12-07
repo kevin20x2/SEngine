@@ -17,7 +17,7 @@ void FRenderTargetGroup::InitializeBySwapChain(FSwapChain* InSwapChain)
 	const uint32 ImageCount = GRHI->GetMaxFrameInFlight();
 
 	RenderPass = TSharedPtr <FRenderPass>(
-		FRenderPass::Create(InSwapChain->GetFormat()) );
+		FRenderPass::Create(InSwapChain->GetFormat(),VK_IMAGE_LAYOUT_PRESENT_SRC_KHR) );
 
     DepthTexture.resize(ImageCount);
     FrameBuffer.resize(ImageCount);
@@ -41,7 +41,7 @@ void FRenderTargetGroup::Initialize(FRenderTargetGroupCreateParams& Params)
     const uint32 ImageCount = GRHI->GetMaxFrameInFlight();
 
     RenderPass = TSharedPtr <FRenderPass>(
-        FRenderPass::Create(VK_FORMAT_R8G8B8A8_SRGB) );
+        FRenderPass::Create(VK_FORMAT_R8G8B8A8_SRGB,VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) );
 
     RenderTexture.resize(ImageCount);
     DepthTexture.resize(ImageCount);
@@ -66,13 +66,6 @@ void FRenderTargetGroup::Initialize(FRenderTargetGroupCreateParams& Params)
 
 void FRenderTargetGroup::BeginRenderTargetGroup(VkCommandBuffer CommandBuffer, uint32 ImageIdx, FVector4 InClearColor)
 {
-
-	VkCommandBufferBeginInfo beginInfo{};
-	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	beginInfo.flags = 0;
-	beginInfo.pInheritanceInfo = nullptr;
-
-	VK_CHECK(vkBeginCommandBuffer(CommandBuffer, &beginInfo));
 
 	VkExtent2D Extent = {.width = CreateParams.Width,.height = CreateParams.Height };
 	VkRenderPassBeginInfo renderPassInfo{};

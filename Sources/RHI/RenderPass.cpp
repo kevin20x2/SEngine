@@ -8,7 +8,7 @@
 #include "volk.h"
 #include "RHIUtils.h"
 
-FRenderPass* FRenderPass::Create(VkFormat InFormat)
+FRenderPass* FRenderPass::Create(VkFormat InFormat,VkImageLayout ImageLayout)
 {
 	FRenderPass * Result = new FRenderPass;
 	VkAttachmentDescription colorAttachment{};
@@ -22,7 +22,7 @@ FRenderPass* FRenderPass::Create(VkFormat InFormat)
 	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 
 	colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	colorAttachment.finalLayout = ImageLayout;
 
 	VkAttachmentDescription depthAttachment{};
 	depthAttachment.format = FRHIUtils::FindDepthFormat();

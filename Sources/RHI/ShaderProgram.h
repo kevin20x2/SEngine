@@ -8,11 +8,17 @@
 #include "Core/BaseTypes.h"
 
 
+struct FDescriptorSetLayoutBinding
+{
+	FString Name;
+	VkDescriptorSetLayoutBinding Binding;
+};
+
 struct FDescriptorSetLayoutInfo
 {
 	uint32 SetNumber;
-	VkDescriptorSetLayoutCreateInfo CreateInfo;
-	TArray <VkDescriptorSetLayoutBinding> Bindings;
+	//VkDescriptorSetLayoutCreateInfo CreateInfo;
+	TArray <FDescriptorSetLayoutBinding> Bindings;
 };
 
 struct FVertexInputInfo
