@@ -21,11 +21,18 @@ class FRenderTargetGroup
 {
 public:
 
+    void InitializeBySwapChain(FSwapChain * InSwapChain);
+
     void Initialize(FRenderTargetGroupCreateParams & Params);
 
     void BeginRenderTargetGroup(VkCommandBuffer CommandBuffer,uint32 ImageIdx,FVector4 InClearColor);
 
     void EndRenderTargetGroup(VkCommandBuffer CommandBuffer);
+
+    FRenderPass * GetRenderPass() const
+    {
+        return RenderPass.get();
+    }
 
 protected:
     TSharedPtr <FRenderPass> RenderPass;

@@ -6,6 +6,33 @@
 #include "RHI.h"
 #include "volk.h"
 
+void FRenderTargetGroup::InitializeBySwapChain(FSwapChain* InSwapChain)
+{
+
+	CreateParams = {
+		InSwapChain->GetExtent().width,
+		InSwapChain->GetExtent().height
+	};
+
+	const uint32 ImageCount = GRHI->GetMaxFrameInFlight();
+
+	RenderPass = TSharedPtr <FRenderPass>(
+		FRenderPass::Create(InSwapChain->GetFormat()) );
+
+    DepthTexture.resize(ImageCount);
+    FrameBuffer.resize(ImageCount);
+
+	for (uint32 idx = 0; idx < ImageCount; ++idx)
+    {
+        DepthTexture[idx] = FTexture::CreateTexture<FDepthTexture>({0,
+            CreateParams.Height,CreateParams.Width
+        });
+        FrameBuffer[idx] = TSharedPtr<FFrameBuffer>(
+            new FFrameBuffer(idx, RenderPass.get(),InSwapChain,DepthTexture) );
+    }
+
+}
+
 void FRenderTargetGroup::Initialize(FRenderTargetGroupCreateParams& Params)
 {
 

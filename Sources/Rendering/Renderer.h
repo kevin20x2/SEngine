@@ -18,6 +18,7 @@
 #include "RHI/Texture.h"
 #include "Shader.h"
 #include "CoreObjects/EngineModuleBase.h"
+#include "RHI/RenderTargetGroup.h"
 
 
 class FRenderTargetGroup;
@@ -36,7 +37,7 @@ public:
 
 	virtual void OnPostInit() override;
 	virtual void OnInitialize() override;
-    //void Initailize();
+
     void Render();
 
     void OnResize(GLFWwindow * Window,int32 Width, int32 Height);
@@ -66,21 +67,18 @@ public:
 
 	FRenderPass * GetRenderPass()
 	{
-		return RenderPass.get();
+		return SwapChainRTG->GetRenderPass();
 	}
 
 protected:
 
 	TSharedPtr<SActor> Actor;
 
-
 	TArray < TSharedPtr<SPrimitiveComponent> > Primitives;
 
     TUniquePtr<FSwapChain> SwapChain;
 
-
     TUniquePtr<FDescriptorPool > DescriptorPool;
-
 
 	TSharedPtr<FSceneView > SceneView;
 
@@ -88,27 +86,14 @@ protected:
 
 	TSharedPtr <FLightRenderData> LightData;
 
-	TSharedPtr <FTexture> Texture;
-
-    TSharedPtr<FRenderPass> RenderPass;
-
-
-	TArray <TSharedPtr <FDepthTexture>>  DepthTextures;
-
-
-
-	TSharedPtr <SShader> Shader;
 
     TUniquePtr<FCommandBufferPool> CommandBufferPool;
 
     TUniquePtr<FCommandBuffers> CommandBuffers;
 
 	void RecreateSwapChains();
-    void RecreateFrameBuffers();
 
-    TArray <
-        TSharedPtr <FFrameBuffer >
-        > FrameBuffers;
+	TSharedPtr <FRenderTargetGroup> SwapChainRTG;
 
 	TSharedPtr <FRenderTargetGroup>  ShadowRTG;
 

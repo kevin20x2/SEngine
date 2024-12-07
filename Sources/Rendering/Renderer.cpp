@@ -31,11 +31,11 @@ void SRenderer::OnPostInit()
 {
 
 	FCImgTextureLoader Loader;
-	Texture =  Loader.LoadTexture(FPath::GetApplicationDir() + "/Assets/Textures/cloth.png" );
+	auto Texture =  Loader.LoadTexture(FPath::GetApplicationDir() + "/Assets/Textures/cloth.png" );
 	SEngineModuleBase::OnPostInit();
 	auto Shader = SShaderManager::GetShaderFromName("test");
 	auto Material = TSharedPtr<SMaterialInterface>(new SMaterialInterface( Shader->AsShared() ) );
-	Material->Initialize(DescriptorPool->Pool,RenderPass.get());
+	Material->Initialize(DescriptorPool->Pool,GetRenderPass());
 	Material->SetTexture(3,Texture);
 	FFbxMeshImporter Importer;
 	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/gy.fbx",Material.get());
@@ -60,15 +60,7 @@ void SRenderer::OnInitialize()
 
 	RecreateSwapChains();
 
-
-    RenderPass = TSharedPtr<FRenderPass>(
-        FRenderPass::Create(SwapChain->GetFormat())
-        );
-
-
     CommandBuffers = TUniquePtr<FCommandBuffers>(new FCommandBuffers(MaxFrameInFlight,CommandBufferPool.get()));
-
-	RecreateFrameBuffers();
 
 	ShadowRTG = TSharedPtr<FRenderTargetGroup>(new FRenderTargetGroup());
 
@@ -80,7 +72,8 @@ void SRenderer::OnInitialize()
 
 	ShadowRTG->Initialize( CreateParams );
 
-
+	SwapChainRTG = TSharedPtr <FRenderTargetGroup>(new FRenderTargetGroup());
+	SwapChainRTG->InitializeBySwapChain(SwapChain.get());
 	CreateSyncObjects();
 
 }
@@ -155,15 +148,14 @@ void SRenderer::OnResize(GLFWwindow* Window, int32 Width, int32 Height)
 {
 	printf("Resize %d %d",Width,Height);
 	RecreateSwapChains();
-    RenderPass = TSharedPtr<FRenderPass>(
-        FRenderPass::Create(SwapChain->GetFormat())
-        );
-	RecreateFrameBuffers();
+
+	SwapChainRTG->InitializeBySwapChain(SwapChain.get());
+
 	for(auto Primitive  : Primitives)
 	{
 		if(Primitive)
 		{
-			Primitive->GetMaterial()->CreatePipeline(RenderPass.get());
+			Primitive->GetMaterial()->CreatePipeline(GetRenderPass());
 		}
 	}
 	FRenderTargetGroupCreateParams Params = {
@@ -171,26 +163,9 @@ void SRenderer::OnResize(GLFWwindow* Window, int32 Width, int32 Height)
 		.Height = (uint32)Height
 	};
 	ShadowRTG->Initialize(Params);
-	//RecreatePipeline();
-	//CommandBuffers->FreeCommandBuffer();
+
 }
 
-
-
-void SRenderer::RecreateFrameBuffers()
-{
-	FrameBuffers.clear();
-    uint32 MaxFrameInFlight = GRHI->GetMaxFrameInFlight();
-    FrameBuffers.resize(MaxFrameInFlight);
-    int32 ViewIdx = 0;
-    for(auto & FrameBuffer : FrameBuffers )
-    {
-        FrameBuffer = TSharedPtr <FFrameBuffer>( new FFrameBuffer(
-            ViewIdx,RenderPass.get(),SwapChain.get(),DepthTextures
-            ));
-        ViewIdx ++ ;
-    }
-}
 
 void SRenderer::CreateSyncObjects()
 {
@@ -220,7 +195,7 @@ void SRenderer::CreateSyncObjects()
 void SRenderer::PreRecordCommandBuffer(uint32 ImageIndex)
 {
 	FPreRecordBufferContext Context = {
-		.RenderPass = RenderPass.get()
+		.RenderPass = GetRenderPass()
 	};
 	for(auto P : Primitives)
 	{
@@ -233,47 +208,8 @@ void SRenderer::PreRecordCommandBuffer(uint32 ImageIndex)
 
 void SRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageIndex)
 {
-	if(ImageIndex >= FrameBuffers.size()) return;
-	VkCommandBufferBeginInfo beginInfo{};
-	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	beginInfo.flags = 0;
-	beginInfo.pInheritanceInfo = nullptr;
 
-	VK_CHECK(vkBeginCommandBuffer(CommandBuffer, &beginInfo));
-
-	auto SwapChainExtent = SwapChain->GetExtent();
-	VkRenderPassBeginInfo renderPassInfo{};
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	renderPassInfo.renderPass = RenderPass->RenderPass;
-	renderPassInfo.framebuffer = FrameBuffers[ImageIndex]->FrameBuffer;
-	renderPassInfo.renderArea.offset = {0, 0};
-	renderPassInfo.renderArea.extent = SwapChainExtent;
-
-
-	VkViewport viewport{};
-	viewport.width = (float)SwapChainExtent.width;
-	viewport.height = (float)SwapChainExtent.height;
-	viewport.minDepth = 0.0f;
-	viewport.maxDepth = 1.0f;
-
-	VkRect2D scissor{};
-	scissor.extent = SwapChainExtent;
-
-	static float grey= 0.5;
-
-	TArray <VkClearValue> clearColor = {
-		{.color = {grey, grey, grey, 1.0f} },
-		{.depthStencil = {1.0f,0}}
-	};
-
-	renderPassInfo.clearValueCount = clearColor.size();
-	renderPassInfo.pClearValues = clearColor.data();
-	vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo,
-	                     VK_SUBPASS_CONTENTS_INLINE);
-
-
-	vkCmdSetScissor(CommandBuffer, 0, 1, &scissor);
-	vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
+	SwapChainRTG->BeginRenderTargetGroup(CommandBuffer,ImageIndex, FVector4(0.5,0.5,0.5,1.0f));
 
 	for(auto P : Primitives)
 	{
@@ -285,7 +221,8 @@ void SRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 
 	GEngine->GetGUIPort()->OnRender(CommandBuffer);
 
-	vkCmdEndRenderPass(CommandBuffer);
+	//vkCmdEndRenderPass(CommandBuffer);
+	SwapChainRTG->EndRenderTargetGroup(CommandBuffer);
 	VK_CHECK(vkEndCommandBuffer(CommandBuffer));
 }
 FCommandBufferPool *
@@ -302,16 +239,6 @@ void SRenderer::RecreateSwapChains()
 	}
 	SwapChain = std::unique_ptr<FSwapChain>(
 		FSwapChain::CreateSwapChain(GRHI->GetDisplaySize()) );
-
-	DepthTextures.resize(SwapChain->GetImageCount()) ;
-	for(auto & DepthTexture : DepthTextures) {
-		DepthTexture =
-			FTexture::CreateTexture<FDepthTexture>({
-													   0,
-													   SwapChain->GetExtent().height,
-													   SwapChain->GetExtent().width
-												   });
-	}
 
 }
 bool SRenderer::OnAddPrimitive(SPrimitiveComponent *InComp)
