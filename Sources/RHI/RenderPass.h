@@ -13,11 +13,13 @@ class FRenderPass
 {
 
 public:
-    static FRenderPass * Create(VkFormat InFormat,VkImageLayout ImageLayout  );
+    static FRenderPass * Create(VkFormat InFormat,VkImageLayout ImageLayout, uint32 ColorCount = 1  );
 
     virtual ~FRenderPass();
 
     VkRenderPass RenderPass;
+
+    uint32 ColorAttachmentNum = 1;
 };
 
 #endif //RENDERPASS_H

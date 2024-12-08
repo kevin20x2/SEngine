@@ -15,6 +15,7 @@ struct FRenderTargetGroupCreateParams
 {
     uint32 Width;
     uint32 Height;
+    uint32 RenderTexNum =1;
 };
 
 class FRenderTargetGroup
@@ -34,9 +35,9 @@ public:
         return RenderPass.get();
     }
 
-    TSharedPtr< FRenderTexture > GetRenderTexture(uint32 Idx) const
+    TSharedPtr< FRenderTexture > GetRenderTexture(uint32 ImageIdx,uint32 TexIdx = 0) const
     {
-        return RenderTexture[Idx];
+        return RenderTextures[ImageIdx][TexIdx];
     }
 
 protected:
@@ -45,7 +46,8 @@ protected:
     TArray <
     TSharedPtr <FFrameBuffer>> FrameBuffer;
 
-    TArray <TSharedPtr <FRenderTexture> > RenderTexture;
+    using FRenderTextureList = TArray<TSharedPtr <FRenderTexture>>;
+    TArray <FRenderTextureList > RenderTextures;
 
     TArray <TSharedPtr <FDepthTexture >> DepthTexture;
 

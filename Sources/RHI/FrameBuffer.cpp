@@ -45,6 +45,25 @@ FFrameBuffer::FFrameBuffer(FRenderPass* InRenderPass,uint32 Width, uint32 Height
 		&Info , nullptr, &FrameBuffer ));
 }
 
+FFrameBuffer::FFrameBuffer(FRenderPass* InRenderPass, uint32 Width, uint32 Height,
+	const TArray<VkImageView>& ImageViews)
+{
+	TArray <VkImageView> Attachments = ImageViews;
+
+	VkFramebufferCreateInfo Info = {
+		.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+		.renderPass = InRenderPass->RenderPass,
+		.attachmentCount = Attachments.size(),
+		.pAttachments = Attachments.data(),
+		.width = Width,
+		.height = Height,
+		.layers = 1
+	};
+
+	VK_CHECK(vkCreateFramebuffer(*GRHI->GetDevice(),
+		&Info , nullptr, &FrameBuffer ));
+}
+
 FFrameBuffer::~FFrameBuffer()
 {
 	Destroy();

@@ -8,21 +8,29 @@
 #include "volk.h"
 #include "RHIUtils.h"
 
-FRenderPass* FRenderPass::Create(VkFormat InFormat,VkImageLayout ImageLayout)
+FRenderPass* FRenderPass::Create(VkFormat InFormat,VkImageLayout ImageLayout,uint32 ColorCount)
 {
 	FRenderPass * Result = new FRenderPass;
-	VkAttachmentDescription colorAttachment{};
-	colorAttachment.format = InFormat;
-	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 
-	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	Result->ColorAttachmentNum = ColorCount;
+	TArray < VkAttachmentDescription> Attachments;
+	for(uint32 Idx = 0 ; Idx <ColorCount ; ++ Idx)
+	{
+		VkAttachmentDescription colorAttachment;
+		colorAttachment.format = InFormat;
+		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 
-	colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 
-	colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	colorAttachment.finalLayout = ImageLayout;
+		colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+
+		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		colorAttachment.finalLayout = ImageLayout;
+
+		Attachments.Add(colorAttachment);
+	}
 
 	VkAttachmentDescription depthAttachment{};
 	depthAttachment.format = FRHIUtils::FindDepthFormat();
@@ -35,18 +43,23 @@ FRenderPass* FRenderPass::Create(VkFormat InFormat,VkImageLayout ImageLayout)
 	depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 	VkAttachmentReference DepthAttachmentRef {
-		.attachment = 1,
+		.attachment = ColorCount,
 		.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
 	};
 
-	VkAttachmentReference colorAttachmentRef{};
-	colorAttachmentRef.attachment = 0;
-	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+	TArray <VkAttachmentReference> colorAttachmentRefs{};
+	for(uint32 Idx = 0 ;Idx < ColorCount ; ++Idx)
+	{
+		VkAttachmentReference ColorAttachmentRef ;
+		ColorAttachmentRef.attachment = Idx;
+		ColorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		colorAttachmentRefs.Add(ColorAttachmentRef);
+	}
 
 	VkSubpassDescription subpass{};
 	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-	subpass.colorAttachmentCount = 1;
-	subpass.pColorAttachments = &colorAttachmentRef;
+	subpass.colorAttachmentCount = ColorCount;
+	subpass.pColorAttachments = colorAttachmentRefs.data();
 	subpass.pDepthStencilAttachment = & DepthAttachmentRef;
 
 	VkSubpassDependency dependency{};
@@ -57,12 +70,11 @@ FRenderPass* FRenderPass::Create(VkFormat InFormat,VkImageLayout ImageLayout)
 	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
-	TArray <VkAttachmentDescription > Attachments =
-		{colorAttachment,depthAttachment};
+	Attachments.Add(depthAttachment);
 
 	VkRenderPassCreateInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-	renderPassInfo.attachmentCount = 2;
+	renderPassInfo.attachmentCount = ColorCount + 1 ;
 	renderPassInfo.pAttachments = Attachments.data();
 	renderPassInfo.subpassCount = 1;
 	renderPassInfo.pSubpasses = &subpass;

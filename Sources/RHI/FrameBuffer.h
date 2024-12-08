@@ -23,6 +23,10 @@ public:
     FFrameBuffer(FRenderPass* InRenderPass,
         uint32 Width , uint32 Height ,VkImageView ColorView,VkImageView DepthView);
 
+    FFrameBuffer(FRenderPass * InRenderPass,
+        uint32 Width ,uint32 Height,const TArray <VkImageView> & ImageViews
+        );
+
     virtual ~FFrameBuffer();
     void Destroy();
 

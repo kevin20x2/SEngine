@@ -30,16 +30,23 @@ VSOutput VertexMain(VSInput input)
 Texture2D texColor : register(t3 ,space0);
 SamplerState samplerColor : register(s4,space0);
 
-
-
-
-float4 FragmentMain(VSOutput input) :SV_TARGET
+struct PSOutput
 {
+    float4 Color : SV_TARGET0 ;
+    float4 Mask : SV_TARGET1 ;
+};
+
+
+PSOutput FragmentMain(VSOutput input)
+{
+    PSOutput output = (PSOutput)0;
     float4 ao = texColor.Sample(samplerColor,float2(input.Uv.x,1.0f - input.Uv.y));
     float3 ViewDir = normalize( ViewData.ViewPos - input.WorldPos.xyz);
     float3 WorldNormal = normalize(input.Normal);
     float NToL = max(0.0f , dot(WorldNormal , LightData.DirectionalLightDir));
     float3 LambertDiffuse = pow(NToL * 0.5f + 0.5f,2.0f) * ao;
     float3 FinalColor = LambertDiffuse * LightData.DirectionalLightColorAndOpacity.xyz ;
-    return float4(FinalColor, 1.0f) ;
+    output.Color = float4(FinalColor, 1.0f) ;
+    output.Mask = float4(1,0,0,1);
+    return output;
 }

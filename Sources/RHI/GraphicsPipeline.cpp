@@ -95,19 +95,25 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
 		  .maxDepthBounds = 1.0f,
 	  };
 
-  VkPipelineColorBlendAttachmentState ColorBlendAttachment{};
-  ColorBlendAttachment.colorWriteMask =
-      VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
-      VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-  ColorBlendAttachment.blendEnable = VK_FALSE;
+	TArray < VkPipelineColorBlendAttachmentState> ColorBlendAttachments;
+	ColorBlendAttachments.resize(Info.RenderPass->ColorAttachmentNum);
+
+	for(uint32 Idx = 0 ; Idx < Info.RenderPass->ColorAttachmentNum; ++ Idx)
+	{
+		ColorBlendAttachments[Idx]= {
+			.blendEnable = VK_FALSE,
+			.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
+			VK_COLOR_COMPONENT_A_BIT,
+		};
+	}
 
   VkPipelineColorBlendStateCreateInfo ColorBlending{};
   ColorBlending.sType =
       VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
   ColorBlending.logicOpEnable = VK_FALSE;
   ColorBlending.logicOp = VK_LOGIC_OP_COPY;
-  ColorBlending.attachmentCount = 1;
-  ColorBlending.pAttachments = &ColorBlendAttachment;
+  ColorBlending.attachmentCount = Info.RenderPass->ColorAttachmentNum;
+  ColorBlending.pAttachments = ColorBlendAttachments.data();
   ColorBlending.blendConstants[0] = 0.0f;
   ColorBlending.blendConstants[1] = 0.0f;
   ColorBlending.blendConstants[2] = 0.0f;

@@ -81,6 +81,6 @@ void FPostProcessManager::BeginPostProcess(uint32 FrameIdx,
 void FPostProcessManager::OnPreRecordCommandBuffer(uint32 ImageIndex, FRenderTargetGroup* InBaseGroup,
     FRenderTargetGroup* SwapChainGroup)
 {
-    BlitMaterial->SetTexture("texColor", InBaseGroup->GetRenderTexture(ImageIndex));
+    BlitMaterial->SetTexture("texColor", InBaseGroup->GetRenderTexture(ImageIndex,0));
 }
 

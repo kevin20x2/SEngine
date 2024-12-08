@@ -70,6 +70,8 @@ void SRenderer::OnInitialize()
 		};
 
 	ShadowRTG->Initialize( CreateParams );
+
+	CreateParams.RenderTexNum = 2;
 	BaseRTG->Initialize(CreateParams);
 
 	SwapChainRTG = TSharedPtr <FRenderTargetGroup>(new FRenderTargetGroup());
@@ -165,6 +167,7 @@ void SRenderer::OnResize(GLFWwindow* Window, int32 Width, int32 Height)
 		.Height = (uint32)Height
 	};
 	ShadowRTG->Initialize(Params);
+	Params.RenderTexNum = 2;
 	BaseRTG->Initialize(Params);
 }
 
