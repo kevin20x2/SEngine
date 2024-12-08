@@ -135,6 +135,14 @@ SShader::GenerateDefaultMaterialParams(FMaterialParameters &MaterialParams)
 				Sampler->DescriptorIdx = DescriptorIdx;
 				Sampler->BindingSlotIdx = Binding.Binding.binding;
 			}
+			if(Binding.Binding.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+			{
+				auto & Uniform = MaterialParams.Parameters.emplace_back(
+					new FMaterialParameterUniformBuffer(Binding) );
+				Uniform->Name = Binding.Name;
+				Uniform->DescriptorIdx = DescriptorIdx;
+				Uniform ->BindingSlotIdx = Binding.Binding.binding;
+			}
 		}
 		DescriptorIdx ++ ;
 	}

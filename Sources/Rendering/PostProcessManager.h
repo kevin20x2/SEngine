@@ -21,6 +21,7 @@ public:
 protected:
 
     TSharedPtr<SMaterialInterface> BlitMaterial;
+    TSharedPtr <SMaterialInterface> OutlineMaterial;
 
     TArray <TSharedPtr <FPostProcess>> PostProcesses;
     TSharedPtr <FVertexBuffer> TriVB;

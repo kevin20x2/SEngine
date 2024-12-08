@@ -1,0 +1,33 @@
+
+
+
+float4 ScreenSize ;
+
+struct VSInput
+{
+    [[vk::location(0)]] float3 Pos : POSITION ;
+    [[vk::location(1)]] float2 Uv : TEXCOORD0;
+};
+
+
+struct VSOutput
+{
+    float4 Pos : SV_POSITION;
+    [[vk::location(1)]] float2 Uv : TEXCOORD0;
+};
+
+VSOutput VertexMain(VSInput input)
+{
+    VSOutput output = (VSOutput)0;
+    output.Pos = float4(input.Pos,1.0f);
+    output.Uv = input.Uv;
+    return output;
+}
+Texture2D texColor : register(t3 ,space0);
+SamplerState pointSampler : register(s4,space0);
+
+float4 FragmentMain(VSOutput input) :SV_TARGET
+{
+    float4 Color = texColor.Sample(pointSampler,input.Uv);
+    return float4(Color.xyz, 1.0f) ;
+}

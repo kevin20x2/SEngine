@@ -7,8 +7,11 @@
 
 
 #include "Core/BaseTypes.h"
+#include "Maths/Math.h"
+#include "RHI/ShaderProgram.h"
 #include "vulkan/vulkan_core.h"
 #include "RHI/Texture.h"
+#include "RHI/UniformBuffer.h"
 
 class FMaterialParameterBase
 {
@@ -37,6 +40,26 @@ public:
 	TArray < VkWriteDescriptorSet > GenerateWriteDescriptorSets(VkDescriptorSet DescriptorSet) override;
 	TSharedPtr <FSampler > Sampler;
 	VkDescriptorImageInfo CachedImageInfo;
+};
+
+
+class FMaterialParameterUniformBuffer : public FMaterialParameterBase
+{
+public:
+
+	FMaterialParameterUniformBuffer( const FDescriptorSetLayoutBinding & Binding);
+
+	bool SetVector(const FString & Name, const FVector4 & Value ) ;
+
+	bool ContainVector(const FString & Name);
+
+	virtual TArray <VkWriteDescriptorSet> GenerateWriteDescriptorSets(VkDescriptorSet DescriptorSet) override;
+
+protected:
+
+	VkDescriptorBufferInfo BufferInfo ;
+	TSharedPtr <FUniformBuffer> Buffer;
+	uint32 Size = 0 ;
 };
 
 class FMaterialParameters

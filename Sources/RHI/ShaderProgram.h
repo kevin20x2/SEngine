@@ -4,14 +4,37 @@
 
 #ifndef SHADERPROGRAM_H
 #define SHADERPROGRAM_H
+#include <spirv_reflect.h>
 #include <vulkan/vulkan_core.h>
 #include "Core/BaseTypes.h"
+
+
+enum class EShaderVariableType
+{
+	Struct,
+	Int,
+	Float,
+	Vector,
+};
+
+struct FShaderVariableInfo
+{
+	FString Name;
+	EShaderVariableType Type;
+	uint32 Size;
+	TArray<TSharedPtr <FShaderVariableInfo>> ChildMembers;
+};
+
 
 
 struct FDescriptorSetLayoutBinding
 {
 	FString Name;
 	VkDescriptorSetLayoutBinding Binding;
+
+	FString TypeName;
+
+	TSharedPtr<FShaderVariableInfo> BindingInfo;
 };
 
 struct FDescriptorSetLayoutInfo

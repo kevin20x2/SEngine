@@ -119,6 +119,30 @@ uint32 FRHIUtils::FindMemoryType(uint32 TypeFilter, VkMemoryPropertyFlags Proper
 	return -1;
 }
 
+
+static TSharedPtr<FShaderVariableInfo> ParseSpvBlockVar(const SpvReflectBlockVariable * Block)
+{
+	TSharedPtr <FShaderVariableInfo> Result;
+	Result.reset(new FShaderVariableInfo());
+
+	if(Block->type_description->type_flags & SPV_REFLECT_TYPE_FLAG_STRUCT)
+	{
+		Result->Type = EShaderVariableType::Struct;
+	}
+	if(Block->type_description->type_flags & SPV_REFLECT_TYPE_FLAG_VECTOR )
+	{
+		Result->Type = EShaderVariableType::Vector;
+	}
+	Result->Name = Block->name;
+	Result->Size = Block->size;
+
+	for(uint32 Idx = 0 ; Idx < Block->member_count; ++ Idx)
+	{
+		Result->ChildMembers.Add( ParseSpvBlockVar(&Block->members[Idx]));
+	}
+	return Result;
+}
+
 VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, VkShaderStageFlagBits Stage
 												   ,TArray <FDescriptorSetLayoutInfo> & LayoutInfos,
 												   FVertexInputInfo & OutVertexInputInfo )
@@ -259,6 +283,12 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 				Binding.Binding.descriptorType = static_cast<VkDescriptorType>(RefBinding.descriptor_type);
 				Binding.Binding.descriptorCount = 1;
 
+				Binding.TypeName = RefBinding.type_description->type_name != nullptr ? RefBinding.type_description->type_name : "" ;
+				if(Binding.TypeName == "$Global")
+				{
+					Binding.BindingInfo  = ParseSpvBlockVar(&RefBinding.block);
+				}
+
 				for(uint32 Dim = 0 ; Dim < RefBinding.array.dims_count ; ++ Dim)
 				{
 					Binding.Binding.descriptorCount += RefBinding.array.dims[Dim];
@@ -266,9 +296,6 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 				Binding.Binding.stageFlags = static_cast<VkShaderStageFlagBits>(ReflectShaderModule.shader_stage);
 			}
 			LayoutInfo.SetNumber = ReflectSet.set;
-			//LayoutInfo.CreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-			//LayoutInfo.CreateInfo.bindingCount = ReflectSet.binding_count;
-			//LayoutInfo.CreateInfo.pBindings = LayoutInfo.Bindings.data();
 		}
 		spvReflectDestroyShaderModule(&ReflectShaderModule);
 	}

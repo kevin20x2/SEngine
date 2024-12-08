@@ -54,11 +54,17 @@ void FPostProcessManager::InitRenderResource()
     }));
 
     auto Shader = SShaderManager::GetShaderFromName("Blit");
+    auto OutlineShader =SShaderManager::GetShaderFromName("ScreenSpaceOutline");
+
+    OutlineMaterial = SNew <SMaterialInterface>(OutlineShader->AsShared());
     BlitMaterial = SNew<SMaterialInterface>(Shader->AsShared());
     auto Renderer = GEngine->GetModuleByClass<SRenderer>();
+
     BlitMaterial->SetbNeedViewData(false);
     BlitMaterial->Initialize(Renderer->GetDescriptorPool()->Pool,Renderer->GetSwapChainRenderPass());
 
+    OutlineMaterial->SetbNeedViewData(false);
+    OutlineMaterial->Initialize(Renderer->GetDescriptorPool()->Pool,Renderer->GetSwapChainRenderPass());
 
 }
 

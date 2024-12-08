@@ -63,6 +63,49 @@ FMaterialParameterSampler::GenerateWriteDescriptorSets(VkDescriptorSet Descripto
 
 	return {SamplerWrite};
 }
+
+FMaterialParameterUniformBuffer::FMaterialParameterUniformBuffer(const FDescriptorSetLayoutBinding& Binding)
+{
+	if(Binding.BindingInfo)
+	{
+		Size =  Binding.BindingInfo->Size;
+		Buffer.reset(FUniformBuffer::Create(Size));
+	}
+}
+
+bool FMaterialParameterUniformBuffer::SetVector(const FString& Name, const FVector4& Value)
+{
+	return false;
+}
+
+bool FMaterialParameterUniformBuffer::ContainVector(const FString& Name)
+{
+	return false;
+}
+
+TArray<VkWriteDescriptorSet> FMaterialParameterUniformBuffer::GenerateWriteDescriptorSets(VkDescriptorSet DescriptorSet)
+{
+	if(!Buffer || Size == 0)
+	{
+		return {};
+	}
+	BufferInfo =
+		{
+		.buffer = Buffer->GetBuffer(),
+		.offset = 0,
+		.range = Size
+		};
+
+		VkWriteDescriptorSet DescriptorWrite{};
+		DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		DescriptorWrite.dstSet = DescriptorSet;
+		DescriptorWrite.dstBinding = BindingSlotIdx;
+		DescriptorWrite.dstArrayElement = 0;
+		DescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		DescriptorWrite.descriptorCount = 1;
+		DescriptorWrite.pBufferInfo = &BufferInfo;
+	return  {DescriptorWrite};
+}
 TArray<VkWriteDescriptorSet>
 FMaterialParameters::GenerateWriteDescriptorSet(VkDescriptorSet DescriptorSet)
 {
@@ -77,6 +120,8 @@ FMaterialParameters::GenerateWriteDescriptorSet(VkDescriptorSet DescriptorSet)
 	}
 	return Results;
 }
+
+
 
 void FMaterialParameters::BindParametersToDescriptorSet(VkDescriptorSet DescriptorSet)
 {
