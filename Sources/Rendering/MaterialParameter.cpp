@@ -3,8 +3,12 @@
 //
 
 #include "MaterialParameter.h"
+
+#include "Material.h"
+#include "Renderer.h"
 #include "RHI/RHI.h"
 #include "volk.h"
+#include "CoreObjects/Engine.h"
 #include "CoreObjects/SObject.h"
 
 TArray<VkWriteDescriptorSet>
@@ -64,48 +68,80 @@ FMaterialParameterSampler::GenerateWriteDescriptorSets(VkDescriptorSet Descripto
 	return {SamplerWrite};
 }
 
-FMaterialParameterUniformBuffer::FMaterialParameterUniformBuffer(const FDescriptorSetLayoutBinding& Binding)
+FMaterialParameterUniformBuffer::FMaterialParameterUniformBuffer( SMaterialInterface * Material,const FDescriptorSetLayoutBinding& Binding)
 {
 	if(Binding.BindingInfo)
 	{
 		Size =  Binding.BindingInfo->Size;
-		Buffer.reset(FUniformBuffer::Create(Size));
+		ParseShaderBindingInfo(Binding.BindingInfo.get());
+		auto BufferCount = GRHI->GetMaxFrameInFlight();
+		Buffers.resize(BufferCount);
+		auto&  DescriptorSets = Material->GetDescriptorSets();
+		for(uint32 i = 0 ;i < BufferCount;i++)
+		{
+			Buffers[i].reset(FUniformBuffer::Create(Size));
+
+			BindingSlotIdx = Binding.Binding.binding;
+			BufferInfo =
+			{
+				.buffer = Buffers[i]->GetBuffer(),
+				.offset = 0,
+				.range = Size
+			};
+			VkWriteDescriptorSet DescriptorWrite{};
+			DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			DescriptorWrite.dstSet = DescriptorSets[i];
+			DescriptorWrite.dstBinding = BindingSlotIdx;
+			DescriptorWrite.dstArrayElement = 0;
+			DescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			DescriptorWrite.descriptorCount = 1;
+			DescriptorWrite.pBufferInfo = &BufferInfo;
+			vkUpdateDescriptorSets(*GRHI->GetDevice(),1,&DescriptorWrite,0,nullptr);
+		}
 	}
 }
 
 bool FMaterialParameterUniformBuffer::SetVector(const FString& Name, const FVector4& Value)
 {
-	return false;
+	if(!ContainVector(Name)) return false;
+
+	const auto & Info =  VectorVariables[Name];
+	TArray <float > Data = {Value.x,Value.y,Value.z,Value.w};
+
+	auto CurrentFrame = GEngine->GetRenderer()->GetFrameIndex();
+
+	return Buffers[CurrentFrame]->UpdateData(Info.Offset,Info.Size,(void *)Data.data());
 }
 
 bool FMaterialParameterUniformBuffer::ContainVector(const FString& Name)
 {
-	return false;
+	return VectorVariables.Contains(Name);
 }
 
 TArray<VkWriteDescriptorSet> FMaterialParameterUniformBuffer::GenerateWriteDescriptorSets(VkDescriptorSet DescriptorSet)
 {
-	if(!Buffer || Size == 0)
-	{
-		return {};
-	}
-	BufferInfo =
-		{
-		.buffer = Buffer->GetBuffer(),
-		.offset = 0,
-		.range = Size
-		};
 
-		VkWriteDescriptorSet DescriptorWrite{};
-		DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		DescriptorWrite.dstSet = DescriptorSet;
-		DescriptorWrite.dstBinding = BindingSlotIdx;
-		DescriptorWrite.dstArrayElement = 0;
-		DescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		DescriptorWrite.descriptorCount = 1;
-		DescriptorWrite.pBufferInfo = &BufferInfo;
-	return  {DescriptorWrite};
+	return  {};
 }
+
+void FMaterialParameterUniformBuffer::ParseShaderBindingInfo(FShaderVariableInfo *Info)
+{
+	if(Info->Type == EShaderVariableType::Vector)
+	{
+		VectorVariables[Info->Name] = {
+			Info->Name,
+			Info->Type,
+			Info->Size,
+			Info->Offset
+		};
+	}
+	for(auto & ChildInfo : Info->ChildMembers)
+	{
+		ParseShaderBindingInfo(ChildInfo.get());
+	}
+}
+
+
 TArray<VkWriteDescriptorSet>
 FMaterialParameters::GenerateWriteDescriptorSet(VkDescriptorSet DescriptorSet)
 {
@@ -169,4 +205,26 @@ void FMaterialParameters::SetTexture(const FString& Name, TSharedPtr<FTexture> I
 			TextureParam->Texture = InTexture;
 		}
 	}
+}
+
+bool FMaterialParameters::SetVector(const FString &Name, const FVector4 &Value)
+{
+	auto ParamIter =  std::find_if(Parameters.begin(), Parameters.end(),
+					   [&] (TSharedPtr <FMaterialParameterBase> Param){
+		if(auto Uniform =  std::static_pointer_cast<FMaterialParameterUniformBuffer>(Param))
+		{
+			return Uniform->ContainVector(Name);
+		}
+		return false;
+	});
+
+	if(ParamIter != Parameters.end())
+	{
+		if(auto Uniform =  std::static_pointer_cast<FMaterialParameterUniformBuffer>(*ParamIter))
+		{
+			Uniform->SetVector(Name, Value);
+			return true;
+		}
+	}
+	return false;
 }

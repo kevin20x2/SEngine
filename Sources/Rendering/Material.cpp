@@ -39,7 +39,7 @@ void
 SMaterialInterface::InitMaterialParameters()
 {
 	if(Shader == nullptr) return ;
-	Shader->GenerateDefaultMaterialParams(MaterialParameters);
+	Shader->GenerateDefaultMaterialParams(MaterialParameters,this );
 }
 void
 SMaterialInterface::Initialize(VkDescriptorPool Pool, FRenderPass *RenderPass)
@@ -98,6 +98,16 @@ void SMaterialInterface::SetTexture(const FString& Name, TSharedPtr<FTexture> In
 	{
 		MaterialParameters.BindParametersToDescriptorSet(DescriptionSet);
 	}
+}
+
+bool SMaterialInterface::SetVector(const FString &Name, const FVector4 &InVector)
+{
+	auto Result = MaterialParameters.SetVector(Name,InVector);
+	/*for(auto & DescriptionSet :DescriptionSets)
+	{
+		MaterialParameters.BindParametersToDescriptorSet(DescriptionSet);
+	}*/
+	return Result;
 }
 
 void SMaterialInterface::OnSetupViewData()

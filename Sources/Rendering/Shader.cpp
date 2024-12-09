@@ -102,7 +102,7 @@ void SShader::GenerateDescriptorSetLayout()
 	}
 }
 void
-SShader::GenerateDefaultMaterialParams(FMaterialParameters &MaterialParams)
+SShader::GenerateDefaultMaterialParams(FMaterialParameters &MaterialParams,SMaterialInterface* MaterialInterface)
 {
 	auto BindingListList = GenerateLayoutBindings();
 	uint32 DescriptorIdx = 0 ;
@@ -138,7 +138,7 @@ SShader::GenerateDefaultMaterialParams(FMaterialParameters &MaterialParams)
 			if(Binding.Binding.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
 			{
 				auto & Uniform = MaterialParams.Parameters.emplace_back(
-					new FMaterialParameterUniformBuffer(Binding) );
+					new FMaterialParameterUniformBuffer(MaterialInterface,Binding) );
 				Uniform->Name = Binding.Name;
 				Uniform->DescriptorIdx = DescriptorIdx;
 				Uniform ->BindingSlotIdx = Binding.Binding.binding;
@@ -173,10 +173,10 @@ SShader::GenerateLayoutBindings()
 			Bindings.push_back(Binding);
 		}
 
-		for(auto & Binding : PixelInfos[i].Bindings)
+		/*for(auto & Binding : PixelInfos[i].Bindings)
 		{
 			Bindings.push_back(Binding);
-		}
+		}*/
 		Results.push_back(Bindings);
 	}
 	return Results;

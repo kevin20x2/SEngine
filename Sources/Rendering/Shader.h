@@ -46,7 +46,7 @@ public:
 		return VertexShaderProgram->VertexInputInfo;
 	}
 
-	void GenerateDefaultMaterialParams(FMaterialParameters & MaterialParams );
+	void GenerateDefaultMaterialParams(FMaterialParameters & MaterialParams, SMaterialInterface * MaterialInterface );
 
 
 	void AddUsedMaterial(SMaterialInterface * MaterialInterface);

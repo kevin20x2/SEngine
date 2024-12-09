@@ -41,6 +41,9 @@ public:
 
 	void SetTexture(const FString & Name, TSharedPtr <FTexture>  InTexture);
 
+	bool SetVector(const FString & Name, const FVector4 & InVector);
+
+
 	void MarkDirty()
 	{
 		bDirty = true;
@@ -48,6 +51,10 @@ public:
 	bool IsDirty() const
 	{
 		return bDirty;
+	}
+	const TArray <VkDescriptorSet> &GetDescriptorSets() const
+	{
+		return DescriptionSets;
 	}
 
 protected:

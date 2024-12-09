@@ -20,6 +20,8 @@ public:
 	}
     void Init();
     void UpdateData(void * InData);
+	bool UpdateData(uint32 Offset,uint32 Size ,void * InData );
+
 private:
     uint32 Size;
     VkBuffer Buffer;

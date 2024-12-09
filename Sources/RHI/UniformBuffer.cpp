@@ -7,6 +7,7 @@
 #include "RHI.h"
 #include "RHIUtils.h"
 #include "volk.h"
+#include "Core/Log.h"
 
 FUniformBuffer* FUniformBuffer::Create(uint32 InSize)
 {
@@ -58,4 +59,19 @@ void FUniformBuffer::UpdateData(void* InData)
 	vkMapMemory(Device,BufferMemory,0,Size,0,&Data);
 	memcpy(Data,InData,Size);
 	vkUnmapMemory(Device,BufferMemory);
+}
+
+bool FUniformBuffer::UpdateData(uint32 Offset, uint32 InSize, void *InData)
+{
+	if(Offset + InSize > Size )
+	{
+		SLogD("Data Out of Range ..");
+		return false;
+	}
+	auto Device = *GRHI->GetDevice();
+	void * Data;
+	vkMapMemory(Device,BufferMemory,Offset,InSize,0,&Data);
+	memcpy(Data,InData,InSize);
+	vkUnmapMemory(Device,BufferMemory);
+	return true;
 }

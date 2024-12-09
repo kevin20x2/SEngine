@@ -1,7 +1,11 @@
 
 
 
+
+cbuffer Global : register(b0)
+{
 float4 ScreenSize ;
+}
 
 struct VSInput
 {
@@ -13,21 +17,33 @@ struct VSInput
 struct VSOutput
 {
     float4 Pos : SV_POSITION;
-    [[vk::location(1)]] float2 Uv : TEXCOORD0;
+    [[vk::location(1)]] float2 UV : TEXCOORD0;
 };
 
 VSOutput VertexMain(VSInput input)
 {
     VSOutput output = (VSOutput)0;
     output.Pos = float4(input.Pos,1.0f);
-    output.Uv = input.Uv;
+    output.UV = input.Uv;
     return output;
 }
 Texture2D texColor : register(t3 ,space0);
+Texture2D texMask : register(t5,space0);
 SamplerState pointSampler : register(s4,space0);
 
 float4 FragmentMain(VSOutput input) :SV_TARGET
 {
-    float4 Color = texColor.Sample(pointSampler,input.Uv);
-    return float4(Color.xyz, 1.0f) ;
+    float4 Color = texColor.Sample(pointSampler,input.UV);
+    float Size = 2.0f;
+    float4 Mask0 = texMask.Sample(pointSampler,input.UV );
+    float4 Mask1 = texMask.Sample(pointSampler,input.UV + float2(0,1)* Size * ScreenSize.xy);
+    float4 Mask2 = texMask.Sample(pointSampler,input.UV + float2(1,0)* Size * ScreenSize.xy);
+    float4 Mask3 = texMask.Sample(pointSampler,input.UV + float2(0,-1)* Size * ScreenSize.xy);
+    float4 Mask4 = texMask.Sample(pointSampler,input.UV + float2(-1,0) * ScreenSize.xy);
+
+    float4 Outline = max(max(abs(Mask0 - Mask1),abs(Mask0 - Mask2) ) , max(abs(Mask0-Mask3) ,abs(Mask0 - Mask4)));
+
+    float4 Final = lerp(Color , Outline,Outline.x);
+
+    return float4(Final.xyz, 1.0f) ;
 }

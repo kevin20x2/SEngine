@@ -72,7 +72,7 @@ void FPostProcessManager::BeginPostProcess(uint32 FrameIdx,
     VkCommandBuffer CommandBuffer ,FRenderTargetGroup* InBaseGroup, FRenderTargetGroup* SwapChainGroup)
 {
 
-    BlitMaterial->OnRecordCommandBuffer(CommandBuffer,FrameIdx);
+    OutlineMaterial->OnRecordCommandBuffer(CommandBuffer,FrameIdx);
 
     VkBuffer VertexBuffers[] = {TriVB->GetHandle()};
     VkDeviceSize Offsets[] = {0};
@@ -88,5 +88,10 @@ void FPostProcessManager::OnPreRecordCommandBuffer(uint32 ImageIndex, FRenderTar
     FRenderTargetGroup* SwapChainGroup)
 {
     BlitMaterial->SetTexture("texColor", InBaseGroup->GetRenderTexture(ImageIndex,0));
+    const auto & Params = InBaseGroup->GetCreateParams();
+    OutlineMaterial->SetVector("ScreenSize",FVector4( 1.0f/ Params.Width, 1.0f /Params.Height,  Params.Width, Params.Height ));
+    //OutlineMaterial->SetVector("ScreenSize",FVector4( 1.0f, 1.0f ,  Params.Width, Params.Height ));
+    OutlineMaterial->SetTexture("texColor", InBaseGroup->GetRenderTexture(ImageIndex,0));
+    OutlineMaterial->SetTexture("texMask", InBaseGroup->GetRenderTexture(ImageIndex,1));
 }
 

@@ -80,6 +80,11 @@ public:
 		return BaseRTG.get();
 	}
 
+	uint32 GetFrameIndex() const
+	{
+		return CurrentFrame;
+	}
+
 protected:
 
 	TSharedPtr<SActor> Actor;

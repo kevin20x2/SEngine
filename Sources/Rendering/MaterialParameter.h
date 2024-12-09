@@ -13,6 +13,8 @@
 #include "RHI/Texture.h"
 #include "RHI/UniformBuffer.h"
 
+class SMaterialInterface;
+
 class FMaterialParameterBase
 {
 public:
@@ -47,7 +49,7 @@ class FMaterialParameterUniformBuffer : public FMaterialParameterBase
 {
 public:
 
-	FMaterialParameterUniformBuffer( const FDescriptorSetLayoutBinding & Binding);
+	FMaterialParameterUniformBuffer(SMaterialInterface * Material ,const FDescriptorSetLayoutBinding & Binding);
 
 	bool SetVector(const FString & Name, const FVector4 & Value ) ;
 
@@ -56,9 +58,20 @@ public:
 	virtual TArray <VkWriteDescriptorSet> GenerateWriteDescriptorSets(VkDescriptorSet DescriptorSet) override;
 
 protected:
+	void ParseShaderBindingInfo(FShaderVariableInfo * Info);
+
+	struct FVariableInfo
+	{
+		FString Name;
+		EShaderVariableType Type;
+		uint32 Size;
+		uint32 Offset;
+	};
+
+	TMap <FString,FVariableInfo > VectorVariables;
 
 	VkDescriptorBufferInfo BufferInfo ;
-	TSharedPtr <FUniformBuffer> Buffer;
+	TArray <TSharedPtr <FUniformBuffer> > Buffers;
 	uint32 Size = 0 ;
 };
 
@@ -70,6 +83,8 @@ public:
 	void SetTexture(uint32 Binding , TSharedPtr <FTexture> InTexture);
 
 	void SetTexture(const FString & Name, TSharedPtr <FTexture> InTexture);
+
+	bool SetVector(const FString & Name, const FVector4 & Value);
 
 protected:
 	TArray <VkWriteDescriptorSet> GenerateWriteDescriptorSet(VkDescriptorSet DescriptorSet);

@@ -40,6 +40,11 @@ public:
         return RenderTextures[ImageIdx][TexIdx];
     }
 
+    const FRenderTargetGroupCreateParams & GetCreateParams() const
+    {
+        return CreateParams;
+    }
+
 protected:
     TSharedPtr <FRenderPass> RenderPass;
 

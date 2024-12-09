@@ -22,6 +22,7 @@ struct FShaderVariableInfo
 	FString Name;
 	EShaderVariableType Type;
 	uint32 Size;
+	uint32 Offset;
 	TArray<TSharedPtr <FShaderVariableInfo>> ChildMembers;
 };
 

@@ -135,6 +135,7 @@ static TSharedPtr<FShaderVariableInfo> ParseSpvBlockVar(const SpvReflectBlockVar
 	}
 	Result->Name = Block->name;
 	Result->Size = Block->size;
+	Result->Offset = Block->offset;
 
 	for(uint32 Idx = 0 ; Idx < Block->member_count; ++ Idx)
 	{
@@ -284,7 +285,7 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 				Binding.Binding.descriptorCount = 1;
 
 				Binding.TypeName = RefBinding.type_description->type_name != nullptr ? RefBinding.type_description->type_name : "" ;
-				if(Binding.TypeName == "$Global")
+				if(Binding.TypeName == "Global")
 				{
 					Binding.BindingInfo  = ParseSpvBlockVar(&RefBinding.block);
 				}

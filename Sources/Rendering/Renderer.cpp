@@ -223,7 +223,7 @@ void SRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 	beginInfo.pInheritanceInfo = nullptr;
 	VK_CHECK(vkBeginCommandBuffer(CommandBuffer, &beginInfo));
 
-	BaseRTG->BeginRenderTargetGroup(CommandBuffer,ImageIndex, FVector4(0.5,0.5,0.5,1.0f));
+	BaseRTG->BeginRenderTargetGroup(CommandBuffer,ImageIndex, FVector4(0,0,0,1.0f));
 
 	for(auto P : Primitives)
 	{
