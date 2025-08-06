@@ -3,6 +3,7 @@ cmake-build-debug-visual-studio/**
 .idea/**
 bin/**
 cmake-build-debug/**
+cmake-build-relwithdebinfo/**
 bin/Debug/SEngine.exe
 bin/Debug/SEngine.pdb
 *.pdb
