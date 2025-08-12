@@ -29,6 +29,8 @@ VSOutput VertexMain(VSInput input)
 }
 Texture2D texColor : register(t3 ,space0);
 SamplerState samplerColor : register(s4,space0);
+TextureCube texCube : register(t4,space0);
+SamplerState samplerCube : register(s4,space0);
 
 struct PSOutput
 {
@@ -45,7 +47,12 @@ PSOutput FragmentMain(VSOutput input)
     float3 WorldNormal = normalize(input.Normal);
     float NToL = max(0.0f , dot(WorldNormal , LightData.DirectionalLightDir));
     float3 LambertDiffuse = pow(NToL * 0.5f + 0.5f,2.0f) * ao;
-    float3 FinalColor = LambertDiffuse * LightData.DirectionalLightColorAndOpacity.xyz ;
+
+    float3 reflectDir = reflect(-ViewDir,WorldNormal);
+    float4 CubeColor = texCube.Sample(samplerCube , reflectDir);
+
+    float3 FinalColor = LambertDiffuse * LightData.DirectionalLightColorAndOpacity.xyz + CubeColor.rgb ;
+
     output.Color = float4(FinalColor, 1.0f) ;
     output.Mask = float4(1,0,0,1);
     return output;

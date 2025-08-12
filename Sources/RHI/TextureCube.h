@@ -18,7 +18,9 @@ class FTextureCubeRHI
 {
 public:
     static TSharedPtr <FTextureCubeRHI> Create(const FTextureCubeCreateParams & Params);
+    virtual ~FTextureCubeRHI();
 protected:
+
 
 
     VkImage CubeImage;

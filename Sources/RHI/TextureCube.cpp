@@ -102,3 +102,11 @@ TSharedPtr<FTextureCubeRHI> FTextureCubeRHI::Create(const FTextureCubeCreatePara
     VK_CHECK( vkCreateImageView(Device , &ImageViewCreateInfo,nullptr, &Cube->CubeImageView));
     return Cube;
 }
+
+FTextureCubeRHI::~FTextureCubeRHI()
+{
+   auto Device = *GRHI->GetDevice();
+   vkDestroyImageView(Device,CubeImageView,nullptr);
+   vkDestroyImage(Device,CubeImage,nullptr);
+   vkFreeMemory(Device,CubeMemory,nullptr);
+}
