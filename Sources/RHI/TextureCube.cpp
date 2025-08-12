@@ -42,4 +42,63 @@ TSharedPtr<FTextureCubeRHI> FTextureCubeRHI::Create(const FTextureCubeCreatePara
         };
     VK_CHECK( vkAllocateMemory(Device,&MemoryAllocateInfo, nullptr, &Cube->CubeMemory));
 
+    VkDeviceSize LayerSize = Params.Width * Params.Height * FRHIUtils::FormatSize(Params.Format);
+
+    VkDeviceSize TotalSize = LayerSize * 6;
+
+    VkBuffer StagingBuffer ;
+    VkDeviceMemory StagingBufferMemory;
+    FRHIUtils::CreateBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT,TotalSize,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        StagingBuffer,StagingBufferMemory
+        );
+
+    void *TempData;
+
+    vkMapMemory(Device ,StagingBufferMemory , 0 ,TotalSize,0,&TempData);
+
+    for(uint32_t layer = 0 ;layer < 6; layer++)
+    {
+        memcpy(static_cast<uint8*>(TempData) + layer*LayerSize,
+            Params.Data
+            ,static_cast<size_t>( LayerSize));
+    }
+    vkUnmapMemory(Device ,StagingBufferMemory);
+
+    FRHIUtils::TransitionImageLayout(Cube->CubeImage,Params.Format,VK_IMAGE_LAYOUT_UNDEFINED,VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,6);
+
+    FRHIUtils::OneTimeCommand([=](VkCommandBuffer CmdBuffer)
+    {
+        TArray <VkBufferImageCopy> CopyRegions;
+        for(uint32_t Layer = 0 ;Layer < 6; Layer++)
+        {
+            VkBufferImageCopy Region {
+                .bufferOffset = (VkDeviceSize)( Layer*LayerSize),
+                .imageSubresource= { VK_IMAGE_ASPECT_COLOR_BIT, 0 , Layer, 1, },
+                .imageExtent = {Params.Width,Params.Height,1},
+            };
+            CopyRegions.Add(Region);
+        }
+
+        vkCmdCopyBufferToImage(CmdBuffer,StagingBuffer,Cube->CubeImage,VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            CopyRegions.size(),CopyRegions.data());
+    });
+
+    FRHIUtils::TransitionImageLayout(Cube->CubeImage,Params.Format,VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,6);
+
+    VkImageViewCreateInfo ImageViewCreateInfo = {
+        .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+        .image = Cube->CubeImage,
+        .viewType = VK_IMAGE_VIEW_TYPE_CUBE,
+        .format = Params.Format,
+        .subresourceRange = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+        .baseMipLevel = 0,
+        .levelCount = 1,
+        .baseArrayLayer = 0,
+        .layerCount = 6,
+            }
+    };
+
+    VK_CHECK( vkCreateImageView(Device , &ImageViewCreateInfo,nullptr, &Cube->CubeImageView));
+    return Cube;
 }

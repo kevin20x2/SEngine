@@ -11,6 +11,7 @@ struct FTextureCubeCreateParams
 {
     uint32_t Width , Height;
     VkFormat Format;
+    uint8 * Data;
 };
 
 class FTextureCubeRHI
@@ -22,6 +23,8 @@ protected:
 
     VkImage CubeImage;
     VkDeviceMemory CubeMemory;
+    VkImageView CubeImageView;
+
 };
 
 

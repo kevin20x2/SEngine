@@ -62,7 +62,9 @@ public:
 		Function(CommandBuffer);
 		EndOneTimeCommandBuffer(CommandBuffer);
 	}
-	static void TransitionImageLayout(VkImage Image,VkFormat Format, VkImageLayout SrcLayout ,VkImageLayout DstLayout  );
+	static uint32_t FormatSize(VkFormat Format);
+
+	static void TransitionImageLayout(VkImage Image,VkFormat Format, VkImageLayout SrcLayout ,VkImageLayout DstLayout,uint32 LayerCount = 1  );
 
 	static void CopyBufferToImage(VkImage Image , VkBuffer Buffer, uint32 Height, uint32 Width);
 

@@ -446,8 +446,10 @@ FRHIUtils::EndOneTimeCommandBuffer(VkCommandBuffer CommandBuffer)
 	vkFreeCommandBuffers(Device, CommandBufferPool->GetPool() , 1, &CommandBuffer);
 }
 
+
+
 void
-FRHIUtils::TransitionImageLayout(VkImage Image, VkFormat Format, VkImageLayout SrcLayout, VkImageLayout DstLayout)
+FRHIUtils::TransitionImageLayout(VkImage Image, VkFormat Format, VkImageLayout SrcLayout, VkImageLayout DstLayout,uint32_t LayerCount)
 {
 	OneTimeCommand([&](VkCommandBuffer Buffer){
 		VkImageMemoryBarrier barrier{};
@@ -464,7 +466,7 @@ FRHIUtils::TransitionImageLayout(VkImage Image, VkFormat Format, VkImageLayout S
 		barrier.subresourceRange.baseMipLevel = 0;
 		barrier.subresourceRange.levelCount = 1;
 		barrier.subresourceRange.baseArrayLayer = 0;
-		barrier.subresourceRange.layerCount = 1;
+		barrier.subresourceRange.layerCount = LayerCount;
 
 		barrier.srcAccessMask = 0; // TODO
 		barrier.dstAccessMask = 0; // TODO
@@ -527,7 +529,7 @@ FRHIUtils::CopyBufferToImage(VkImage Image, VkBuffer Buffer, uint32 Height, uint
 
 }
 
-static uint32_t FormatSize(VkFormat format) {
+uint32_t FRHIUtils::FormatSize(VkFormat format) {
 	uint32_t result = 0;
 	switch (format) {
 	case VK_FORMAT_UNDEFINED:

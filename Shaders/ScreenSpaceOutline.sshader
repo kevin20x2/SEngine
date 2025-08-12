@@ -43,7 +43,7 @@ float4 FragmentMain(VSOutput input) :SV_TARGET
 
     float4 Outline = max(max(abs(Mask0 - Mask1),abs(Mask0 - Mask2) ) , max(abs(Mask0-Mask3) ,abs(Mask0 - Mask4)));
 
-    float4 Final = lerp(Color , Outline,Outline.x);
+    float4 Final = lerp(Color , float4(1,1,0,1),Outline.x);
 
     return float4(Final.xyz, 1.0f) ;
 }
