@@ -163,6 +163,8 @@ add_executable(SEngine
         ${EngineSources}
         ${IMGUIFILES}
         ${CppDelegateFiles}
+        Sources/RHI/TextureCube.cpp
+        Sources/RHI/TextureCube.h
 
 )
 
