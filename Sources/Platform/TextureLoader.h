@@ -5,14 +5,18 @@
 #ifndef TEXTURELOADER_H
 #define TEXTURELOADER_H
 
-#include "RHI/Texture.h"
+#include "RHI/Texture2D.h"
 #include "Core/BaseTypes.h"
+
+class FTextureCubeRHI;
 
 class FTextureLoader
 {
 	public :
 
-	virtual TSharedPtr < FTexture > LoadTexture(const FString & FilePath ) = 0 ;
+	virtual TSharedPtr < FTexture2D > LoadTexture(const FString & FilePath ) = 0 ;
+
+	virtual TSharedPtr <FTextureCubeRHI> LoadSingleCubeTexture(const FString & Path) = 0;
 };
 
 #endif //TEXTURELOADER_H

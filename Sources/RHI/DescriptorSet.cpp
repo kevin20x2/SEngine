@@ -8,7 +8,7 @@
 #include "volk.h"
 
 FDescriptorSets* FDescriptorSets::Create(const TArray<VkDescriptorSetLayout>& Layouts,
-                                         const FDescriptorPool& Pool, const TArray<FUniformBuffer*>& Buffers, TSharedPtr<FTexture> Texture)
+                                         const FDescriptorPool& Pool, const TArray<FUniformBuffer*>& Buffers, TSharedPtr<FTexture2D> Texture)
 {
     FDescriptorSets * Result = new FDescriptorSets();
 

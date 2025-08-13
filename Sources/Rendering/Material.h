@@ -8,6 +8,7 @@
 #include "Shader.h"
 #include "CoreObjects/SObject.h"
 #include "RHI/GraphicsPipeline.h"
+#include "RHI/TextureCube.h"
 
 
 struct FPreRecordBufferContext;
@@ -37,9 +38,10 @@ public:
 	virtual void CreatePipeline(FRenderPass * RenderPass);
 	virtual void InitMaterialParameters();
 
-	void SetTexture(uint32 Binding , TSharedPtr <FTexture> InTexture );
+	void SetTexture(uint32 Binding , TSharedPtr <FTexture2D> InTexture );
+	void SetTextureCube(uint32 Binding , TSharedPtr <FTextureCubeRHI> CubeTexture);
 
-	void SetTexture(const FString & Name, TSharedPtr <FTexture>  InTexture);
+	void SetTexture(const FString & Name, TSharedPtr <FTexture2D>  InTexture);
 
 	bool SetVector(const FString & Name, const FVector4 & InVector);
 

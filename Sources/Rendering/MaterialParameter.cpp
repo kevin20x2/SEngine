@@ -167,7 +167,7 @@ void FMaterialParameters::BindParametersToDescriptorSet(VkDescriptorSet Descript
 						   Writes.size(),Writes.data(),0,nullptr);
 }
 void
-FMaterialParameters::SetTexture(uint32 Binding, TSharedPtr<FTexture> InTexture)
+FMaterialParameters::SetTexture(uint32 Binding, TSharedPtr<FTextureBase> InTexture)
 {
 	auto ParamIter =  std::find_if(Parameters.begin(), Parameters.end(),
 					   [&] (TSharedPtr <FMaterialParameterBase> Param){
@@ -186,7 +186,7 @@ FMaterialParameters::SetTexture(uint32 Binding, TSharedPtr<FTexture> InTexture)
 	}
 }
 
-void FMaterialParameters::SetTexture(const FString& Name, TSharedPtr<FTexture> InTexture)
+void FMaterialParameters::SetTexture(const FString& Name, TSharedPtr<FTextureBase> InTexture)
 {
 
 	auto ParamIter =  std::find_if(Parameters.begin(), Parameters.end(),

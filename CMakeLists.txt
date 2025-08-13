@@ -87,8 +87,8 @@ set(EngineSources
         Sources/Platform/Path.h
         Sources/Platform/TextureLoader.cpp
         Sources/Platform/TextureLoader.h
-        Sources/RHI/Texture.cpp
-        Sources/RHI/Texture.h
+        Sources/RHI/Texture2D.cpp
+        Sources/RHI/Texture2D.h
         Sources/Platform/CImgTextureLoader.cpp
         Sources/Platform/CImgTextureLoader.h
         Sources/Rendering/Shader.cpp

@@ -82,7 +82,7 @@ SMaterialInterface::OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,uint32 C
 
 }
 void
-SMaterialInterface::SetTexture(uint32 Binding, TSharedPtr<FTexture> InTexture)
+SMaterialInterface::SetTexture(uint32 Binding, TSharedPtr<FTexture2D> InTexture)
 {
 	MaterialParameters.SetTexture(Binding,InTexture);
 	for(auto & DescriptionSet :DescriptionSets)
@@ -91,7 +91,16 @@ SMaterialInterface::SetTexture(uint32 Binding, TSharedPtr<FTexture> InTexture)
 	}
 }
 
-void SMaterialInterface::SetTexture(const FString& Name, TSharedPtr<FTexture> InTexture)
+void SMaterialInterface::SetTextureCube(uint32 Binding, TSharedPtr<FTextureCubeRHI> CubeTexture)
+{
+	MaterialParameters.SetTexture(Binding,CubeTexture);
+	for(auto & DescriptionSet :DescriptionSets)
+	{
+		MaterialParameters.BindParametersToDescriptorSet(DescriptionSet);
+	}
+}
+
+void SMaterialInterface::SetTexture(const FString& Name, TSharedPtr<FTexture2D> InTexture)
 {
 	MaterialParameters.SetTexture(Name,InTexture);
 	for(auto & DescriptionSet :DescriptionSets)

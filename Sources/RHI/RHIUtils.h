@@ -40,7 +40,7 @@ public:
 
 
 	static void CreateImage(uint32 Height, uint32 Width,VkFormat Format,VkImageTiling Tiling,
-							VkImageUsageFlags UsageFlags,VkFlags PropertyFlags,VkImage& Image,VkDeviceMemory & DeviceMemory );
+							VkImageUsageFlags UsageFlags,VkFlags PropertyFlags,VkImage& Image,VkDeviceMemory & DeviceMemory,int32 LayerNum = 1 );
 
 	static VkCommandBuffer BeginOneTimeCommandBuffer();
 
@@ -66,7 +66,7 @@ public:
 
 	static void TransitionImageLayout(VkImage Image,VkFormat Format, VkImageLayout SrcLayout ,VkImageLayout DstLayout,uint32 LayerCount = 1  );
 
-	static void CopyBufferToImage(VkImage Image , VkBuffer Buffer, uint32 Height, uint32 Width);
+	static void CopyBufferToImage(VkImage Image , VkBuffer Buffer, uint32 Height, uint32 Width,int32 LayerCount = 1);
 
 	static void CreateImageView(VkImage Image,VkFormat Format, VkImageAspectFlags AspectFlags,VkImageView & ImageView);
 

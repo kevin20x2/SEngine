@@ -6,8 +6,8 @@
 #define DEPTHTEXTURE_H
 
 
-#include "Texture.h"
-class FDepthTexture : public FTexture
+#include "Texture2D.h"
+class FDepthTexture : public FTexture2D
 {
 public:
 

@@ -7,10 +7,14 @@
 
 
 #include "TextureLoader.h"
+class FTextureCubeRHI;
+
 class FCImgTextureLoader : public FTextureLoader
 {
 public:
-	virtual TSharedPtr <FTexture> LoadTexture(const FString & Path) override;
+	virtual TSharedPtr <FTexture2D> LoadTexture(const FString & Path) override;
+
+	virtual TSharedPtr <FTextureCubeRHI> LoadSingleCubeTexture(const FString & Path) override;
 };
 
 

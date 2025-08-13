@@ -16,7 +16,7 @@
 #include "RHI/SwapChain.h"
 #include "RHI/FrameBuffer.h"
 #include "RHI/RenderPass.h"
-#include "RHI/Texture.h"
+#include "RHI/Texture2D.h"
 #include "Shader.h"
 #include "CoreObjects/EngineModuleBase.h"
 #include "RHI/RenderTargetGroup.h"

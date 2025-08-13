@@ -14,11 +14,21 @@ struct FTextureCubeCreateParams
     uint8 * Data;
 };
 
-class FTextureCubeRHI
+class FTextureCubeRHI : public FTextureBase
 {
 public:
     static TSharedPtr <FTextureCubeRHI> Create(const FTextureCubeCreateParams & Params);
     virtual ~FTextureCubeRHI();
+
+    virtual VkImageView GetImageView() const override
+    {
+        return CubeImageView;
+    }
+    virtual VkSampler GetSampler() const override
+    {
+        return Sampler;
+    }
+
 protected:
 
 
@@ -26,7 +36,7 @@ protected:
     VkImage CubeImage;
     VkDeviceMemory CubeMemory;
     VkImageView CubeImageView;
-
+    VkSampler  Sampler;
 };
 
 

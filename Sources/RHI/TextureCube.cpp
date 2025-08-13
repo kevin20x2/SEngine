@@ -28,8 +28,8 @@ TSharedPtr<FTextureCubeRHI> FTextureCubeRHI::Create(const FTextureCubeCreatePara
         .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
     };
 
-
    auto Device = *GRHI->GetDevice();
+
    VK_CHECK( vkCreateImage( Device ,  & ImageInfo , nullptr,  &Cube->CubeImage));
 
     VkMemoryRequirements MemoryRequirements;
@@ -41,7 +41,16 @@ TSharedPtr<FTextureCubeRHI> FTextureCubeRHI::Create(const FTextureCubeCreatePara
         .memoryTypeIndex = FRHIUtils::FindMemoryType(MemoryRequirements.memoryTypeBits,VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)
         };
     VK_CHECK( vkAllocateMemory(Device,&MemoryAllocateInfo, nullptr, &Cube->CubeMemory));
+    vkBindImageMemory(Device,Cube->CubeImage,Cube->CubeMemory,0);
 
+
+    /*
+    FRHIUtils::CreateImage(Params.Height,Params.Width,Params.Format,VK_IMAGE_TILING_OPTIMAL,VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+        Cube->CubeImage,Cube->CubeMemory
+        );
+
+    */
     VkDeviceSize LayerSize = Params.Width * Params.Height * FRHIUtils::FormatSize(Params.Format);
 
     VkDeviceSize TotalSize = LayerSize * 6;
@@ -57,16 +66,17 @@ TSharedPtr<FTextureCubeRHI> FTextureCubeRHI::Create(const FTextureCubeCreatePara
 
     vkMapMemory(Device ,StagingBufferMemory , 0 ,TotalSize,0,&TempData);
 
-    for(uint32_t layer = 0 ;layer < 6; layer++)
+    //for(uint32_t layer = 0 ;layer < 6; layer++)
     {
-        memcpy(static_cast<uint8*>(TempData) + layer*LayerSize,
+        memcpy(static_cast<uint8*>(TempData) ,
             Params.Data
-            ,static_cast<size_t>( LayerSize));
+            ,static_cast<size_t>( TotalSize));
     }
     vkUnmapMemory(Device ,StagingBufferMemory);
 
     FRHIUtils::TransitionImageLayout(Cube->CubeImage,Params.Format,VK_IMAGE_LAYOUT_UNDEFINED,VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,6);
 
+    //FRHIUtils::CopyBufferToImage(Cube->CubeImage,StagingBuffer,Params.Height,Params.Width,6);
     FRHIUtils::OneTimeCommand([=](VkCommandBuffer CmdBuffer)
     {
         TArray <VkBufferImageCopy> CopyRegions;
@@ -75,6 +85,7 @@ TSharedPtr<FTextureCubeRHI> FTextureCubeRHI::Create(const FTextureCubeCreatePara
             VkBufferImageCopy Region {
                 .bufferOffset = (VkDeviceSize)( Layer*LayerSize),
                 .imageSubresource= { VK_IMAGE_ASPECT_COLOR_BIT, 0 , Layer, 1, },
+                .imageOffset ={ 0, 0, 0 },
                 .imageExtent = {Params.Width,Params.Height,1},
             };
             CopyRegions.Add(Region);
@@ -100,6 +111,30 @@ TSharedPtr<FTextureCubeRHI> FTextureCubeRHI::Create(const FTextureCubeCreatePara
     };
 
     VK_CHECK( vkCreateImageView(Device , &ImageViewCreateInfo,nullptr, &Cube->CubeImageView));
+
+	VkSamplerCreateInfo samplerInfo{};
+	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+	samplerInfo.magFilter = VK_FILTER_LINEAR;
+	samplerInfo.minFilter = VK_FILTER_LINEAR;
+	samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+
+	samplerInfo.anisotropyEnable = VK_FALSE;
+
+	samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+	samplerInfo.unnormalizedCoordinates = VK_FALSE;
+
+	samplerInfo.compareEnable = VK_FALSE;
+	samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+
+	samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+	samplerInfo.mipLodBias = 0.0f;
+	samplerInfo.minLod = 0.0f;
+	samplerInfo.maxLod = 0.0f;
+
+	VK_CHECK(vkCreateSampler(Device,&samplerInfo,nullptr,&Cube->Sampler));
+
     return Cube;
 }
 

@@ -10,7 +10,7 @@
 #include "Maths/Math.h"
 #include "RHI/ShaderProgram.h"
 #include "vulkan/vulkan_core.h"
-#include "RHI/Texture.h"
+#include "RHI/Texture2D.h"
 #include "RHI/UniformBuffer.h"
 
 class SMaterialInterface;
@@ -30,7 +30,7 @@ class FMaterialParameterTexture : public FMaterialParameterBase
 {
 public:
 	TArray < VkWriteDescriptorSet > GenerateWriteDescriptorSets(VkDescriptorSet DescriptorSet) override;
-	TSharedPtr <FTexture > Texture;
+	TSharedPtr <FTextureBase > Texture;
 	VkDescriptorImageInfo CachedImageInfo;
 };
 
@@ -80,9 +80,9 @@ class FMaterialParameters
 public:
 	void BindParametersToDescriptorSet(VkDescriptorSet DescriptorSet);
 
-	void SetTexture(uint32 Binding , TSharedPtr <FTexture> InTexture);
+	void SetTexture(uint32 Binding , TSharedPtr <FTextureBase> InTexture);
 
-	void SetTexture(const FString & Name, TSharedPtr <FTexture> InTexture);
+	void SetTexture(const FString & Name, TSharedPtr <FTextureBase> InTexture);
 
 	bool SetVector(const FString & Name, const FVector4 & Value);
 

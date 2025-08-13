@@ -372,7 +372,7 @@ FRHIUtils::CreateImage(uint32 Height,
                        VkImageUsageFlags UsageFlags,
                        VkFlags PropertyFlags,
                        VkImage &Image,
-                       VkDeviceMemory &DeviceMemory)
+                       VkDeviceMemory &DeviceMemory,int32 LayerNum)
 {
 	VkImageCreateInfo imageInfo{};
 	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -381,7 +381,7 @@ FRHIUtils::CreateImage(uint32 Height,
 	imageInfo.extent.height = Height;
 	imageInfo.extent.depth = 1;
 	imageInfo.mipLevels = 1;
-	imageInfo.arrayLayers = 1;
+	imageInfo.arrayLayers = LayerNum;
 	imageInfo.format = Format;
 	imageInfo.tiling = Tiling;
 	imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -497,7 +497,7 @@ FRHIUtils::TransitionImageLayout(VkImage Image, VkFormat Format, VkImageLayout S
 
 }
 void
-FRHIUtils::CopyBufferToImage(VkImage Image, VkBuffer Buffer, uint32 Height, uint32 Width)
+FRHIUtils::CopyBufferToImage(VkImage Image, VkBuffer Buffer, uint32 Height, uint32 Width,int32 LayerCount)
 {
 	OneTimeCommand([&](VkCommandBuffer CommandBuffer){
 		VkBufferImageCopy region{};
@@ -508,7 +508,7 @@ FRHIUtils::CopyBufferToImage(VkImage Image, VkBuffer Buffer, uint32 Height, uint
 		region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		region.imageSubresource.mipLevel = 0;
 		region.imageSubresource.baseArrayLayer = 0;
-		region.imageSubresource.layerCount = 1;
+		region.imageSubresource.layerCount = LayerCount;
 
 		region.imageOffset = {0, 0, 0};
 		region.imageExtent = {

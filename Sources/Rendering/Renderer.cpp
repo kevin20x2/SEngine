@@ -30,11 +30,13 @@ void SRenderer::OnPostInit()
 {
 	FCImgTextureLoader Loader;
 	auto Texture =  Loader.LoadTexture(FPath::GetApplicationDir() + "/Assets/Textures/cloth.png" );
+	auto CubeTexture = Loader.LoadSingleCubeTexture(FPath::GetApplicationDir() + "/Assets/Textures/canyon1.png");
 	SEngineModuleBase::OnPostInit();
 	auto Shader = SShaderManager::GetShaderFromName("test");
 	auto Material = TSharedPtr<SMaterialInterface>(new SMaterialInterface( Shader->AsShared() ) );
 	Material->Initialize(DescriptorPool->Pool,GetRenderPass());
 	Material->SetTexture(3,Texture);
+	Material->SetTextureCube(5,CubeTexture);
 	FFbxMeshImporter Importer;
 	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/gy.fbx",Material.get());
 }

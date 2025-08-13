@@ -23,7 +23,7 @@ void FRenderTargetGroup::InitializeBySwapChain(FSwapChain* InSwapChain)
 
     for (uint32 idx = 0; idx < ImageCount; ++idx)
     {
-        DepthTexture[idx] = FTexture::CreateTexture<FDepthTexture>({
+        DepthTexture[idx] = FTexture2D::CreateTexture<FDepthTexture>({
             0,
             CreateParams.Height, CreateParams.Width
         });
@@ -52,14 +52,14 @@ void FRenderTargetGroup::Initialize(FRenderTargetGroupCreateParams& Params)
         RenderTextures[idx].resize(Params.RenderTexNum);
         for (uint32 TexIdx = 0; TexIdx < Params.RenderTexNum; ++TexIdx)
         {
-            RenderTextures[idx][TexIdx] = FTexture::CreateTexture<FRenderTexture>({
+            RenderTextures[idx][TexIdx] = FTexture2D::CreateTexture<FRenderTexture>({
                 0,
                 Params.Height, Params.Width
             });
             Attachments.Add(RenderTextures[idx][TexIdx]->GetImageView());
         }
 
-        DepthTexture[idx] = FTexture::CreateTexture<FDepthTexture>({
+        DepthTexture[idx] = FTexture2D::CreateTexture<FDepthTexture>({
             0,
             Params.Height, Params.Width
         });

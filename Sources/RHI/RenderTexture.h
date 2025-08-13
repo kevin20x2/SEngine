@@ -4,10 +4,10 @@
 
 #ifndef RENDERTEXTURE_H
 #define RENDERTEXTURE_H
-#include "Texture.h"
+#include "Texture2D.h"
 
 
-class FRenderTexture : public FTexture
+class FRenderTexture : public FTexture2D
 {
 public:
     virtual void Initialize(const FTextureCreateParams& Params) override;
