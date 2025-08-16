@@ -30,6 +30,8 @@ public:
 
     void EndRenderTargetGroup(VkCommandBuffer CommandBuffer);
 
+    void CleanUp();
+
     FRenderPass * GetRenderPass() const
     {
         return RenderPass.get();

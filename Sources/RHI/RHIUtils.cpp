@@ -468,10 +468,11 @@ FRHIUtils::TransitionImageLayout(VkImage Image, VkFormat Format, VkImageLayout S
 		barrier.subresourceRange.baseArrayLayer = 0;
 		barrier.subresourceRange.layerCount = LayerCount;
 
+
 		barrier.srcAccessMask = 0; // TODO
 		barrier.dstAccessMask = 0; // TODO
-		VkPipelineStageFlags sourceStage = 0;
-		VkPipelineStageFlags destinationStage = 0 ;
+		VkPipelineStageFlags sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		VkPipelineStageFlags destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT ;
 		if(SrcLayout == VK_IMAGE_LAYOUT_UNDEFINED && DstLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
 		{
 			barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;

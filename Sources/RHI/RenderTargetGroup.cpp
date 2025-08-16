@@ -121,3 +121,11 @@ void FRenderTargetGroup::EndRenderTargetGroup(VkCommandBuffer CommandBuffer)
     vkCmdEndRenderPass(CommandBuffer);
     //VK_CHECK(vkEndCommandBuffer(CommandBuffer));
 }
+
+void FRenderTargetGroup::CleanUp()
+{
+    RenderPass = nullptr;
+    FrameBuffer.empty();
+    RenderTextures.empty();
+    DepthTexture.empty();
+}

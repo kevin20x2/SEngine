@@ -153,6 +153,8 @@ void SRenderer::Render()
 void SRenderer::OnResize(GLFWwindow* Window, int32 Width, int32 Height)
 {
 	printf("Resize %d %d",Width,Height);
+    SwapChainRTG->CleanUp();
+
 	RecreateSwapChains();
 
 	SwapChainRTG->InitializeBySwapChain(SwapChain.get());
@@ -253,6 +255,7 @@ SRenderer::GetCommandBufferPool() const
 
 void SRenderer::RecreateSwapChains()
 {
+
 	if(SwapChain)
 	{
 		SwapChain->CleanUp();

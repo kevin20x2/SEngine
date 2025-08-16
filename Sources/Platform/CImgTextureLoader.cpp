@@ -88,7 +88,7 @@ TSharedPtr<FTextureCubeRHI> FCImgTextureLoader::LoadSingleCubeTexture(const FStr
 				ColorBuffer[BaseFaceOffset + 4*(( h * CubeFaceSize ) + w ) + 0 ] =  Src(w+WidthBegin,h+HeightBegin,0,0);
 				ColorBuffer[BaseFaceOffset + 4*(( h * CubeFaceSize ) + w ) + 1 ] = Src(w+WidthBegin,h+HeightBegin,0,1);
 				ColorBuffer[BaseFaceOffset + 4*(( h * CubeFaceSize ) + w ) + 2 ] = Src(w+WidthBegin,h+HeightBegin,0,2);
-				ColorBuffer[BaseFaceOffset + 4*(( h * CubeFaceSize ) + w ) + 4 ] =
+				ColorBuffer[BaseFaceOffset + 4*(( h * CubeFaceSize ) + w ) + 3 ] =
 					Spectrum == 3 ?  255 : Src(w+WidthBegin,h+HeightBegin,0,0);
 
 			}

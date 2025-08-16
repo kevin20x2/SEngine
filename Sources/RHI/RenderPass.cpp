@@ -17,6 +17,7 @@ FRenderPass* FRenderPass::Create(VkFormat InFormat,VkImageLayout ImageLayout,uin
 	for(uint32 Idx = 0 ; Idx <ColorCount ; ++ Idx)
 	{
 		VkAttachmentDescription colorAttachment;
+        colorAttachment.flags = 0;
 		colorAttachment.format = InFormat;
 		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 
@@ -33,6 +34,7 @@ FRenderPass* FRenderPass::Create(VkFormat InFormat,VkImageLayout ImageLayout,uin
 	}
 
 	VkAttachmentDescription depthAttachment{};
+    depthAttachment.flags = 0;
 	depthAttachment.format = FRHIUtils::FindDepthFormat();
 	depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 	depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;

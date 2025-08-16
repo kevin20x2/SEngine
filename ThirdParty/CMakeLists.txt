@@ -107,7 +107,7 @@ if(NOT MSVC)
 endif()
 add_subdirectory(zlib)
 
-add_subdirectory(libpng)
+add_subdirectory(libpng-1.6.44)
 
 
 
