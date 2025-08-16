@@ -165,6 +165,8 @@ add_executable(SEngine
         ${CppDelegateFiles}
         Sources/RHI/TextureCube.cpp
         Sources/RHI/TextureCube.h
+        Sources/Rendering/RenderTargetCube.cpp
+        Sources/Rendering/RenderTargetCube.h
 
 )
 

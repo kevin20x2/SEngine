@@ -19,12 +19,15 @@
 2. MouseOperation code
 1. shader dynamic binding uniform buffer
 
+3. CubeMap Load 
+
 TODO:
 
 Material GUI 
 
 
 RoadMap:
+4. prefilter cubemap 
 1. shadow
 2. PBR
 3. gi

@@ -8,10 +8,29 @@
 #include "RHIUtils.h"
 #include "volk.h"
 
+static uint32 ComputeTotalMips(uint32 Width , uint32 Height)
+{
+    if(Width <=0 || Height <=0) return 0;
+    uint32 Size = max(Width,Height);
+    uint32 Levels = 0 ;
+
+    while(Size)
+    {
+        ++Levels;
+        Size>>=1;
+    }
+    return Levels;
+}
+
+
 TSharedPtr<FTextureCubeRHI> FTextureCubeRHI::Create(const FTextureCubeCreateParams &Params)
 {
 
     TSharedPtr<FTextureCubeRHI> Cube = std::make_shared<FTextureCubeRHI>();
+
+    auto & MipLevels = Cube->MipLevels;
+    MipLevels = min(Params.MaxMipLevels, ComputeTotalMips(Params.Width, Params.Height) );
+    MipLevels = Params.bCreateMips ? MipLevels : 1;
 
     VkImageCreateInfo ImageInfo = {
         .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
@@ -19,11 +38,11 @@ TSharedPtr<FTextureCubeRHI> FTextureCubeRHI::Create(const FTextureCubeCreatePara
         .imageType = VK_IMAGE_TYPE_2D,
         .format = Params.Format,
         .extent= { Params.Width, Params.Height,1 },
-        .mipLevels = 1,
+        .mipLevels = MipLevels,
         .arrayLayers = 6,
         .samples = VK_SAMPLE_COUNT_1_BIT,
         .tiling = VK_IMAGE_TILING_OPTIMAL,
-        .usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+        .usage = Params.UsageFlags,
         .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
         .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
     };
@@ -104,7 +123,7 @@ TSharedPtr<FTextureCubeRHI> FTextureCubeRHI::Create(const FTextureCubeCreatePara
         .format = Params.Format,
         .subresourceRange = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
         .baseMipLevel = 0,
-        .levelCount = 1,
+        .levelCount = MipLevels,
         .baseArrayLayer = 0,
         .layerCount = 6,
             }

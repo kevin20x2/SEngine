@@ -8,7 +8,7 @@
 #include "volk.h"
 #include "RHIUtils.h"
 
-FRenderPass* FRenderPass::Create(VkFormat InFormat,VkImageLayout ImageLayout,uint32 ColorCount)
+FRenderPass* FRenderPass::Create(VkFormat InFormat,VkImageLayout ImageLayout,uint32 ColorCount,bool bNeedDepth)
 {
 	FRenderPass * Result = new FRenderPass;
 
@@ -62,7 +62,7 @@ FRenderPass* FRenderPass::Create(VkFormat InFormat,VkImageLayout ImageLayout,uin
 	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 	subpass.colorAttachmentCount = ColorCount;
 	subpass.pColorAttachments = colorAttachmentRefs.data();
-	subpass.pDepthStencilAttachment = & DepthAttachmentRef;
+	subpass.pDepthStencilAttachment = bNeedDepth ?  & DepthAttachmentRef : nullptr;
 
 	VkSubpassDependency dependency{};
 	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;

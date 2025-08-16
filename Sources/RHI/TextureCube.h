@@ -12,6 +12,9 @@ struct FTextureCubeCreateParams
     uint32_t Width , Height;
     VkFormat Format;
     uint8 * Data;
+    VkImageUsageFlags UsageFlags = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    bool bCreateMips = false;
+    uint32 MaxMipLevels = static_cast<uint32>(-1);
 };
 
 class FTextureCubeRHI : public FTextureBase
@@ -29,6 +32,16 @@ public:
         return Sampler;
     }
 
+    uint32 GetMipLevels() const
+    {
+        return MipLevels;
+    }
+
+    VkImage GetImage() const
+    {
+        return CubeImage;
+    }
+
 protected:
 
 
@@ -37,6 +50,7 @@ protected:
     VkDeviceMemory CubeMemory;
     VkImageView CubeImageView;
     VkSampler  Sampler;
+    uint32 MipLevels;
 };
 
 
