@@ -43,3 +43,8 @@ void FCommandBuffers::FreeCommandBuffer()
 {
 	vkFreeCommandBuffers(*GRHI->GetDevice(),Pool->Pool,Buffers.size(),Buffers.data());
 }
+
+FCommandBuffers::~FCommandBuffers()
+{
+    FreeCommandBuffer();
+}

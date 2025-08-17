@@ -15,7 +15,7 @@ class SCoreComponentBase : public SObject
 public:
 	S_REGISTER_CLASS(SObject)
 
-    explicit SCoreComponentBase(const TSharedPtr<SActor> & InActor) :
+    explicit SCoreComponentBase(const TSharedPtr<SActor> & InActor = nullptr) :
         Owner(InActor)
     {
     }

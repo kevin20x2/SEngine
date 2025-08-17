@@ -17,6 +17,13 @@ struct FTextureCubeCreateParams
     uint32 MaxMipLevels = static_cast<uint32>(-1);
 };
 
+struct FTextureCubeData
+{
+    uint32 Width;
+    uint32 Height;
+    TArray <uint8> InData;
+};
+
 class FTextureCubeRHI : public FTextureBase
 {
 public:

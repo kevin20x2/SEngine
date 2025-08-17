@@ -167,6 +167,10 @@ add_executable(SEngine
         Sources/RHI/TextureCube.h
         Sources/Rendering/RenderTargetCube.cpp
         Sources/Rendering/RenderTargetCube.h
+        Sources/Components/ReflectionCaptureComponent.cpp
+        Sources/Components/ReflectionCaptureComponent.h
+        Sources/Rendering/RenderingUtils.cpp
+        Sources/Rendering/RenderingUtils.h
 
 )
 

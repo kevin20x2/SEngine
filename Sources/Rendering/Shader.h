@@ -19,7 +19,6 @@ protected:
 	SShader(TSharedPtr<FVertexShaderProgram> InVert , TSharedPtr<FPixelShaderProgram> InPixel) :
 		VertexShaderProgram(InVert),PixelShaderProgram(InPixel)
 	{
-		GenerateDescriptorSetLayout();
 	}
 public:
 
@@ -48,6 +47,7 @@ public:
 
 	void GenerateDefaultMaterialParams(FMaterialParameters & MaterialParams, SMaterialInterface * MaterialInterface );
 
+    void GenerateDescriptorSetLayout();
 
 	void AddUsedMaterial(SMaterialInterface * MaterialInterface);
 	void RemoveUsedMaterial(SMaterialInterface * MaterialInterace);
@@ -56,7 +56,6 @@ public:
 
 protected:
 
-	void GenerateDescriptorSetLayout();
 
 	using DescriptorSetLayoutBindingList = TArray <FDescriptorSetLayoutBinding>;
 	TArray <DescriptorSetLayoutBindingList> GenerateLayoutBindings();

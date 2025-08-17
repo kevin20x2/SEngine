@@ -18,6 +18,7 @@
 #include "Platform/CImgTextureLoader.h"
 #include "RHI/RenderTargetGroup.h"
 #include "Systems/ShaderManager/ShaderManager.h"
+#include "RenderTargetCube.h"
 
 void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
 {
@@ -28,17 +29,28 @@ void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
 
 void SRenderer::OnPostInit()
 {
+    SEngineModuleBase::OnPostInit();
+
 	FCImgTextureLoader Loader;
 	auto Texture =  Loader.LoadTexture(FPath::GetApplicationDir() + "/Assets/Textures/cloth.png" );
-	auto CubeTexture = Loader.LoadSingleCubeTexture(FPath::GetApplicationDir() + "/Assets/Textures/canyon1.png");
-	SEngineModuleBase::OnPostInit();
+	FTextureCubeData  CubeTextureData ;
+    Loader.LoadSingleCubeTextureData(FPath::GetApplicationDir() + "/Assets/Textures/canyon1.png", CubeTextureData);
+
+    auto CubeRT = FRenderTargetCube ::Create(CubeTextureData.Width,CubeTextureData.Height,CubeTextureData.InData.data());
+    ReflectionCapture = std::make_shared<SReflectionCaptureComponent>();
+    ReflectionCapture->SetCubeRT(CubeRT);
+    //ReflectionCapture->FilterCubeMap();
+
 	auto Shader = SShaderManager::GetShaderFromName("test");
 	auto Material = TSharedPtr<SMaterialInterface>(new SMaterialInterface( Shader->AsShared() ) );
 	Material->Initialize(DescriptorPool->Pool,GetRenderPass());
 	Material->SetTexture(3,Texture);
-	Material->SetTextureCube(5,CubeTexture);
 	FFbxMeshImporter Importer;
 	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/gy.fbx",Material.get());
+
+    ReflectionCapture->FilterCubeMap();
+
+    Material->SetTextureCube(5,CubeRT->GetCubeTexture());
 }
 
 void SRenderer::OnInitialize()
@@ -83,6 +95,7 @@ void SRenderer::OnInitialize()
 	PostProcessManager->InitRenderResource();
 
 	CreateSyncObjects();
+
 
 }
 

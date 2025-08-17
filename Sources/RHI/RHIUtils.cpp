@@ -133,6 +133,11 @@ static TSharedPtr<FShaderVariableInfo> ParseSpvBlockVar(const SpvReflectBlockVar
 	{
 		Result->Type = EShaderVariableType::Vector;
 	}
+    if(Block->type_description->type_flags & SPV_REFLECT_TYPE_FLAG_INT)
+    {
+        Result->Type = EShaderVariableType::Int;
+    }
+
 	Result->Name = Block->name;
 	Result->Size = Block->size;
 	Result->Offset = Block->offset;

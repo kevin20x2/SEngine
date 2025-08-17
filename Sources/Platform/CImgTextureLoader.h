@@ -14,6 +14,8 @@ class FCImgTextureLoader : public FTextureLoader
 public:
 	virtual TSharedPtr <FTexture2D> LoadTexture(const FString & Path) override;
 
+    virtual bool LoadSingleCubeTextureData(const FString & Path , FTextureCubeData & OutCubeData ) override;
+
 	virtual TSharedPtr <FTextureCubeRHI> LoadSingleCubeTexture(const FString & Path) override;
 };
 

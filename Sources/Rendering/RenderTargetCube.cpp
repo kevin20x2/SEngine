@@ -6,15 +6,17 @@
 #include "RHI/RHI.h"
 #include "volk.h"
 
-void FRenderTargetCube::Initialize(uint32 Width, uint32 Height)
-{
 
+void FRenderTargetCube::Initialize(uint32 InWidth, uint32 InHeight,uint8 * InData)
+{
+    Width = InWidth;
+    Height = InHeight;
     FTextureCubeCreateParams CubeCreateParams =
     {
             .Width = Width,
             .Height = Height,
             .Format = VK_FORMAT_R8G8B8A8_SRGB,
-            .Data = nullptr,
+            .Data = InData,
             .UsageFlags = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |VK_IMAGE_USAGE_SAMPLED_BIT,
             .bCreateMips = true
     };
@@ -63,4 +65,51 @@ void FRenderTargetCube::Initialize(uint32 Width, uint32 Height)
         CurWidth = max(CurWidth / 2 , 1);
         CurHeight = max(CurHeight / 2 , 1);
     }
+}
+
+TSharedPtr<FRenderTargetCube> FRenderTargetCube::Create(uint32 Width, uint32 Height, uint8 *InData)
+{
+    auto Cube = TSharedPtr<FRenderTargetCube>(new FRenderTargetCube());
+    Cube->Initialize(Width,Height,InData);
+    return Cube;
+}
+
+void FRenderTargetCube::BeginRenderTargetGroup(VkCommandBuffer CommandBuffer,int32 MipIdx, int32 FaceIdx)
+{
+    auto MipWidth = (Width >> MipIdx);
+    auto MipHeight= (Height >> MipIdx);
+
+    VkExtent2D Extent = {.width = MipWidth, .height = MipHeight};
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = RenderPass->RenderPass;
+    renderPassInfo.framebuffer = FrameBuffers[MipIdx * 6 + FaceIdx]->FrameBuffer;
+    renderPassInfo.renderArea.offset = {0, 0};
+    renderPassInfo.renderArea.extent = Extent;
+
+
+    VkViewport viewport{};
+    viewport.width = (float)Extent.width;
+    viewport.height = (float)Extent.height;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+
+    VkRect2D scissor{};
+    scissor.extent = Extent;
+
+    TArray<VkClearValue> ClearColor = { {.color = {0,0,0,1}}};
+
+    renderPassInfo.clearValueCount = ClearColor.size();
+    renderPassInfo.pClearValues = ClearColor.data();
+    vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo,
+                         VK_SUBPASS_CONTENTS_INLINE);
+
+    vkCmdSetScissor(CommandBuffer, 0, 1, &scissor);
+    vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
+
+}
+
+void FRenderTargetCube::EndRenderTargetGroup(VkCommandBuffer CommandBuffer)
+{
+    vkCmdEndRenderPass(CommandBuffer);
 }

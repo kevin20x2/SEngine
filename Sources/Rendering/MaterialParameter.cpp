@@ -135,10 +135,36 @@ void FMaterialParameterUniformBuffer::ParseShaderBindingInfo(FShaderVariableInfo
 			Info->Offset
 		};
 	}
+    if(Info->Type== EShaderVariableType::Int)
+    {
+        IntVariables[Info->Name] = {
+                Info->Name,
+                Info->Type,
+                Info->Size,
+                Info->Offset
+        };
+    }
 	for(auto & ChildInfo : Info->ChildMembers)
 	{
 		ParseShaderBindingInfo(ChildInfo.get());
 	}
+}
+
+bool FMaterialParameterUniformBuffer::ContainInt(const FString &Name)
+{
+    return IntVariables.Contains(Name);
+}
+
+bool FMaterialParameterUniformBuffer::SetInt(const FString &Name, int32 InValue)
+{
+    if(!ContainInt(Name)) return false;
+
+    const auto & Info =  VectorVariables[Name];
+    TArray <int32 > Data = {InValue};
+
+    auto CurrentFrame = GEngine->GetRenderer()->GetFrameIndex();
+
+    return Buffers[CurrentFrame]->UpdateData(Info.Offset,Info.Size,(void *)Data.data());
 }
 
 
@@ -227,4 +253,27 @@ bool FMaterialParameters::SetVector(const FString &Name, const FVector4 &Value)
 		}
 	}
 	return false;
+}
+
+bool FMaterialParameters::SetInt(const FString &Name, int32 IntValue)
+{
+
+    auto ParamIter =  std::find_if(Parameters.begin(), Parameters.end(),
+                                   [&] (TSharedPtr <FMaterialParameterBase> Param){
+                                       if(auto Uniform =  std::static_pointer_cast<FMaterialParameterUniformBuffer>(Param))
+                                       {
+                                           return Uniform->ContainInt(Name);
+                                       }
+                                       return false;
+                                   });
+
+    if(ParamIter != Parameters.end())
+    {
+        if(auto Uniform =  std::static_pointer_cast<FMaterialParameterUniformBuffer>(*ParamIter))
+        {
+            Uniform->SetInt(Name, IntValue);
+            return true;
+        }
+    }
+    return false;
 }

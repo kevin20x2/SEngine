@@ -52,55 +52,68 @@ TSharedPtr<FTexture2D> FCImgTextureLoader::LoadTexture(const FString &Path)
 
 TSharedPtr<FTextureCubeRHI> FCImgTextureLoader::LoadSingleCubeTexture(const FString &Path)
 {
-	CImg<uint8> Src(Path.c_str());
-	int32 OriginHeight = Src.height();
-	int32 OriginWidth = Src.width();
+    FTextureCubeData CubeData;
 
-	if(OriginHeight/3 != OriginWidth / 4 )
-	{
-		SLogW(TEXT("Invalid CubeMap Size"));
-		return nullptr;
-	}
-	int32 CubeFaceSize = OriginHeight/3;
-	FVector2 FixedUVSize = {1.0f/4 ,1.0f/3};
-	uint32 Spectrum =  Src.spectrum();
+    if(LoadSingleCubeTextureData(Path,CubeData))
+    {
+        FTextureCubeCreateParams CubeCreateParams{
+                .Width = (uint32) CubeData.Width,
+                .Height = (uint32) CubeData.Height,
+                .Format = VK_FORMAT_R8G8B8A8_SRGB,
+                .Data = CubeData.InData.data(),
+        };
+        auto CubeTexture = FTextureCubeRHI::Create(CubeCreateParams);
+        return CubeTexture;
+    }
+    return nullptr;
+}
 
-	TArray <FVector2> UVRanges = {
-		{1.0f/4,1.0f/3.0f }, // front
-		{3.0f/4,1.0f/3}, //back
-		{2.0f/4,1.0f/3}, //right
-		{0,1.0f/3}, // left
-		{1.0f/4,0.0f }, // top
-		{1.0f/4,2.0f/3.0f }, // down
-	};
-	uint32 BufferSize = sizeof(uint32) * CubeFaceSize * CubeFaceSize * 6;
-	TArray<uint8 > ColorBuffer(BufferSize);
-	for(int32 FaceIdx = 0 ;FaceIdx < 6; ++ FaceIdx)
-	{
-		auto WidthBegin = static_cast<int32>( OriginWidth *  UVRanges[FaceIdx].x);
-		auto HeightBegin =static_cast<int32>( OriginHeight *  UVRanges[FaceIdx ].y);
-		int32 BaseFaceOffset =FaceIdx *4*( CubeFaceSize * CubeFaceSize) ;
-		for(int32 h = 0; h <  CubeFaceSize ; ++ h )
-		{
-			for(int32 w= 0; w < CubeFaceSize ; ++ w)
-			{
+bool FCImgTextureLoader::LoadSingleCubeTextureData(const FString &Path, FTextureCubeData &OutCubeData)
+{
+    CImg<uint8> Src(Path.c_str());
+    int32 OriginHeight = Src.height();
+    int32 OriginWidth = Src.width();
 
-				ColorBuffer[BaseFaceOffset + 4*(( h * CubeFaceSize ) + w ) + 0 ] =  Src(w+WidthBegin,h+HeightBegin,0,0);
-				ColorBuffer[BaseFaceOffset + 4*(( h * CubeFaceSize ) + w ) + 1 ] = Src(w+WidthBegin,h+HeightBegin,0,1);
-				ColorBuffer[BaseFaceOffset + 4*(( h * CubeFaceSize ) + w ) + 2 ] = Src(w+WidthBegin,h+HeightBegin,0,2);
-				ColorBuffer[BaseFaceOffset + 4*(( h * CubeFaceSize ) + w ) + 3 ] =
-					Spectrum == 3 ?  255 : Src(w+WidthBegin,h+HeightBegin,0,0);
+    if(OriginHeight/3 != OriginWidth / 4 )
+    {
+        SLogW(TEXT("Invalid CubeMap Size"));
+        return false;
+    }
+    int32 CubeFaceSize = OriginHeight/3;
+    FVector2 FixedUVSize = {1.0f/4 ,1.0f/3};
+    uint32 Spectrum =  Src.spectrum();
 
-			}
-		}
-	}
+    TArray <FVector2> UVRanges = {
+            {1.0f/4,1.0f/3.0f }, // front
+            {3.0f/4,1.0f/3}, //back
+            {2.0f/4,1.0f/3}, //right
+            {0,1.0f/3}, // left
+            {1.0f/4,0.0f }, // top
+            {1.0f/4,2.0f/3.0f }, // down
+    };
+    uint32 BufferSize = sizeof(uint32) * CubeFaceSize * CubeFaceSize * 6;
+    TArray<uint8 > ColorBuffer(BufferSize);
+    for(int32 FaceIdx = 0 ;FaceIdx < 6; ++ FaceIdx)
+    {
+        auto WidthBegin = static_cast<int32>( OriginWidth *  UVRanges[FaceIdx].x);
+        auto HeightBegin =static_cast<int32>( OriginHeight *  UVRanges[FaceIdx ].y);
+        int32 BaseFaceOffset =FaceIdx *4*( CubeFaceSize * CubeFaceSize) ;
+        for(int32 h = 0; h <  CubeFaceSize ; ++ h )
+        {
+            for(int32 w= 0; w < CubeFaceSize ; ++ w)
+            {
 
-	FTextureCubeCreateParams CubeCreateParams {
-		.Width = (uint32)CubeFaceSize,
-		.Height = (uint32)CubeFaceSize,
-		.Format = VK_FORMAT_R8G8B8A8_SRGB,
-		.Data = ColorBuffer.data(),
-	};
-	auto CubeTexture = FTextureCubeRHI::Create(CubeCreateParams);
-	return CubeTexture ;
+                ColorBuffer[BaseFaceOffset + 4*(( h * CubeFaceSize ) + w ) + 0 ] =  Src(w+WidthBegin,h+HeightBegin,0,0);
+                ColorBuffer[BaseFaceOffset + 4*(( h * CubeFaceSize ) + w ) + 1 ] = Src(w+WidthBegin,h+HeightBegin,0,1);
+                ColorBuffer[BaseFaceOffset + 4*(( h * CubeFaceSize ) + w ) + 2 ] = Src(w+WidthBegin,h+HeightBegin,0,2);
+                ColorBuffer[BaseFaceOffset + 4*(( h * CubeFaceSize ) + w ) + 3 ] =
+                        Spectrum == 3 ?  255 : Src(w+WidthBegin,h+HeightBegin,0,0);
+
+            }
+        }
+    }
+    OutCubeData.Width = CubeFaceSize;
+    OutCubeData.Height = CubeFaceSize;
+    OutCubeData.InData = ColorBuffer;
+    return true;
 }

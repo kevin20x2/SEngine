@@ -76,7 +76,7 @@ FRenderPass* FRenderPass::Create(VkFormat InFormat,VkImageLayout ImageLayout,uin
 
 	VkRenderPassCreateInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-	renderPassInfo.attachmentCount = ColorCount + 1 ;
+	renderPassInfo.attachmentCount = ColorCount + ( bNeedDepth ?  1 : 0) ;
 	renderPassInfo.pAttachments = Attachments.data();
 	renderPassInfo.subpassCount = 1;
 	renderPassInfo.pSubpasses = &subpass;

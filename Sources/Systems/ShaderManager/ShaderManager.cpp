@@ -24,7 +24,7 @@ TSharedPtr<SShader> SShaderManager::CreateShader(const FString& ShaderFilePath)
     auto NameWithExt =  FPath::GetFileNameFromPath(ShaderFilePath);
     auto Name =NameWithExt.substr(0, NameWithExt.find_last_of('.'));
     Shader->SetName(Name);
-
+    Shader->GenerateDescriptorSetLayout();
     auto This = GetEngineModule<SShaderManager>();
     if(This)
     {

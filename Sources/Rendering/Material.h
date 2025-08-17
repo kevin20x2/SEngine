@@ -45,6 +45,7 @@ public:
 
 	bool SetVector(const FString & Name, const FVector4 & InVector);
 
+    bool SetInt(const FString & Name, int32 IntValue);
 
 	void MarkDirty()
 	{

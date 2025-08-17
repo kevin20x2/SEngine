@@ -20,6 +20,7 @@
 #include "Shader.h"
 #include "CoreObjects/EngineModuleBase.h"
 #include "RHI/RenderTargetGroup.h"
+#include "Components/ReflectionCaptureComponent.h"
 
 
 class FRenderTargetGroup;
@@ -87,7 +88,12 @@ public:
 
 protected:
 
+    // TEMP:
+
+    TSharedPtr <SReflectionCaptureComponent> ReflectionCapture;
+
 	TSharedPtr<SActor> Actor;
+    // TEMP ENDK
 
 	TArray < TSharedPtr<SPrimitiveComponent> > Primitives;
 

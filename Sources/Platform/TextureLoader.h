@@ -9,6 +9,7 @@
 #include "Core/BaseTypes.h"
 
 class FTextureCubeRHI;
+struct FTextureCubeData;
 
 class FTextureLoader
 {
@@ -16,7 +17,9 @@ class FTextureLoader
 
 	virtual TSharedPtr < FTexture2D > LoadTexture(const FString & FilePath ) = 0 ;
 
-	virtual TSharedPtr <FTextureCubeRHI> LoadSingleCubeTexture(const FString & Path) = 0;
+    virtual bool LoadSingleCubeTextureData(const FString & Path , FTextureCubeData & OutCubeData ) = 0;
+
+    virtual TSharedPtr <FTextureCubeRHI> LoadSingleCubeTexture(const FString & Path) = 0;
 };
 
 #endif //TEXTURELOADER_H

@@ -119,6 +119,12 @@ bool SMaterialInterface::SetVector(const FString &Name, const FVector4 &InVector
 	return Result;
 }
 
+bool SMaterialInterface::SetInt(const FString &Name, int32 IntValue)
+{
+    auto Result = MaterialParameters.SetInt(Name,IntValue);
+    return Result;
+}
+
 void SMaterialInterface::OnSetupViewData()
 {
 	auto SceneView = GEngine->GetRenderer()->GetSceneView();
@@ -203,3 +209,5 @@ void SMaterialInterface::OnSetupPrimitiveData(FPrimitiveRenderData* InRenderData
 
 	}
 }
+
+

@@ -55,6 +55,10 @@ public:
 
 	bool ContainVector(const FString & Name);
 
+    bool ContainInt(const FString & Name);
+
+    bool SetInt(const FString & Name, int32 InValue);
+
 	virtual TArray <VkWriteDescriptorSet> GenerateWriteDescriptorSets(VkDescriptorSet DescriptorSet) override;
 
 protected:
@@ -69,6 +73,7 @@ protected:
 	};
 
 	TMap <FString,FVariableInfo > VectorVariables;
+    TMap <FString,FVariableInfo > IntVariables;
 
 	VkDescriptorBufferInfo BufferInfo ;
 	TArray <TSharedPtr <FUniformBuffer> > Buffers;
@@ -85,6 +90,8 @@ public:
 	void SetTexture(const FString & Name, TSharedPtr <FTextureBase> InTexture);
 
 	bool SetVector(const FString & Name, const FVector4 & Value);
+
+    bool SetInt(const FString & Name,int32 IntValue);
 
 protected:
 	TArray <VkWriteDescriptorSet> GenerateWriteDescriptorSet(VkDescriptorSet DescriptorSet);

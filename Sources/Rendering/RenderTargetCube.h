@@ -12,11 +12,30 @@ class FRenderTargetCube
 {
 
 public:
-    void Initialize(uint32 Width,uint32 Height);
+
+    static TSharedPtr <FRenderTargetCube > Create(uint32 InWidth , uint32 InHeight, uint8 * InData);
+
+    void Initialize(uint32 Width,uint32 Height,uint8 * InData);
+
+    void BeginRenderTargetGroup(VkCommandBuffer CommandBuffer,int32 MipIdx,int32 FaceIdx);
+
+    void EndRenderTargetGroup(VkCommandBuffer CommandBuffer);
+
+    TSharedPtr<FTextureCubeRHI>  GetCubeTexture() const
+    {
+        return CubeTexture;
+    }
+
+    FRenderPass * GetRenderPass()const
+    {
+        return RenderPass.get();
+    }
 
 protected:
-    TSharedPtr <FTextureCubeRHI> CubeTexture;
+    uint32 Width;
+    uint32 Height;
 
+    TSharedPtr <FTextureCubeRHI> CubeTexture;
     // Mip, Face
     TArray <TArray <VkImageView> > CubeRT2DViews;
 

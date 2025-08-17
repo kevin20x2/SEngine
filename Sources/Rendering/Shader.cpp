@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by 郑文凯 on 2024/10/1.
 //
 
@@ -46,6 +46,7 @@ void SShader::GenerateDescriptorSetLayout()
         return;
     }
     auto &VertexInfos = VertexShaderProgram->GetDescriptorSetLayoutInfos();
+
     auto &PixelInfos = PixelShaderProgram->GetDescriptorSetLayoutInfos();
 
     if (VertexInfos.size() != PixelInfos.size())

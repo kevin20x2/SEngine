@@ -26,6 +26,8 @@ class FCommandBuffers
 public:
     FCommandBuffers(uint32 Size,FCommandBufferPool * Pool);
 
+    virtual ~FCommandBuffers();
+
     void FreeCommandBuffer();
 
     VkCommandBuffer GetHandle(int32 Idx)
