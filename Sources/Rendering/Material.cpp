@@ -109,6 +109,15 @@ void SMaterialInterface::SetTexture(const FString& Name, TSharedPtr<FTexture2D> 
 	}
 }
 
+void SMaterialInterface::SetTextureCube(const FString &Name, TSharedPtr<FTextureCubeRHI> CubeTexture)
+{
+    MaterialParameters.SetTexture(Name,CubeTexture);
+    for(auto & DescriptionSet :DescriptionSets)
+    {
+        MaterialParameters.BindParametersToDescriptorSet(DescriptionSet);
+    }
+}
+
 bool SMaterialInterface::SetVector(const FString &Name, const FVector4 &InVector)
 {
 	auto Result = MaterialParameters.SetVector(Name,InVector);
@@ -209,5 +218,12 @@ void SMaterialInterface::OnSetupPrimitiveData(FPrimitiveRenderData* InRenderData
 
 	}
 }
+
+void SMaterialInterface::SyncToCommandBuffer(VkCommandBuffer CommandBuffer)
+{
+    MaterialParameters.OnSyncToCommandBuffer(CommandBuffer);
+}
+
+
 
 

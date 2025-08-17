@@ -15,7 +15,8 @@ public:
     void BeginPostProcess(uint32 FrameIdx,
         VkCommandBuffer CommandBuffer ,FRenderTargetGroup * InBaseGroup, FRenderTargetGroup * SwapChainGroup );
 
-    void OnPreRecordCommandBuffer(uint32 ImageIndex , FRenderTargetGroup * InBaseGroup ,FRenderTargetGroup * SwapChainGroup);
+    void OnPreRecordCommandBuffer(VkCommandBuffer CommandBuffer,
+                                  uint32 ImageIndex , FRenderTargetGroup * InBaseGroup ,FRenderTargetGroup * SwapChainGroup);
 
     void InitRenderResource();
 protected:

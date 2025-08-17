@@ -339,7 +339,7 @@ FString FRHIUtils::GetShaderEntryPointByShaderStage(VkShaderStageFlagBits Stage)
 }
 
 void
-FRHIUtils::CreateBuffer(VkBufferUsageFlagBits Usage,
+FRHIUtils::CreateBuffer(VkBufferUsageFlags Usage,
                         uint32 BufferSize,
                         VkFlags PropertyFlags,
                         VkBuffer &Buffer,

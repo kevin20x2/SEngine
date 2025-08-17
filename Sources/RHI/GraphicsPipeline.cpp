@@ -64,13 +64,14 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
 	RasterizationState.polygonMode = VK_POLYGON_MODE_FILL;
 	RasterizationState.lineWidth = 1.0f;
 
-	RasterizationState.cullMode = VK_CULL_MODE_BACK_BIT;
+	RasterizationState.cullMode = VK_CULL_MODE_NONE;
 	RasterizationState.frontFace = VK_FRONT_FACE_CLOCKWISE;
 
 	RasterizationState.depthBiasEnable = VK_FALSE;
 	RasterizationState.depthBiasConstantFactor = 0.0f;
 	RasterizationState.depthBiasClamp = 0.0f;
 	RasterizationState.depthBiasSlopeFactor = 0.0f;
+
 
 	VkPipelineMultisampleStateCreateInfo Multisampling{};
 	  Multisampling.sType =
@@ -84,8 +85,8 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
 
 	  VkPipelineDepthStencilStateCreateInfo DepthStencil {
 		  .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-		  .depthTestEnable = VK_TRUE,
-		  .depthWriteEnable = VK_TRUE,
+		  .depthTestEnable = Info.ZTest,
+		  .depthWriteEnable = Info.ZWrite,
 		  .depthCompareOp = VK_COMPARE_OP_LESS,
 		  .depthBoundsTestEnable = VK_FALSE,
 		  .stencilTestEnable = VK_FALSE,

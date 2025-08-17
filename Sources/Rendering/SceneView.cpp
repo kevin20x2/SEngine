@@ -22,9 +22,9 @@ void FSceneView::UpdateViewData(SCameraComponent* InCameraComp)
     ViewData.ViewOrigin = ViewPos;
 }
 
-void FSceneView::SyncData(uint32 CurrentFrame)
+void FSceneView::SyncData(VkCommandBuffer CommandBuffer, uint32 CurrentFrame)
 {
-    UniformBuffers[CurrentFrame]->UpdateData(&ViewData);
+    UniformBuffers[CurrentFrame]->UpdateData(CommandBuffer,&ViewData);
 }
 
 void FSceneView::Initialize()

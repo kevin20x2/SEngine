@@ -41,11 +41,15 @@ public:
 	void SetTexture(uint32 Binding , TSharedPtr <FTexture2D> InTexture );
 	void SetTextureCube(uint32 Binding , TSharedPtr <FTextureCubeRHI> CubeTexture);
 
+    void SetTextureCube(const FString & Name , TSharedPtr <FTextureCubeRHI> CubeTexture);
+
 	void SetTexture(const FString & Name, TSharedPtr <FTexture2D>  InTexture);
 
 	bool SetVector(const FString & Name, const FVector4 & InVector);
 
     bool SetInt(const FString & Name, int32 IntValue);
+
+    void SyncToCommandBuffer(VkCommandBuffer CommandBuffer);
 
 	void MarkDirty()
 	{

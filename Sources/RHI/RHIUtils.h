@@ -35,7 +35,7 @@ public:
 
 	static FVertexInputInfo GenerateVertexInputStateCreateInfo(TArray <SpvReflectInterfaceVariable *> InputVars);
 
-	static void CreateBuffer(VkBufferUsageFlagBits Usage,uint32 BufferSize,
+	static void CreateBuffer(VkBufferUsageFlags Usage,uint32 BufferSize,
 							 VkFlags PropertyFlags,VkBuffer & Buffer, VkDeviceMemory & DeviceMemory);
 
 

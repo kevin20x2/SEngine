@@ -16,13 +16,14 @@ class SReflectionCaptureComponent : public SCoreComponentBase
     S_REGISTER_CLASS(SReflectionCaptureComponent)
 public:
 
+    void Init();
 
     void SetCubeRT(TSharedPtr <FRenderTargetCube> InCubeRT)
     {
         CubeRT = InCubeRT;
     }
 
-    void FilterCubeMap();
+    void FilterCubeMap(VkCommandBuffer CommandBuffer);
 
 protected:
 

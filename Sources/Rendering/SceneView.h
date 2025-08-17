@@ -29,7 +29,7 @@ public:
 
 
     void UpdateViewData(SCameraComponent * InCameraComp);
-    void SyncData(uint32 CurrentFrame);
+    void SyncData(VkCommandBuffer CommandBuffer,uint32 CurrentFrame);
 protected:
     void Initialize();
 

@@ -15,6 +15,7 @@ struct FTextureCubeCreateParams
     VkImageUsageFlags UsageFlags = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
     bool bCreateMips = false;
     uint32 MaxMipLevels = static_cast<uint32>(-1);
+    bool bRenderTarget = false;
 };
 
 struct FTextureCubeData

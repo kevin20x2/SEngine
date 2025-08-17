@@ -8,19 +8,25 @@
 #include "Rendering/Renderer.h"
 #include "Rendering/RenderingUtils.h"
 #include "RHI/RHIUtils.h"
-
-void SReflectionCaptureComponent::FilterCubeMap()
+void SReflectionCaptureComponent::Init()
 {
     auto CubeMapFilterShader = SShaderManager::GetShaderFromName("CubemapFilter");
     CubeFilterMaterial = SNew <SMaterialInterface>(CubeMapFilterShader->AsShared());
     CubeFilterMaterial->SetbNeedViewData(false);
 
-    auto CommandBuffer = FRHIUtils::BeginOneTimeCommandBuffer();
-
     auto Renderer = GEngine->GetModuleByClass<SRenderer>();
     if(CubeRT)
     {
-        CubeFilterMaterial->Initialize( Renderer->GetDescriptorPool()->Pool , CubeRT->GetRenderPass());
+        CubeFilterMaterial->Initialize(Renderer->GetDescriptorPool()->Pool, CubeRT->GetRenderPass());
+    }
+}
+
+void SReflectionCaptureComponent::FilterCubeMap(VkCommandBuffer CommandBuffer)
+{
+
+
+    if(CubeRT)
+    {
         auto MipLevel = CubeRT->GetCubeTexture()->GetMipLevels();
         for(int32 MipIdx = 1; MipIdx < MipLevel  ; ++MipIdx)
         {
@@ -29,16 +35,21 @@ void SReflectionCaptureComponent::FilterCubeMap()
                 CubeFilterMaterial->SetInt("CubeFace",FaceIdx);
                 CubeFilterMaterial->SetInt("MipIndex",MipIdx);
                 CubeFilterMaterial->SetInt("NumMips",MipLevel);
+                CubeFilterMaterial->SetTextureCube("CubemapTexture",CubeRT->GetCubeTexture());
 
+                CubeFilterMaterial->SyncToCommandBuffer(CommandBuffer);
 
                 CubeRT->BeginRenderTargetGroup(CommandBuffer, MipIdx,FaceIdx);
 
                 FRenderingUtils::DrawScreenTriangle(CommandBuffer,CubeFilterMaterial.get());
 
                 CubeRT->EndRenderTargetGroup(CommandBuffer);
+                break;
             }
+            break;
         }
     }
 
-    FRHIUtils::EndOneTimeCommandBuffer(CommandBuffer);
 }
+
+

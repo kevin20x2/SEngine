@@ -5,6 +5,7 @@
 #include "RenderTargetCube.h"
 #include "RHI/RHI.h"
 #include "volk.h"
+#include "RHI/RHIUtils.h"
 
 
 void FRenderTargetCube::Initialize(uint32 InWidth, uint32 InHeight,uint8 * InData)
@@ -18,14 +19,15 @@ void FRenderTargetCube::Initialize(uint32 InWidth, uint32 InHeight,uint8 * InDat
             .Format = VK_FORMAT_R8G8B8A8_SRGB,
             .Data = InData,
             .UsageFlags = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |VK_IMAGE_USAGE_SAMPLED_BIT,
-            .bCreateMips = true
+            .bCreateMips = true,
+            .bRenderTarget = true
     };
 
     CubeTexture = FTextureCubeRHI::Create(CubeCreateParams);
 
     RenderPass = TSharedPtr <FRenderPass> (  FRenderPass::Create(
             VK_FORMAT_R8G8B8A8_SRGB,
-            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,1,false ));
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,1,false));
 
     uint32 MipLevels = CubeTexture->GetMipLevels();
     FrameBuffers.resize(MipLevels * 6 );
@@ -78,6 +80,8 @@ void FRenderTargetCube::BeginRenderTargetGroup(VkCommandBuffer CommandBuffer,int
 {
     auto MipWidth = (Width >> MipIdx);
     auto MipHeight= (Height >> MipIdx);
+
+    //FRHIUtils::TransitionImageLayout(CubeTexture->GetImage(),VK_FORMAT_R8G8B8A8_SRGB,)
 
     VkExtent2D Extent = {.width = MipWidth, .height = MipHeight};
     VkRenderPassBeginInfo renderPassInfo{};

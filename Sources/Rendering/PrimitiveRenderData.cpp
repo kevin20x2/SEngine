@@ -16,9 +16,9 @@ void FPrimitiveRenderData::UpdateModelMatrix(const FMatrix4& InMat)
     RenderData.ModelMatrix = glm::transpose(InMat);
 }
 
-void FPrimitiveRenderData::SyncData(uint32 CurrentFrame)
+void FPrimitiveRenderData::SyncData(VkCommandBuffer CommandBuffer,uint32 CurrentFrame)
 {
-    UniformBuffers[CurrentFrame]->UpdateData(&RenderData);
+    UniformBuffers[CurrentFrame]->UpdateData(CommandBuffer,&RenderData);
 }
 
 void FPrimitiveRenderData::Initialize()

@@ -23,6 +23,10 @@ public:
 	FString Name;
 	uint32 DescriptorIdx ;
 	uint32 BindingSlotIdx ;
+
+    virtual void OnSyncToCommandBuffer(VkCommandBuffer CommandBuffer)
+    { }
+
 };
 
 
@@ -61,6 +65,8 @@ public:
 
 	virtual TArray <VkWriteDescriptorSet> GenerateWriteDescriptorSets(VkDescriptorSet DescriptorSet) override;
 
+    virtual void OnSyncToCommandBuffer(VkCommandBuffer CommandBuffer) override;
+
 protected:
 	void ParseShaderBindingInfo(FShaderVariableInfo * Info);
 
@@ -74,6 +80,9 @@ protected:
 
 	TMap <FString,FVariableInfo > VectorVariables;
     TMap <FString,FVariableInfo > IntVariables;
+
+
+    TArray <uint8> HostBuffer;
 
 	VkDescriptorBufferInfo BufferInfo ;
 	TArray <TSharedPtr <FUniformBuffer> > Buffers;
@@ -92,6 +101,8 @@ public:
 	bool SetVector(const FString & Name, const FVector4 & Value);
 
     bool SetInt(const FString & Name,int32 IntValue);
+
+    void OnSyncToCommandBuffer(VkCommandBuffer CommandBuffer);
 
 protected:
 	TArray <VkWriteDescriptorSet> GenerateWriteDescriptorSet(VkDescriptorSet DescriptorSet);

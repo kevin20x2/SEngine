@@ -18,7 +18,7 @@ class FPrimitiveRenderData
 public:
     FPrimitiveRenderData();
     void UpdateModelMatrix(const FMatrix4 & InMat);
-    void SyncData(uint32 CurrentFrame);
+    void SyncData(VkCommandBuffer CommandBuffer,uint32 CurrentFrame);
 
     FUniformBuffer * GetUniformBuffer(uint32 FrameIdx)
     {

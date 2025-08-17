@@ -11,7 +11,7 @@ cbuffer Global : register(b0)
 
 struct VSInput
 {
-    [[vk::location(0)]] float2 Position : POSITION;
+    [[vk::location(0)]] float3 Position : POSITION;
     [[vk::location(1)]] float2 UV : TEXCOORD0;
 };
 
@@ -51,11 +51,11 @@ float3 GetCubemapVector(float2 ScaledUVs, int InCubeFace)
 
 float4 VertexMain(VSInput input)
 {
-    return float4(input.Position , 0.0f,1.0f);
+    return float4(input.Position ,1.0f);
 }
 
-TextureCube CubemapTexture;
-SamplerState CubeSampler ;
+TextureCube CubemapTexture : register(t1,space0);
+SamplerState CubeSampler :register(s2,space0);
 
 float4 FragmentMain(float4 SvPosition : SV_POSITION) :  SV_TARGET
 {
@@ -65,5 +65,9 @@ float4 FragmentMain(float4 SvPosition : SV_POSITION) :  SV_TARGET
     float3 CubeCoordinates = GetCubemapVector(ScaledUVs,CubeFace);
     float4 OutColor = CubemapTexture.SampleLevel(CubeSampler,CubeCoordinates,0);
 
-    return OutColor;
+    if (CubeFace == 5)
+    {
+        OutColor = float4(1,1,1,1);
+    }
+    return float4(1,1,1,1);
 }

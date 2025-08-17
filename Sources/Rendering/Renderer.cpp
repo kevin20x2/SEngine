@@ -39,6 +39,7 @@ void SRenderer::OnPostInit()
     auto CubeRT = FRenderTargetCube ::Create(CubeTextureData.Width,CubeTextureData.Height,CubeTextureData.InData.data());
     ReflectionCapture = std::make_shared<SReflectionCaptureComponent>();
     ReflectionCapture->SetCubeRT(CubeRT);
+    ReflectionCapture->Init();
     //ReflectionCapture->FilterCubeMap();
 
 	auto Shader = SShaderManager::GetShaderFromName("test");
@@ -46,21 +47,14 @@ void SRenderer::OnPostInit()
 	Material->Initialize(DescriptorPool->Pool,GetRenderPass());
 	Material->SetTexture(3,Texture);
 	FFbxMeshImporter Importer;
-	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/gy.fbx",Material.get());
+	//Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/gy.fbx",Material.get());
 
-    ReflectionCapture->FilterCubeMap();
 
     Material->SetTextureCube(5,CubeRT->GetCubeTexture());
 }
 
 void SRenderer::OnInitialize()
 {
-
-	SceneView = TSharedPtr<FSceneView>(new FSceneView);
-
-	PrimitiveData = TSharedPtr<FPrimitiveRenderData>(new FPrimitiveRenderData());
-
-	LightData = SNew<FLightRenderData>();
 
     uint32 MaxFrameInFlight = GRHI->GetMaxFrameInFlight();
 
@@ -73,6 +67,13 @@ void SRenderer::OnInitialize()
 	RecreateSwapChains();
 
     CommandBuffers = TUniquePtr<FCommandBuffers>(new FCommandBuffers(MaxFrameInFlight,CommandBufferPool.get()));
+
+
+    SceneView = TSharedPtr<FSceneView>(new FSceneView);
+
+    PrimitiveData = TSharedPtr<FPrimitiveRenderData>(new FPrimitiveRenderData());
+
+    LightData = SNew<FLightRenderData>();
 
 	ShadowRTG = TSharedPtr<FRenderTargetGroup>(new FRenderTargetGroup());
 	BaseRTG = TSharedPtr<FRenderTargetGroup>(new FRenderTargetGroup());
@@ -105,6 +106,8 @@ void SRenderer::Render()
 	auto Device = *GRHI->GetDevice();
 	vkWaitForFences(Device,1, &InFlightFences[CurrentFrame], VK_TRUE , UINT64_MAX);
 
+    FUniformGlobalStagingBuffer::GetInstance()->ResetOffset();
+
 	uint32_t ImageIndex ;
 	VkResult Result = vkAcquireNextImageKHR(
 		Device,*SwapChain->GetSwapChain(),UINT64_MAX,ImageAvailableSems[CurrentFrame],
@@ -112,15 +115,29 @@ void SRenderer::Render()
 
 	vkResetFences(Device,1,&InFlightFences[CurrentFrame]);
 
+
 	auto Camera = GEngine->GetLocalPlayer()->GetPlayerController()->CameraManager->GetCamera();
 
-	SceneView->UpdateViewData(Camera);
-	SceneView->SyncData(CurrentFrame);
-	LightData->SyncData(CurrentFrame);
-	GEngine->GetGUIPort()->OnRecordGUIData();
+    auto CommandBuffer = CommandBuffers->Buffers[CurrentFrame];
 
-	PreRecordCommandBuffer(ImageIndex);
-	RecordCommandBuffer(CommandBuffers->Buffers[CurrentFrame],ImageIndex);
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = 0;
+    beginInfo.pInheritanceInfo = nullptr;
+    VK_CHECK(vkBeginCommandBuffer(CommandBuffer, &beginInfo));
+
+    ReflectionCapture->FilterCubeMap(CommandBuffer);
+
+	SceneView->UpdateViewData(Camera);
+	SceneView->SyncData(CommandBuffer,CurrentFrame);
+	LightData->SyncData(CommandBuffer,CurrentFrame);
+	//GEngine->GetGUIPort()->OnRecordGUIData();
+
+
+    PreRecordCommandBuffer(CommandBuffer,ImageIndex);
+	RecordCommandBuffer(CommandBuffer,ImageIndex);
+
+    VK_CHECK(vkEndCommandBuffer(CommandBuffer));
 
 	// Submit
 	VkSubmitInfo submitInfo {};
@@ -214,7 +231,7 @@ void SRenderer::CreateSyncObjects()
 	}
 }
 
-void SRenderer::PreRecordCommandBuffer(uint32 ImageIndex)
+void SRenderer::PreRecordCommandBuffer(VkCommandBuffer CommandBuffer,uint32 ImageIndex)
 {
 	FPreRecordBufferContext Context = {
 		.RenderPass = GetRenderPass()
@@ -223,22 +240,16 @@ void SRenderer::PreRecordCommandBuffer(uint32 ImageIndex)
 	{
 		if(P)
 		{
-			P->OnPreRecordCommandBuffer(CurrentFrame,Context);
+			P->OnPreRecordCommandBuffer(CommandBuffer,CurrentFrame,Context);
 		}
 	}
 
-	PostProcessManager->OnPreRecordCommandBuffer(ImageIndex,BaseRTG.get(),SwapChainRTG.get());
+	PostProcessManager->OnPreRecordCommandBuffer(CommandBuffer,ImageIndex,BaseRTG.get(),SwapChainRTG.get());
 }
 
 void SRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageIndex)
 {
 
-
-	VkCommandBufferBeginInfo beginInfo{};
-	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	beginInfo.flags = 0;
-	beginInfo.pInheritanceInfo = nullptr;
-	VK_CHECK(vkBeginCommandBuffer(CommandBuffer, &beginInfo));
 
 	BaseRTG->BeginRenderTargetGroup(CommandBuffer,ImageIndex, FVector4(0,0,0,1.0f));
 
@@ -255,10 +266,9 @@ void SRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 	SwapChainRTG->BeginRenderTargetGroup(CommandBuffer,ImageIndex,FVector4(0,0,0,1));
 
 	PostProcessManager->BeginPostProcess(CurrentFrame,CommandBuffer,BaseRTG.get(),SwapChainRTG.get());
-	GEngine->GetGUIPort()->OnRender(CommandBuffer);
+	//GEngine->GetGUIPort()->OnRender(CommandBuffer);
 	SwapChainRTG->EndRenderTargetGroup(CommandBuffer);
 
-	VK_CHECK(vkEndCommandBuffer(CommandBuffer));
 }
 FCommandBufferPool *
 SRenderer::GetCommandBufferPool() const

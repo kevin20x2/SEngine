@@ -116,6 +116,11 @@ TSharedPtr<FTextureCubeRHI> FTextureCubeRHI::Create(const FTextureCubeCreatePara
 
     FRHIUtils::TransitionImageLayout(Cube->CubeImage,Params.Format,VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,6);
 
+    if(Params.bRenderTarget)
+    {
+        FRHIUtils::TransitionImageLayout(Cube->CubeImage,Params.Format,VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,6);
+    }
+
     VkImageViewCreateInfo ImageViewCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
         .image = Cube->CubeImage,

@@ -84,7 +84,9 @@ void FPostProcessManager::BeginPostProcess(uint32 FrameIdx,
 
 }
 
-void FPostProcessManager::OnPreRecordCommandBuffer(uint32 ImageIndex, FRenderTargetGroup* InBaseGroup,
+void FPostProcessManager::OnPreRecordCommandBuffer(
+        VkCommandBuffer CommandBuffer
+        , uint32 ImageIndex, FRenderTargetGroup* InBaseGroup,
     FRenderTargetGroup* SwapChainGroup)
 {
     BlitMaterial->SetTexture("texColor", InBaseGroup->GetRenderTexture(ImageIndex,0));
@@ -93,5 +95,6 @@ void FPostProcessManager::OnPreRecordCommandBuffer(uint32 ImageIndex, FRenderTar
     //OutlineMaterial->SetVector("ScreenSize",FVector4( 1.0f, 1.0f ,  Params.Width, Params.Height ));
     OutlineMaterial->SetTexture("texColor", InBaseGroup->GetRenderTexture(ImageIndex,0));
     OutlineMaterial->SetTexture("texMask", InBaseGroup->GetRenderTexture(ImageIndex,1));
+    OutlineMaterial->SyncToCommandBuffer(CommandBuffer);
 }
 

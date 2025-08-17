@@ -27,7 +27,7 @@ public:
         Mesh = InMesh;
     }
     void CreateRHIResource();
-	virtual void OnPreRecordCommandBuffer(uint32 CurrentFrame, FPreRecordBufferContext & Context);
+	virtual void OnPreRecordCommandBuffer(VkCommandBuffer CommandBuffer,uint32 CurrentFrame, FPreRecordBufferContext & Context);
 
     virtual void OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,uint32 CurrentFrame);
 

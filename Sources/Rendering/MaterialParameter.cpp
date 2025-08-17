@@ -76,6 +76,7 @@ FMaterialParameterUniformBuffer::FMaterialParameterUniformBuffer( SMaterialInter
 		ParseShaderBindingInfo(Binding.BindingInfo.get());
 		auto BufferCount = GRHI->GetMaxFrameInFlight();
 		Buffers.resize(BufferCount);
+        HostBuffer.resize(Size);
 		auto&  DescriptorSets = Material->GetDescriptorSets();
 		for(uint32 i = 0 ;i < BufferCount;i++)
 		{
@@ -110,7 +111,8 @@ bool FMaterialParameterUniformBuffer::SetVector(const FString& Name, const FVect
 
 	auto CurrentFrame = GEngine->GetRenderer()->GetFrameIndex();
 
-	return Buffers[CurrentFrame]->UpdateData(Info.Offset,Info.Size,(void *)Data.data());
+	memcpy( (void*)(HostBuffer.data() + Info.Offset),(void *)Data.data(),Info.Size);
+    return true;
 }
 
 bool FMaterialParameterUniformBuffer::ContainVector(const FString& Name)
@@ -120,7 +122,6 @@ bool FMaterialParameterUniformBuffer::ContainVector(const FString& Name)
 
 TArray<VkWriteDescriptorSet> FMaterialParameterUniformBuffer::GenerateWriteDescriptorSets(VkDescriptorSet DescriptorSet)
 {
-
 	return  {};
 }
 
@@ -159,12 +160,20 @@ bool FMaterialParameterUniformBuffer::SetInt(const FString &Name, int32 InValue)
 {
     if(!ContainInt(Name)) return false;
 
-    const auto & Info =  VectorVariables[Name];
+    const auto & Info =  IntVariables[Name];
     TArray <int32 > Data = {InValue};
 
-    auto CurrentFrame = GEngine->GetRenderer()->GetFrameIndex();
 
-    return Buffers[CurrentFrame]->UpdateData(Info.Offset,Info.Size,(void *)Data.data());
+    memcpy( HostBuffer.data() + Info.Offset,(void *)Data.data(),Info.Size);
+    return true;
+}
+
+void FMaterialParameterUniformBuffer::OnSyncToCommandBuffer(VkCommandBuffer CommandBuffer)
+{
+
+    auto CurrentFrame = GEngine->GetRenderer()->GetFrameIndex();
+    FMaterialParameterBase::OnSyncToCommandBuffer(CommandBuffer);
+    Buffers[CurrentFrame]->UpdateData(CommandBuffer,HostBuffer.data());
 }
 
 
@@ -276,4 +285,12 @@ bool FMaterialParameters::SetInt(const FString &Name, int32 IntValue)
         }
     }
     return false;
+}
+
+void FMaterialParameters::OnSyncToCommandBuffer(VkCommandBuffer CommandBuffer)
+{
+    for(auto Param : Parameters)
+    {
+        Param->OnSyncToCommandBuffer(CommandBuffer);
+    }
 }

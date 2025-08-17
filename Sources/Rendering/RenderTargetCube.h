@@ -36,6 +36,7 @@ protected:
     uint32 Height;
 
     TSharedPtr <FTextureCubeRHI> CubeTexture;
+
     // Mip, Face
     TArray <TArray <VkImageView> > CubeRT2DViews;
 

@@ -22,10 +22,10 @@ void SPrimitiveComponent::CreateRHIResource()
 
 }
 
-void SPrimitiveComponent::OnPreRecordCommandBuffer(uint32 CurrentFrame,FPreRecordBufferContext & Context )
+void SPrimitiveComponent::OnPreRecordCommandBuffer(VkCommandBuffer CommandBuffer,uint32 CurrentFrame,FPreRecordBufferContext & Context )
 {
 	RenderData->UpdateModelMatrix( GetWorldTransform().ToMatrix() );
-	RenderData->SyncData(CurrentFrame);
+	RenderData->SyncData( CommandBuffer,CurrentFrame);
 	if(Material)
 	{
 		Material->OnPreRecordCommandBuffer(RenderData.get(),CurrentFrame,Context);

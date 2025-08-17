@@ -25,7 +25,7 @@ public:
     {
         return UniformBuffers[FrameIdx].get();
     }
-    void SyncData(uint32 CurrentFrame);
+    void SyncData(VkCommandBuffer CommandBuffer,uint32 CurrentFrame);
 
 
 protected:

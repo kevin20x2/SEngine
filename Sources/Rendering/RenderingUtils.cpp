@@ -5,6 +5,8 @@
 #include "RenderingUtils.h"
 #include "RHI/IndexBuffer.h"
 #include "volk.h"
+#include "CoreObjects/Engine.h"
+#include "Rendering/Renderer.h"
 
 static TSharedPtr <FVertexBuffer> ScreenTriangleVB ;
 static TSharedPtr <FIndexBuffer> ScreenTriangleIB ;
@@ -14,14 +16,16 @@ void InitScreenRHI()
 {
     TArray <FVector> Positions = {
             FVector(-1.0f,-1,0.5),
-            FVector(4,-1,0.5),
-            FVector(-1,4,0.5)
+            FVector(1,-1,0.5),
+            FVector(-1,1,0.5),
+            FVector(1,1,0.5)
     };
     TArray <FVector2> Uv =
             {
                     FVector2(0,0),
-                    FVector2(2,0),
-                    FVector2(0,2)
+                    FVector2(1,0),
+                    FVector2(0,1),
+                    FVector2(1,1)
             };
 
     const uint32 Stride = sizeof(FVector) + sizeof(FVector2);
@@ -42,7 +46,7 @@ void InitScreenRHI()
                                                                 BufferSize,(float * ) Buffer.data()
                                                         }));
 
-    TArray <uint16> Indexes = {0,1,2};
+    TArray <uint16> Indexes = {0,1,2,2,1,3};
 
     ScreenTriangleIB.reset(new FIndexBuffer({
                                          uint32(Indexes.size() * sizeof(uint16)),
@@ -61,7 +65,9 @@ void FRenderingUtils::DrawScreenTriangle(VkCommandBuffer CommandBuffer,
         InitScreenRHI();
     }
 
-    InMaterial->OnRecordCommandBuffer(CommandBuffer,0);
+    auto CurrentFrame = GEngine->GetRenderer()->GetFrameIndex();
+
+    InMaterial->OnRecordCommandBuffer(CommandBuffer,CurrentFrame);
 
     VkBuffer VertexBuffers[] = {ScreenTriangleVB->GetHandle()};
     VkDeviceSize Offsets[] = {0};
@@ -69,6 +75,6 @@ void FRenderingUtils::DrawScreenTriangle(VkCommandBuffer CommandBuffer,
     vkCmdBindVertexBuffers(CommandBuffer,0,1,VertexBuffers,Offsets);
     vkCmdBindIndexBuffer( CommandBuffer,ScreenTriangleIB->GetHandle(),0,VK_INDEX_TYPE_UINT16);
 
-    vkCmdDrawIndexed(CommandBuffer,3,1,0,0,0);
+    vkCmdDrawIndexed(CommandBuffer,6,1,0,0,0);
 
 }

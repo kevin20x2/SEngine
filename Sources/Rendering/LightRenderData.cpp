@@ -11,9 +11,9 @@ FLightRenderData::FLightRenderData()
     Initialize();
 }
 
-void FLightRenderData::SyncData(uint32 CurrentFrame)
+void FLightRenderData::SyncData(VkCommandBuffer CommandBuffer,uint32 CurrentFrame)
 {
-    UniformBuffers[CurrentFrame]->UpdateData(&RenderData);
+    UniformBuffers[CurrentFrame]->UpdateData(CommandBuffer,&RenderData);
 }
 
 void FLightRenderData::Initialize()
@@ -27,7 +27,6 @@ void FLightRenderData::Initialize()
             TSharedPtr <FUniformBuffer> (
                 FUniformBuffer::Create(sizeof(FLightRenderDataShape))
                 );
-        Buffer->UpdateData(&RenderData);
     }
 }
 
