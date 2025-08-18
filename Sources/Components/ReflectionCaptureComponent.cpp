@@ -24,7 +24,6 @@ void SReflectionCaptureComponent::Init()
 void SReflectionCaptureComponent::FilterCubeMap(VkCommandBuffer CommandBuffer)
 {
 
-
     if(CubeRT)
     {
         auto MipLevel = CubeRT->GetCubeTexture()->GetMipLevels();
@@ -39,11 +38,13 @@ void SReflectionCaptureComponent::FilterCubeMap(VkCommandBuffer CommandBuffer)
 
                 CubeFilterMaterial->SyncToCommandBuffer(CommandBuffer);
 
+
                 CubeRT->BeginRenderTargetGroup(CommandBuffer, MipIdx,FaceIdx);
 
                 FRenderingUtils::DrawScreenTriangle(CommandBuffer,CubeFilterMaterial.get());
 
                 CubeRT->EndRenderTargetGroup(CommandBuffer);
+
                 break;
             }
             break;

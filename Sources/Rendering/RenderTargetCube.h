@@ -8,6 +8,8 @@
 #include "RHI/TextureCube.h"
 #include "RHI/FrameBuffer.h"
 
+class FRenderTexture;
+
 class FRenderTargetCube
 {
 
@@ -40,7 +42,7 @@ protected:
     // Mip, Face
     TArray <TArray <VkImageView> > CubeRT2DViews;
 
-    TArray <TSharedPtr <FFrameBuffer> > FrameBuffers;
+    TArray < TSharedPtr <FFrameBuffer>>  FrameBuffers;
 
     TSharedPtr <FRenderPass> RenderPass;
 };

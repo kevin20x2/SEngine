@@ -31,6 +31,7 @@ public:
     void Destroy();
 
     VkFramebuffer FrameBuffer;
+    VkFramebufferCreateInfo FrameBufferCreateInfo;
 };
 
 

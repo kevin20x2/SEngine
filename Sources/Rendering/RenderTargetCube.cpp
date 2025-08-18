@@ -5,6 +5,7 @@
 #include "RenderTargetCube.h"
 #include "RHI/RHI.h"
 #include "volk.h"
+#include "RHI/RenderTexture.h"
 #include "RHI/RHIUtils.h"
 
 
@@ -18,7 +19,7 @@ void FRenderTargetCube::Initialize(uint32 InWidth, uint32 InHeight,uint8 * InDat
             .Height = Height,
             .Format = VK_FORMAT_R8G8B8A8_SRGB,
             .Data = InData,
-            .UsageFlags = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |VK_IMAGE_USAGE_SAMPLED_BIT,
+            .UsageFlags = VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
             .bCreateMips = true,
             .bRenderTarget = true
     };
@@ -29,44 +30,44 @@ void FRenderTargetCube::Initialize(uint32 InWidth, uint32 InHeight,uint8 * InDat
             VK_FORMAT_R8G8B8A8_SRGB,
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,1,false));
 
-    uint32 MipLevels = CubeTexture->GetMipLevels();
-    FrameBuffers.resize(MipLevels * 6 );
+
 
     auto Device = *GRHI->GetDevice();
     TArray <VkImageView> Attachments;
-    CubeRT2DViews.empty();
     uint32 CurWidth = Width;
     uint32 CurHeight = Height;
-    for(uint32 Mip = 0 ; Mip <MipLevels; ++Mip)
+
+    for(uint32 Mip = 0 ; Mip < CubeTexture->GetMipLevels() ; ++Mip)
     {
-        auto & Views = CubeRT2DViews.emplace_back();
-        for(uint32 Face = 0 ; Face < 6; ++ Face)
+        for (uint32 Face = 0; Face < 6; ++Face)
         {
             VkImageViewCreateInfo CreateInfo = {
-                    .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-                    .image = CubeTexture->GetImage(),
-                    .viewType = VK_IMAGE_VIEW_TYPE_2D,
-                    .format = VK_FORMAT_R8G8B8A8_SRGB,
-                    .subresourceRange = {
-                            .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-                            .baseMipLevel = Mip,
-                            .levelCount = 1,
-                            .baseArrayLayer = Face,
-                            .layerCount = 1
-                    }
+                .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+                .image = CubeTexture->GetImage(),
+                .viewType = VK_IMAGE_VIEW_TYPE_2D,
+                .format = VK_FORMAT_R8G8B8A8_SRGB,
+                .subresourceRange = {
+                    .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                    .baseMipLevel = Mip,
+                    .levelCount = 1,
+                    .baseArrayLayer = Face,
+                    .layerCount = 1
+                }
             };
+
             VkImageView ImageView;
 
-            vkCreateImageView(Device,&CreateInfo,nullptr,&ImageView);
-            Views.Add(ImageView);
+            vkCreateImageView(Device, &CreateInfo, nullptr, &ImageView);
 
-            FrameBuffers[Mip * 6 + Face] = TSharedPtr<FFrameBuffer>(
-                    new FFrameBuffer(RenderPass.get(),CurWidth,CurHeight,{ImageView})
-                    );
+               FrameBuffers.Add( TSharedPtr<FFrameBuffer>(
+                   new FFrameBuffer(RenderPass.get(), CurWidth, CurHeight, {ImageView})));
         }
-        CurWidth = max(CurWidth / 2 , 1);
-        CurHeight = max(CurHeight / 2 , 1);
+        CurWidth >>=1;
+        CurHeight >>=1;
     }
+
+
+
 }
 
 TSharedPtr<FRenderTargetCube> FRenderTargetCube::Create(uint32 Width, uint32 Height, uint8 *InData)
@@ -78,10 +79,14 @@ TSharedPtr<FRenderTargetCube> FRenderTargetCube::Create(uint32 Width, uint32 Hei
 
 void FRenderTargetCube::BeginRenderTargetGroup(VkCommandBuffer CommandBuffer,int32 MipIdx, int32 FaceIdx)
 {
+
     auto MipWidth = (Width >> MipIdx);
     auto MipHeight= (Height >> MipIdx);
 
-    //FRHIUtils::TransitionImageLayout(CubeTexture->GetImage(),VK_FORMAT_R8G8B8A8_SRGB,)
+
+    FRHIUtils::TransitionImageLayoutWithCommandBuffer(CommandBuffer, CubeTexture->GetImage(),
+                    VK_FORMAT_R8G8B8A8_SRGB,VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                    MipIdx,1,FaceIdx);
 
     VkExtent2D Extent = {.width = MipWidth, .height = MipHeight};
     VkRenderPassBeginInfo renderPassInfo{};
@@ -101,7 +106,7 @@ void FRenderTargetCube::BeginRenderTargetGroup(VkCommandBuffer CommandBuffer,int
     VkRect2D scissor{};
     scissor.extent = Extent;
 
-    TArray<VkClearValue> ClearColor = { {.color = {0,0,0,1}}};
+    TArray<VkClearValue> ClearColor = { {.color = {0,0,0,0}}};
 
     renderPassInfo.clearValueCount = ClearColor.size();
     renderPassInfo.pClearValues = ClearColor.data();

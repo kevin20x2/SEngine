@@ -51,6 +51,10 @@ public:
 	{
 		return Sampler;
 	}
+	VkImage GetImage() const
+	{
+		return ImageHandle;
+	}
 
 protected:
 	uint32 Height,Width;

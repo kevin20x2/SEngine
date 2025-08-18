@@ -51,11 +51,6 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
 	InputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 	InputAssembly.primitiveRestartEnable = VK_FALSE;
 
-	VkPipelineViewportStateCreateInfo ViewportState{};
-	ViewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-	ViewportState.viewportCount = 1;
-	ViewportState.scissorCount = 1;
-
 
 	VkPipelineRasterizationStateCreateInfo RasterizationState{};
 	RasterizationState.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
@@ -103,6 +98,12 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
 	{
 		ColorBlendAttachments[Idx]= {
 			.blendEnable = VK_FALSE,
+			.srcColorBlendFactor = VK_BLEND_FACTOR_ONE,
+			.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO,
+			.colorBlendOp = VK_BLEND_OP_ADD,
+			.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
+			.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
+			.alphaBlendOp = VK_BLEND_OP_ADD,
 			.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
 			VK_COLOR_COMPONENT_A_BIT,
 		};
@@ -136,6 +137,18 @@ FGraphicsPipeline::FGraphicsPipeline(FGrpahicsPipelineCreateInfo Info)
   dynamicStateCI.pDynamicStates = dynamicStateEnables.data();
   dynamicStateCI.dynamicStateCount =
       static_cast<uint32_t>(dynamicStateEnables.size());
+
+	VkViewport DummyViewport = {0,0,1,1,0,1};
+	VkRect2D Scissor = {0,0,1,1};
+
+	VkPipelineViewportStateCreateInfo ViewportState = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+		.viewportCount = 1,
+		.pViewports = &DummyViewport,
+		.scissorCount = 1,
+		.pScissors = &Scissor
+	};
+
 
   VkGraphicsPipelineCreateInfo PipelineInfo{};
   PipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;

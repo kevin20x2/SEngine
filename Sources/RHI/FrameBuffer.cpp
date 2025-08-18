@@ -40,6 +40,7 @@ FFrameBuffer::FFrameBuffer(FRenderPass* InRenderPass,uint32 Width, uint32 Height
 		.height = Height,
 		.layers = 1
 	};
+	FrameBufferCreateInfo = Info;
 
 	VK_CHECK(vkCreateFramebuffer(*GRHI->GetDevice(),
 		&Info , nullptr, &FrameBuffer ));
@@ -60,6 +61,7 @@ FFrameBuffer::FFrameBuffer(FRenderPass* InRenderPass, uint32 Width, uint32 Heigh
 		.layers = 1
 	};
 
+	FrameBufferCreateInfo = Info;
 	VK_CHECK(vkCreateFramebuffer(*GRHI->GetDevice(),
 		&Info , nullptr, &FrameBuffer ));
 }

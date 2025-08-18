@@ -454,9 +454,31 @@ FRHIUtils::EndOneTimeCommandBuffer(VkCommandBuffer CommandBuffer)
 
 
 void
-FRHIUtils::TransitionImageLayout(VkImage Image, VkFormat Format, VkImageLayout SrcLayout, VkImageLayout DstLayout,uint32_t LayerCount)
+FRHIUtils::TransitionImageLayout(
+		VkImage Image,
+		VkFormat Format,
+		VkImageLayout SrcLayout , VkImageLayout DstLayout,
+		uint32 BaseMipLevel  ,
+		uint32 MipLevelCount ,
+		uint32 BaseLayer  ,
+		uint32 LayerCount )
 {
 	OneTimeCommand([&](VkCommandBuffer Buffer){
+		TransitionImageLayoutWithCommandBuffer(Buffer,Image,Format, SrcLayout,DstLayout,BaseMipLevel,MipLevelCount,BaseLayer,LayerCount);
+	});
+
+}
+
+void FRHIUtils::TransitionImageLayoutWithCommandBuffer(VkCommandBuffer CommandBuffer,
+		VkImage Image,
+		VkFormat Format,
+		VkImageLayout SrcLayout , VkImageLayout DstLayout,
+		uint32 BaseMipLevel  ,
+		uint32 MipLevelCount ,
+		uint32 BaseLayer ,
+		uint32 LayerCount )
+{
+
 		VkImageMemoryBarrier barrier{};
 		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 		barrier.oldLayout = SrcLayout;
@@ -468,16 +490,28 @@ FRHIUtils::TransitionImageLayout(VkImage Image, VkFormat Format, VkImageLayout S
 		barrier.image = Image;
 
 		barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		barrier.subresourceRange.baseMipLevel = 0;
-		barrier.subresourceRange.levelCount = 1;
-		barrier.subresourceRange.baseArrayLayer = 0;
+		barrier.subresourceRange.baseMipLevel = BaseMipLevel;
+		barrier.subresourceRange.levelCount = MipLevelCount;
+		barrier.subresourceRange.baseArrayLayer = BaseLayer;
 		barrier.subresourceRange.layerCount = LayerCount;
 
 
+		barrier.dstAccessMask = 0;
 		barrier.srcAccessMask = 0; // TODO
-		barrier.dstAccessMask = 0; // TODO
+		if(DstLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+		{
+			barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+			barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		}
 		VkPipelineStageFlags sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 		VkPipelineStageFlags destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT ;
+
+		if(DstLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+		{
+			sourceStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+			destinationStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		}
+
 		if(SrcLayout == VK_IMAGE_LAYOUT_UNDEFINED && DstLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
 		{
 			barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
@@ -492,16 +526,15 @@ FRHIUtils::TransitionImageLayout(VkImage Image, VkFormat Format, VkImageLayout S
 		}
 
 		vkCmdPipelineBarrier(
-			Buffer,
+			CommandBuffer,
 			sourceStage /* TODO */, destinationStage /* TODO */,
 			0,
 			0, nullptr,
 			0, nullptr,
 			1, &barrier
 		);
-	});
-
 }
+
 void
 FRHIUtils::CopyBufferToImage(VkImage Image, VkBuffer Buffer, uint32 Height, uint32 Width,int32 LayerCount)
 {

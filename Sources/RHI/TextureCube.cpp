@@ -93,7 +93,7 @@ TSharedPtr<FTextureCubeRHI> FTextureCubeRHI::Create(const FTextureCubeCreatePara
     }
     vkUnmapMemory(Device ,StagingBufferMemory);
 
-    FRHIUtils::TransitionImageLayout(Cube->CubeImage,Params.Format,VK_IMAGE_LAYOUT_UNDEFINED,VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,6);
+    FRHIUtils::TransitionImageLayout(Cube->CubeImage,Params.Format,VK_IMAGE_LAYOUT_UNDEFINED,VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,0,1,0,6);
 
     //FRHIUtils::CopyBufferToImage(Cube->CubeImage,StagingBuffer,Params.Height,Params.Width,6);
     FRHIUtils::OneTimeCommand([=](VkCommandBuffer CmdBuffer)
@@ -114,12 +114,9 @@ TSharedPtr<FTextureCubeRHI> FTextureCubeRHI::Create(const FTextureCubeCreatePara
             CopyRegions.size(),CopyRegions.data());
     });
 
-    FRHIUtils::TransitionImageLayout(Cube->CubeImage,Params.Format,VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,6);
+    FRHIUtils::TransitionImageLayout(Cube->CubeImage,Params.Format,VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,0,1,0,6);
+    FRHIUtils::TransitionImageLayout(Cube->CubeImage,Params.Format,VK_IMAGE_LAYOUT_UNDEFINED,VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,1,MipLevels-1,0,6);
 
-    if(Params.bRenderTarget)
-    {
-        FRHIUtils::TransitionImageLayout(Cube->CubeImage,Params.Format,VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,6);
-    }
 
     VkImageViewCreateInfo ImageViewCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
