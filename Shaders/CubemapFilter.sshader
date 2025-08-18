@@ -54,6 +54,12 @@ float4 VertexMain(VSInput input) : SV_POSITION
     return float4(input.Position ,1.0f);
 }
 
+float D_GGX(float a2 , float NoH)
+{
+    float d = ( NoH * a2 - NoH) * NoH + 1;
+    return a2 / (PI *d *d );
+}
+
 TextureCube CubemapTexture : register(t1,space0);
 SamplerState CubeSampler :register(s2,space0);
 
@@ -61,7 +67,45 @@ float4 FragmentMain(float4 SvPosition : SV_POSITION) :  SV_TARGET
 {
 
     float2 UV = SvPosition.xy ;
-    float2 ScaledUVs = UV * 2 - 1;
+    float2 ScaledUVs = UV ;
 
-    return float4(1,1,1,1);
+    float3 CubeCorrdinates = GetCubemapVector(ScaledUVs,CubeFace);
+    float3 N = normalize(CubeCorrdinates);
+
+    float3x3 TangentToWorld = GetTangentBasis(N);
+
+    float Roughness = float(MipIndex) / (NumMips - 1);
+    float R4 = (Roughness * Roughness) *(Roughness * Roughness);
+
+    uint CubeSize =  1 << (NumMips - 1);
+    const float SoldAngleTexel = 4.0f * PI / float(6 * CubeSize * CubeSize)* 2.0f;
+
+    float4 FilteredColor = 0;
+    uint NumSamples = 64;
+    for(uint i = 0 ; i < NumSamples ; i ++)
+    {
+        float2 E = Hammersley(i,NumSamples,0);
+
+        E.y *= 0.995;
+        float3 H = ImportanceSampleGGX(E,R4).xyz;
+        float3 L = 2 * H.z *H - float3(0,0,1);
+
+        float NoL = L.z;
+        float NoH = H.z;
+
+        if( NoL > 0)
+        {
+            float PDF = D_GGX(R4,NoH) * 0.25;
+            float SolidAngleSample = 1.0 / (NumSamples * PDF);
+            float Mip = 0.5f * log2(SolidAngleSample/ SoldAngleTexel);
+
+            L = mul(L , TangentToWorld);
+            FilteredColor +=  CubemapTexture.SampleLevel(CubeSampler,L,Mip);
+        }
+
+
+    }
+    float4 OutColor = FilteredColor / NumSamples;
+
+    return OutColor;
 }

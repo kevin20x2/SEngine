@@ -1,5 +1,6 @@
 
 
+const float PI = 3.1415926f;
 
 float Hammersley(uint Index, uint NumSamples ,uint2 Random)
 {
@@ -10,7 +11,6 @@ float Hammersley(uint Index, uint NumSamples ,uint2 Random)
 
 float4 ImportanceSampleGGX(float2 E ,float a2)
 {
-    const float PI = 3.1415926f;
     float Phi = 2 * PI *E.x;
     float CosTheta = sqrt((1-E.y) / (1+(a2-1) *E.y));
     float SinTheta = sqrt(1 - CosTheta * CosTheta);
@@ -25,3 +25,23 @@ float4 ImportanceSampleGGX(float2 E ,float a2)
     float PDF = D * CosTheta;
     return float4(H,PDF);
 }
+
+float Pow2(float x)
+{
+  return x*x;
+}
+
+
+// [ Duff et al. 2017, "Building an Orthonormal Basis, Revisited" ]
+float3x3 GetTangentBasis( float3 TangentZ )
+{
+	const float Sign = TangentZ.z >= 0 ? 1 : -1;
+	const float a = -rcp( Sign + TangentZ.z );
+	const float b = TangentZ.x * TangentZ.y * a;
+
+	float3 TangentX = { 1 + Sign * a * Pow2( TangentZ.x ), Sign * b, -Sign * TangentZ.x };
+	float3 TangentY = { b,  Sign + a * Pow2( TangentZ.y ), -TangentZ.y };
+
+	return float3x3( TangentX, TangentY, TangentZ );
+}
+

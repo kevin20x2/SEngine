@@ -45,9 +45,7 @@ void SReflectionCaptureComponent::FilterCubeMap(VkCommandBuffer CommandBuffer)
 
                 CubeRT->EndRenderTargetGroup(CommandBuffer);
 
-                break;
             }
-            break;
         }
     }
 
