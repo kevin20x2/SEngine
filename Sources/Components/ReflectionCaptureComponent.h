@@ -23,7 +23,7 @@ public:
         CubeRT = InCubeRT;
     }
 
-    void FilterCubeMap(VkCommandBuffer CommandBuffer);
+    void FilterCubeMap();
 
 protected:
 

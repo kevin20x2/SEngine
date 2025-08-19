@@ -49,11 +49,11 @@ PSOutput FragmentMain(VSOutput input)
     float3 LambertDiffuse = pow(NToL * 0.5f + 0.5f,2.0f) * ao;
 
     float3 reflectDir = reflect(-ViewDir,WorldNormal);
-    float4 CubeColor = texCube.SampleLevel(samplerCube , reflectDir,8);
+    float4 CubeColor = texCube.SampleLevel(samplerCube , WorldNormal,0);
 
     float3 FinalColor =  CubeColor.rgb ;
 
-    output.Color = float4(FinalColor, 1.0f) ;
+    output.Color = float4(CubeColor.rgb, 1.0f) ;
     output.Mask = float4(1,0,0,1);
     return output;
 }

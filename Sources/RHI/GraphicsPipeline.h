@@ -16,8 +16,8 @@ struct FGrpahicsPipelineCreateInfo
 {
 	SShader * Shader;
     FRenderPass * RenderPass;
-    bool ZTest  = false;
-    bool ZWrite = false;
+    bool ZTest  = true;
+    bool ZWrite = true;
 };
 
 class FGraphicsPipeline

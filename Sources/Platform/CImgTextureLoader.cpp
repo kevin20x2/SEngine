@@ -91,6 +91,31 @@ bool FCImgTextureLoader::LoadSingleCubeTextureData(const FString &Path, FTexture
             {1.0f/4,0.0f }, // top
             {1.0f/4,2.0f/3.0f }, // down
     };
+
+	TArray <bool> bSwapXY = {
+		true,
+		false,
+		false,
+		false,
+		false,
+		false
+	};
+	TArray <bool> InvertX = {
+		true,
+		false,
+		false,
+		false,
+		false
+	};
+	TArray <bool> InvertY = {
+		false,
+		false,
+		false,
+		false,
+		false,
+		false
+	};
+
     uint32 BufferSize = sizeof(uint32) * CubeFaceSize * CubeFaceSize * 6;
     TArray<uint8 > ColorBuffer(BufferSize);
     for(int32 FaceIdx = 0 ;FaceIdx < 6; ++ FaceIdx)
@@ -98,17 +123,34 @@ bool FCImgTextureLoader::LoadSingleCubeTextureData(const FString &Path, FTexture
         auto WidthBegin = static_cast<int32>( OriginWidth *  UVRanges[FaceIdx].x);
         auto HeightBegin =static_cast<int32>( OriginHeight *  UVRanges[FaceIdx ].y);
         int32 BaseFaceOffset =FaceIdx *4*( CubeFaceSize * CubeFaceSize) ;
+    	bool FlipFace = bSwapXY[FaceIdx];
         for(int32 h = 0; h <  CubeFaceSize ; ++ h )
         {
             for(int32 w= 0; w < CubeFaceSize ; ++ w)
             {
+            	int32 X = w + WidthBegin;
+            	int32 Y = h + HeightBegin;
+            	int32 W = w;
+            	int32 H = h;
+            	if(InvertX[FaceIdx])
+            	{
+            		W = CubeFaceSize - 1 - W;
+            	}
+            	if(InvertY[FaceIdx])
+            	{
+            		H = CubeFaceSize - 1 - H;
+            	}
 
-                ColorBuffer[BaseFaceOffset + 4*(( h * CubeFaceSize ) + w ) + 0 ] =  Src(w+WidthBegin,h+HeightBegin,0,0);
-                ColorBuffer[BaseFaceOffset + 4*(( h * CubeFaceSize ) + w ) + 1 ] = Src(w+WidthBegin,h+HeightBegin,0,1);
-                ColorBuffer[BaseFaceOffset + 4*(( h * CubeFaceSize ) + w ) + 2 ] = Src(w+WidthBegin,h+HeightBegin,0,2);
-                ColorBuffer[BaseFaceOffset + 4*(( h * CubeFaceSize ) + w ) + 3 ] =
+            	if(FlipFace)
+            	{
+            		std::swap(W,H);
+            	}
+
+                ColorBuffer[BaseFaceOffset + 4*(( H * CubeFaceSize ) + W ) + 0 ] =  Src(X,Y,0,0);
+                ColorBuffer[BaseFaceOffset + 4*(( H * CubeFaceSize ) + W ) + 1 ] = Src(X,Y,0,1);
+            	ColorBuffer[BaseFaceOffset + 4*(( H * CubeFaceSize ) + W ) + 2 ] = Src(X,Y,0,2);
+                ColorBuffer[BaseFaceOffset + 4*(( H * CubeFaceSize ) + W ) + 3 ] =
                         Spectrum == 3 ?  255 : Src(w+WidthBegin,h+HeightBegin,0,0);
-
             }
         }
     }

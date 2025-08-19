@@ -21,9 +21,10 @@ void SReflectionCaptureComponent::Init()
     }
 }
 
-void SReflectionCaptureComponent::FilterCubeMap(VkCommandBuffer CommandBuffer)
+void SReflectionCaptureComponent::FilterCubeMap()
 {
 
+    VkCommandBuffer CommandBuffer = FRHIUtils::BeginOneTimeCommandBuffer();
     if(CubeRT)
     {
         auto MipLevel = CubeRT->GetCubeTexture()->GetMipLevels();
@@ -48,7 +49,7 @@ void SReflectionCaptureComponent::FilterCubeMap(VkCommandBuffer CommandBuffer)
             }
         }
     }
-
+    FRHIUtils::EndOneTimeCommandBuffer(CommandBuffer);
 }
 
 

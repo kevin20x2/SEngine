@@ -106,7 +106,7 @@ static void CollectMesh(FbxNode * InNode, FTravelFbxNodeContext & Context)
 	Context.Mesh->TexCoord0.resize(Context.Mesh->Positions.size());
 	auto AddNormal =[&](int32 PointIdx,const FbxVector4 & Normal)
 	{
-		Context.Mesh->Normals[PointIdx] = (FVector4(Normal[0],Normal[1],Normal[2],Normal[3]));
+		Context.Mesh->Normals[PointIdx] += (FVector4(Normal[0],Normal[1],Normal[2],Normal[3]));
 	};
 
 
@@ -115,10 +115,27 @@ static void CollectMesh(FbxNode * InNode, FTravelFbxNodeContext & Context)
     {
         int32 PolygonSize = pMesh->GetPolygonSize(i);
 
+    	// index
+    	if(PolygonSize >=3 )
+    	{
+    		for(int32 vIdx = 2; vIdx < PolygonSize; ++vIdx)
+    		{
+			    const int idx0 = pMesh->GetPolygonVertex(i, 0);
+			    const int idx1 = pMesh->GetPolygonVertex(i, vIdx - 1);
+			    int idx2 = pMesh->GetPolygonVertex(i, vIdx);
+
+    			if(idx0 < 0 || idx1 < 0 || idx2 < 0) continue;
+
+				Context.Mesh->Indexes.push_back(idx0 + VertexOffset);
+				Context.Mesh->Indexes.push_back(idx2 + VertexOffset);
+				Context.Mesh->Indexes.push_back(idx1 + VertexOffset);
+    		}
+    	}
+
+
         for(int32 j = 0 ; j < PolygonSize; ++ j)
         {
             int32 PointIndex = pMesh->GetPolygonVertex(i,j);
-            Context.Mesh->Indexes.push_back(PointIndex + VertexOffset);
         	CollectVertexColor(pMesh,Context,PointIndex,VertexId);
         	bool bHasNormal = false;
 			bool bHasUv = false;
@@ -214,6 +231,11 @@ static void CollectMesh(FbxNode * InNode, FTravelFbxNodeContext & Context)
         	VertexId++;
         } // polygon size
     } // polygon count
+
+	for(auto & Normal : Context.Mesh->Normals)
+	{
+		Normal /= Normal.w;
+	}
 
 }
 

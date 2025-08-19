@@ -47,10 +47,12 @@ void SRenderer::OnPostInit()
 	Material->Initialize(DescriptorPool->Pool,GetRenderPass());
 	Material->SetTexture(3,Texture);
 	FFbxMeshImporter Importer;
-	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/gy.fbx",Material.get());
+	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/Cube.fbx",Material.get());
 
 
     Material->SetTextureCube(5,CubeRT->GetCubeTexture());
+
+    ReflectionCapture->FilterCubeMap();
 }
 
 void SRenderer::OnInitialize()
@@ -126,7 +128,6 @@ void SRenderer::Render()
     beginInfo.pInheritanceInfo = nullptr;
     VK_CHECK(vkBeginCommandBuffer(CommandBuffer, &beginInfo));
 
-    ReflectionCapture->FilterCubeMap(CommandBuffer);
 
 	SceneView->UpdateViewData(Camera);
 	SceneView->SyncData(CommandBuffer,CurrentFrame);
