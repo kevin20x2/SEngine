@@ -19,6 +19,7 @@
 #include "RHI/RenderTargetGroup.h"
 #include "Systems/ShaderManager/ShaderManager.h"
 #include "RenderTargetCube.h"
+#include "Components/IrradianceCubeComponent.h"
 
 void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
 {
@@ -37,23 +38,29 @@ void SRenderer::OnPostInit()
     Loader.LoadSingleCubeTextureData(FPath::GetApplicationDir() + "/Assets/Textures/canyon1.png", CubeTextureData);
 
     auto CubeRT = FRenderTargetCube ::Create(CubeTextureData.Width,CubeTextureData.Height,CubeTextureData.InData.data());
+	auto IrradianceCubeTex = FRenderTargetCube::Create(CubeTextureData.Width,CubeTextureData.Height,CubeTextureData.InData.data());
     ReflectionCapture = std::make_shared<SReflectionCaptureComponent>();
     ReflectionCapture->SetCubeRT(CubeRT);
     ReflectionCapture->Init();
-    //ReflectionCapture->FilterCubeMap();
+
+	IrradianceCube = std::make_shared<SIrradianceCubeComponent>();
+	IrradianceCube->SetCubeRT(IrradianceCubeTex);
+	IrradianceCube->Init();
 
 	auto Shader = SShaderManager::GetShaderFromName("test");
 	auto Material = TSharedPtr<SMaterialInterface>(new SMaterialInterface( Shader->AsShared() ) );
 	Material->Initialize(DescriptorPool->Pool,GetRenderPass());
 	Material->SetTexture(3,Texture);
 	FFbxMeshImporter Importer;
-	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/Cube.fbx",Material.get());
+	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/gy.fbx",Material.get());
 
 
     Material->SetTextureCube(5,CubeRT->GetCubeTexture());
 	Material->SetSampler("samplerCube",CubeRT->GetCubeTexture());
+	Material->SetTextureCube("IrradianceCube",IrradianceCubeTex->GetCubeTexture());
 
     ReflectionCapture->FilterCubeMap();
+	IrradianceCube->GenerateIrradianceCubeMap();
 }
 
 void SRenderer::OnInitialize()
@@ -106,6 +113,7 @@ void SRenderer::OnInitialize()
 void SRenderer::Render()
 {
 
+
 	auto Device = *GRHI->GetDevice();
 	vkWaitForFences(Device,1, &InFlightFences[CurrentFrame], VK_TRUE , UINT64_MAX);
 
@@ -120,6 +128,8 @@ void SRenderer::Render()
 
 
 	auto Camera = GEngine->GetLocalPlayer()->GetPlayerController()->CameraManager->GetCamera();
+
+	IrradianceCube->GenerateIrradianceCubeMap();
 
     auto CommandBuffer = CommandBuffers->Buffers[CurrentFrame];
 

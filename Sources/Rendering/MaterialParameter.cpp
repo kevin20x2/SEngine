@@ -104,9 +104,9 @@ FMaterialParameterUniformBuffer::FMaterialParameterUniformBuffer( SMaterialInter
 
 bool FMaterialParameterUniformBuffer::SetVector(const FString& Name, const FVector4& Value)
 {
-	if(!ContainVector(Name)) return false;
+	if(!Contain(Name)) return false;
 
-	const auto & Info =  VectorVariables[Name];
+	const auto & Info =  VariableInfos[Name];
 	TArray <float > Data = {Value.x,Value.y,Value.z,Value.w};
 
 	auto CurrentFrame = GEngine->GetRenderer()->GetFrameIndex();
@@ -115,9 +115,9 @@ bool FMaterialParameterUniformBuffer::SetVector(const FString& Name, const FVect
     return true;
 }
 
-bool FMaterialParameterUniformBuffer::ContainVector(const FString& Name)
+bool FMaterialParameterUniformBuffer::Contain(const FString& Name)
 {
-	return VectorVariables.Contains(Name);
+	return VariableInfos.Contains(Name);
 }
 
 TArray<VkWriteDescriptorSet> FMaterialParameterUniformBuffer::GenerateWriteDescriptorSets(VkDescriptorSet DescriptorSet)
@@ -127,45 +127,42 @@ TArray<VkWriteDescriptorSet> FMaterialParameterUniformBuffer::GenerateWriteDescr
 
 void FMaterialParameterUniformBuffer::ParseShaderBindingInfo(FShaderVariableInfo *Info)
 {
-	if(Info->Type == EShaderVariableType::Vector)
 	{
-		VectorVariables[Info->Name] = {
+		VariableInfos[Info->Name] = {
 			Info->Name,
 			Info->Type,
 			Info->Size,
 			Info->Offset
 		};
 	}
-    if(Info->Type== EShaderVariableType::Int)
-    {
-        IntVariables[Info->Name] = {
-                Info->Name,
-                Info->Type,
-                Info->Size,
-                Info->Offset
-        };
-    }
+
 	for(auto & ChildInfo : Info->ChildMembers)
 	{
 		ParseShaderBindingInfo(ChildInfo.get());
 	}
 }
 
-bool FMaterialParameterUniformBuffer::ContainInt(const FString &Name)
-{
-    return IntVariables.Contains(Name);
-}
+
 
 bool FMaterialParameterUniformBuffer::SetInt(const FString &Name, int32 InValue)
 {
-    if(!ContainInt(Name)) return false;
+    if(!Contain(Name)) return false;
 
-    const auto & Info =  IntVariables[Name];
+    const auto & Info =  VariableInfos[Name];
     TArray <int32 > Data = {InValue};
-
 
     memcpy( HostBuffer.data() + Info.Offset,(void *)Data.data(),Info.Size);
     return true;
+}
+
+bool FMaterialParameterUniformBuffer::SetScalar(const FString &Name, float InValue)
+{
+	if(!Contain(Name) ) return false;
+
+	const auto & Info =  VariableInfos[Name];
+	TArray<float> Data= {InValue};
+	memcpy(HostBuffer.data() + Info.Offset,(void *)Data.data(),Info.Size);
+	return true;
 }
 
 void FMaterialParameterUniformBuffer::OnSyncToCommandBuffer(VkCommandBuffer CommandBuffer)
@@ -271,7 +268,7 @@ bool FMaterialParameters::SetVector(const FString &Name, const FVector4 &Value)
 					   [&] (TSharedPtr <FMaterialParameterBase> Param){
 		if(auto Uniform =  std::static_pointer_cast<FMaterialParameterUniformBuffer>(Param))
 		{
-			return Uniform->ContainVector(Name);
+			return Uniform->Contain(Name);
 		}
 		return false;
 	});
@@ -294,7 +291,7 @@ bool FMaterialParameters::SetInt(const FString &Name, int32 IntValue)
                                    [&] (TSharedPtr <FMaterialParameterBase> Param){
                                        if(auto Uniform =  std::static_pointer_cast<FMaterialParameterUniformBuffer>(Param))
                                        {
-                                           return Uniform->ContainInt(Name);
+                                           return Uniform->Contain(Name);
                                        }
                                        return false;
                                    });
@@ -304,6 +301,29 @@ bool FMaterialParameters::SetInt(const FString &Name, int32 IntValue)
         if(auto Uniform =  std::static_pointer_cast<FMaterialParameterUniformBuffer>(*ParamIter))
         {
             Uniform->SetInt(Name, IntValue);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool FMaterialParameters::SetScalar(const FString &Name, float InValue)
+{
+    auto ParamIter =  std::find_if(Parameters.begin(), Parameters.end(),
+                                   [&] (TSharedPtr <FMaterialParameterBase> Param){
+                                       if(auto Uniform =  std::static_pointer_cast<FMaterialParameterUniformBuffer>(Param))
+                                       {
+                                           return Uniform->Contain(Name);
+                                       }
+                                       return false;
+                                   });
+
+    if(ParamIter != Parameters.end())
+    {
+        if(auto Uniform =
+        	std::static_pointer_cast<FMaterialParameterUniformBuffer>(*ParamIter))
+        {
+            Uniform->SetScalar(Name,InValue );
             return true;
         }
     }

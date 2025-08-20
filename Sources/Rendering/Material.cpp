@@ -144,6 +144,12 @@ bool SMaterialInterface::SetInt(const FString &Name, int32 IntValue)
     return Result;
 }
 
+bool SMaterialInterface::SetScalar(const FString &Name, float InValue)
+{
+    auto Result = MaterialParameters.SetScalar(Name,InValue);
+    return Result;
+}
+
 void SMaterialInterface::OnSetupViewData()
 {
 	auto SceneView = GEngine->GetRenderer()->GetSceneView();

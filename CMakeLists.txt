@@ -156,7 +156,9 @@ set(IMGUIFILES
         ${IMGUI_DIR}/imgui_tables.cpp
         ${IMGUI_DIR}/imgui_widgets.cpp)
 set(CppDelegateFiles
-    ThirdParty/CppDelegates/Delegates.cpp)
+    ThirdParty/CppDelegates/Delegates.cpp
+        Sources/Components/IrradianceCubeComponent.cpp
+        Sources/Components/IrradianceCubeComponent.h)
 
 add_executable(SEngine
         ${Spirv_ReflectSource}

@@ -1,0 +1,114 @@
+
+#include "MonteCarlo.hlsl"
+
+cbuffer Global : register(b0)
+{
+    int CubeFace;
+    int MipIndex;
+    int NumMips;
+    float DeltaPhi;
+    float DeltaTheta;
+}
+
+struct VSInput
+{
+    [[vk::location(0)]] float3 Position : POSITION;
+    [[vk::location(1)]] float2 UV : TEXCOORD0;
+};
+
+struct VSOutput
+{
+    float4 Pos : SV_POSITION;
+    [[vk::location(1)]] float2 UV : TEXCOORD0;
+
+};
+
+float3 GetCubemapVector(float2 ScaledUVs, int InCubeFace)
+{
+	float3 CubeCoordinates;
+
+	//@todo - this could be a 3x3 matrix multiply
+	if (InCubeFace == 0)
+	{
+		CubeCoordinates = float3(1, -ScaledUVs.y, -ScaledUVs.x);
+	}
+	else if (InCubeFace == 1)
+	{
+		CubeCoordinates = float3(-1, -ScaledUVs.y, ScaledUVs.x);
+	}
+	else if (InCubeFace == 2)
+	{
+		CubeCoordinates = float3(ScaledUVs.x, 1, ScaledUVs.y);
+	}
+	else if (InCubeFace == 3)
+	{
+		CubeCoordinates = float3(ScaledUVs.x, -1, -ScaledUVs.y);
+	}
+	else if (InCubeFace == 4)
+	{
+		CubeCoordinates = float3(ScaledUVs.x, -ScaledUVs.y, 1);
+	}
+	else
+	{
+		CubeCoordinates = float3(-ScaledUVs.x, -ScaledUVs.y, -1);
+	}
+
+	return CubeCoordinates;
+}
+
+
+VSOutput VertexMain(VSInput input)
+{
+    VSOutput output = (VSOutput) 0;
+    output.Pos = float4(input.Position,1.0f);
+    output.UV = input.UV;
+    return output;
+}
+
+
+
+TextureCube CubemapTexture : register(t1,space0);
+SamplerState CubeSampler :register(s2,space0);
+
+
+
+
+
+float4 DownSampleCube(float3 N )
+{
+     return  CubemapTexture.SampleLevel(CubeSampler,N,0);
+}
+
+float4 FragmentMain(VSOutput input ) :  SV_TARGET
+{
+
+    float2 UV = input.UV ;
+    float2 ScaledUVs = 2*UV -1.0f ;
+
+    float3 CubeCorrdinates = GetCubemapVector(ScaledUVs,CubeFace);
+    float3 N = normalize(CubeCorrdinates);
+
+    float3 Up = float3(0,0,1);
+    float3 Right = normalize(cross(Up,N));
+
+
+    const float TWO_PI = PI * 2.0f;
+    const float HALF_PI = PI * 0.5f;
+
+    float3 color =float3(0,0,0);
+
+    uint SampleCount = 0u;
+    for(float phi = 0.0; phi < TWO_PI; phi+= DeltaPhi)
+    {
+        for(float theta = 0.0 ; theta < HALF_PI ; theta += DeltaTheta)
+        {
+
+            float3 TempVec = cos(phi) *N + sin(theta)*Up;
+            float3 SamplerVector = cos(theta) *N + sin(theta) * TempVec;
+            color += CubemapTexture.Sample(CubeSampler,SamplerVector).rgb * cos(theta) *sin(theta);
+            SampleCount ++ ;
+        }
+    }
+
+    return float4(PI * color /float(SampleCount),1.0 );
+}

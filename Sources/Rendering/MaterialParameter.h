@@ -57,11 +57,12 @@ public:
 
 	bool SetVector(const FString & Name, const FVector4 & Value ) ;
 
-	bool ContainVector(const FString & Name);
+	bool Contain(const FString & Name);
 
-    bool ContainInt(const FString & Name);
 
     bool SetInt(const FString & Name, int32 InValue);
+
+	bool SetScalar(const FString & Name,float InValue);
 
 	virtual TArray <VkWriteDescriptorSet> GenerateWriteDescriptorSets(VkDescriptorSet DescriptorSet) override;
 
@@ -78,8 +79,7 @@ protected:
 		uint32 Offset;
 	};
 
-	TMap <FString,FVariableInfo > VectorVariables;
-    TMap <FString,FVariableInfo > IntVariables;
+	TMap <FString,FVariableInfo > VariableInfos;
 
 
     TArray <uint8> HostBuffer;
@@ -103,6 +103,8 @@ public:
 	bool SetVector(const FString & Name, const FVector4 & Value);
 
     bool SetInt(const FString & Name,int32 IntValue);
+
+	bool SetScalar(const FString & Name,float InValue);
 
     void OnSyncToCommandBuffer(VkCommandBuffer CommandBuffer);
 

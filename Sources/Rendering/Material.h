@@ -51,6 +51,8 @@ public:
 
     bool SetInt(const FString & Name, int32 IntValue);
 
+	bool SetScalar(const FString & Name,float InValue);
+
     void SyncToCommandBuffer(VkCommandBuffer CommandBuffer);
 
 	void MarkDirty()
