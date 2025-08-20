@@ -98,6 +98,8 @@ public:
 
 	void SetTexture(const FString & Name, TSharedPtr <FTextureBase> InTexture);
 
+	void SetTextureSampler(const FString & Name , TSharedPtr <FTextureBase> InTexture );
+
 	bool SetVector(const FString & Name, const FVector4 & Value);
 
     bool SetInt(const FString & Name,int32 IntValue);

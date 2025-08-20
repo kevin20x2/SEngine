@@ -109,6 +109,16 @@ void SMaterialInterface::SetTexture(const FString& Name, TSharedPtr<FTexture2D> 
 	}
 }
 
+void SMaterialInterface::SetSampler(const FString &Name, TSharedPtr<FTextureBase> InTexture)
+{
+	MaterialParameters.SetTextureSampler(Name,InTexture);
+	for(auto & DescriptionSet :DescriptionSets)
+	{
+		MaterialParameters.BindParametersToDescriptorSet(DescriptionSet);
+	}
+
+}
+
 void SMaterialInterface::SetTextureCube(const FString &Name, TSharedPtr<FTextureCubeRHI> CubeTexture)
 {
     MaterialParameters.SetTexture(Name,CubeTexture);

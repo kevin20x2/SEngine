@@ -45,6 +45,8 @@ public:
 
 	void SetTexture(const FString & Name, TSharedPtr <FTexture2D>  InTexture);
 
+	void SetSampler(const FString & Name, TSharedPtr <FTextureBase> InTexture);
+
 	bool SetVector(const FString & Name, const FVector4 & InVector);
 
     bool SetInt(const FString & Name, int32 IntValue);

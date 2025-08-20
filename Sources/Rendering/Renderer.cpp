@@ -51,6 +51,7 @@ void SRenderer::OnPostInit()
 
 
     Material->SetTextureCube(5,CubeRT->GetCubeTexture());
+	Material->SetSampler("samplerCube",CubeRT->GetCubeTexture());
 
     ReflectionCapture->FilterCubeMap();
 }

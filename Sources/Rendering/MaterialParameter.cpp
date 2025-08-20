@@ -242,6 +242,29 @@ void FMaterialParameters::SetTexture(const FString& Name, TSharedPtr<FTextureBas
 	}
 }
 
+void FMaterialParameters::SetTextureSampler(const FString &Name, TSharedPtr<FTextureBase> InTexture)
+{
+
+	auto ParamIter =  std::find_if(Parameters.begin(), Parameters.end(),
+					   [&] (TSharedPtr <FMaterialParameterBase> Param){
+		if(auto Sampler =  std::static_pointer_cast<FMaterialParameterSampler>(Param))
+		{
+			return Sampler->Name == Name;
+		}
+		return false;
+	});
+
+	if(ParamIter != Parameters.end())
+	{
+		if(auto Sampler = std::static_pointer_cast<FMaterialParameterSampler>(*ParamIter))
+		{
+			Sampler->Sampler->Sampler = InTexture->GetSampler();
+		}
+	}
+
+}
+
+
 bool FMaterialParameters::SetVector(const FString &Name, const FVector4 &Value)
 {
 	auto ParamIter =  std::find_if(Parameters.begin(), Parameters.end(),
