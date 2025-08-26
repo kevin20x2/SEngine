@@ -54,15 +54,18 @@ void SShader::GenerateDescriptorSetLayout()
         return;
     }
 
+
+    VkDescriptorSetLayoutCreateInfo CreateInfo = {}; // = VertexInfos[i].CreateInfo;
+    CreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    VkDescriptorSetLayoutBindingFlagsCreateInfo BindingFlagCreateInfo = {
+            .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO,
+    };
+
+    TArray<VkDescriptorSetLayoutBinding> Bindings;
+    TArray<VkDescriptorBindingFlags> BindingFlags;
     for (uint32 i = 0; i < VertexInfos.size(); ++i)
     {
-        TArray<VkDescriptorSetLayoutBinding> Bindings;
-        TArray<VkDescriptorBindingFlags> BindingFlags;
-        VkDescriptorSetLayoutCreateInfo CreateInfo = {}; // = VertexInfos[i].CreateInfo;
-        CreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        VkDescriptorSetLayoutBindingFlagsCreateInfo BindingFlagCreateInfo = {
-            .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO,
-        };
+
         //CreateInfo.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT;
         for (auto &Binding: VertexInfos[i].Bindings)
         {
@@ -91,16 +94,18 @@ void SShader::GenerateDescriptorSetLayout()
             }
         }
 
-        BindingFlagCreateInfo.bindingCount = BindingFlags.size();
-        BindingFlagCreateInfo.pBindingFlags = BindingFlags.data();
 
-        CreateInfo.pNext = &BindingFlagCreateInfo;
-        CreateInfo.bindingCount = Bindings.size();
-        CreateInfo.pBindings = Bindings.data();
 
-        VK_CHECK(vkCreateDescriptorSetLayout(*GRHI->GetDevice(),
-            &CreateInfo, nullptr,&DescriptorSetLayout));
     }
+
+    BindingFlagCreateInfo.bindingCount = BindingFlags.size();
+    BindingFlagCreateInfo.pBindingFlags = BindingFlags.data();
+
+    CreateInfo.pNext = &BindingFlagCreateInfo;
+    CreateInfo.bindingCount = Bindings.size();
+    CreateInfo.pBindings = Bindings.data();
+    VK_CHECK(vkCreateDescriptorSetLayout(*GRHI->GetDevice(),
+                                         &CreateInfo, nullptr,&DescriptorSetLayout));
 }
 
 static void HandleImageParams(const FDescriptorSetLayoutBinding &Binding, uint32 DescriptorIdx,

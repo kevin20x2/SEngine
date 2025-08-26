@@ -49,7 +49,7 @@ void SRenderer::OnPostInit()
 	IrradianceCube->Init();
 
 	BRDFLUTRenderer = std::make_shared<SBRDFLUTRenderComponent>();
-	//BRDFLUTRenderer->Init();
+	BRDFLUTRenderer->Init();
 
 	auto Shader = SShaderManager::GetShaderFromName("test");
 	auto Material = TSharedPtr<SMaterialInterface>(new SMaterialInterface( Shader->AsShared() ) );
@@ -62,6 +62,7 @@ void SRenderer::OnPostInit()
     Material->SetTextureCube(5,CubeRT->GetCubeTexture());
 	Material->SetSampler("samplerCube",CubeRT->GetCubeTexture());
 	Material->SetTextureCube("IrradianceCube",IrradianceCubeTex->GetCubeTexture());
+    Material->SetTexture("BRDFLUT", BRDFLUTRenderer->GetRenderTexture());
 
     ReflectionCapture->FilterCubeMap();
 	IrradianceCube->GenerateIrradianceCubeMap();
@@ -117,7 +118,6 @@ void SRenderer::OnInitialize()
 void SRenderer::Render()
 {
 
-
 	auto Device = *GRHI->GetDevice();
 	vkWaitForFences(Device,1, &InFlightFences[CurrentFrame], VK_TRUE , UINT64_MAX);
 
@@ -134,6 +134,8 @@ void SRenderer::Render()
 	auto Camera = GEngine->GetLocalPlayer()->GetPlayerController()->CameraManager->GetCamera();
 
 	//IrradianceCube->GenerateIrradianceCubeMap();
+
+    BRDFLUTRenderer->Render();
 
     auto CommandBuffer = CommandBuffers->Buffers[CurrentFrame];
 

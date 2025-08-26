@@ -32,16 +32,24 @@ void SBRDFLUTRenderComponent::Init()
     auto Renderer = GEngine->GetModuleByClass<SRenderer>();
     Material->Initialize(Renderer->GetDescriptorPool()->Pool,RTG->GetRenderPass());
 
-    Render();
 }
 
 void SBRDFLUTRenderComponent::Render()
 {
     VkCommandBuffer CommandBuffer = FRHIUtils::BeginOneTimeCommandBuffer();
 
-    RTG->BeginRenderTargetGroup(CommandBuffer,0,FVector4(0,0,0,0));
+    auto CurrentFrame = GEngine->GetRenderer()->GetFrameIndex();
+
+    RTG->BeginRenderTargetGroup(CommandBuffer,CurrentFrame,FVector4(0,0,0,1));
 
     FRenderingUtils::DrawScreenTriangle(CommandBuffer,Material.get());
 
     RTG->EndRenderTargetGroup(CommandBuffer);
+
+    FRHIUtils::EndOneTimeCommandBuffer(CommandBuffer);
+}
+
+TSharedPtr<FRenderTexture> SBRDFLUTRenderComponent::GetRenderTexture()
+{
+    return RTG ? RTG->GetRenderTexture(0) : nullptr;
 }

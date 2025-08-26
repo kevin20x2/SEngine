@@ -5,6 +5,7 @@
 #ifndef BRDFLUTRENDERCOMPONENT_H
 #define BRDFLUTRENDERCOMPONENT_H
 #include "CoreObjects/SCoreComponentBase.h"
+#include "RHI/RenderTexture.h"
 
 
 class SMaterialInterface;
@@ -18,6 +19,9 @@ public:
     void Init();
 
     void Render();
+
+    TSharedPtr <FRenderTexture> GetRenderTexture();
+
 protected:
     TSharedPtr  <FRenderTargetGroup> RTG;
 

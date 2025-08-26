@@ -34,6 +34,8 @@ SamplerState samplerCube : register(s6,space0);
 
 TextureCube IrradianceCube : register(t7,space0);
 
+Texture2D BRDFLUT :  register(t8,space0);
+
 struct PSOutput
 {
     float4 Color : SV_TARGET0 ;
@@ -52,6 +54,7 @@ PSOutput FragmentMain(VSOutput input)
 
     float3 reflectDir = reflect(-ViewDir,WorldNormal);
     float4 CubeColor = IrradianceCube.SampleLevel(samplerCube , reflectDir,2);
+    float3 BRDFLUTSample = BRDFLUT.Sample(samplerColor,float2(input.Uv));
 
     float3 FinalColor =  CubeColor.rgb ;
 
