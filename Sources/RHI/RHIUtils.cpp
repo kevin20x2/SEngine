@@ -218,7 +218,7 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 	if (!Program.link(Messages))
 	{
 		SLogE("Failed to parse HLSL Shader ,Error {} \n {}", Shader.getInfoDebugLog(), Shader.getInfoDebugLog());
-		//throw std::runtime_error("Fail to parse HLSL Shader");
+		throw std::runtime_error("Fail to parse HLSL Shader");
 		return ErrorShaderModule;
 	}
 

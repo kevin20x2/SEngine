@@ -1,0 +1,69 @@
+#include "Brdf.hlsl"
+#include "MonteCarlo.hlsl"
+
+struct VSInput
+{
+    [[vk::location(0)]] float3 Position : POSITION;
+    [[vk::location(1)]] float2 UV : TEXCOORD0;
+};
+
+struct VSOutput
+{
+    float4 Pos : SV_POSITION;
+    [[vk::location(1)]] float2 UV : TEXCOORD0;
+
+};
+
+
+VSOutput VertexMain(VSInput input)
+{
+    VSOutput output = (VSOutput) 0;
+    output.Pos = float4(input.Position,1.0f);
+    output.UV = input.UV;
+    return output;
+}
+
+
+float2 BRDF(float NoV, float roughness)
+{
+    const float3 N = float3(0,0,1);
+    float3 V = float3(sqrt(1.0- NoV*NoV),0.0,NoV);
+    float2 LUT =float2(0,0);
+    const uint NumSamples = 1024u;
+
+    float R4 = (roughness * roughness) *(roughness * roughness);
+
+    for(uint i = 0 ; i < NumSamples ; i++)
+    {
+        float2 Xi = Hammersley(i, NumSamples,0);
+        float3 H = ImportanceSampleGGX(Xi , R4);
+
+        float3 L = 2.0 * dot(V,H)*H - V;
+
+        float dotNL = max(dot(N,L),0.0);
+        float dotNV = max(dot(N,V),0.0);
+        float dotVH = max(dot(V,H),0.0);
+        float dotNH = max(dot(H,N),0.0);
+
+        if(dotNL > 0.0)
+        {
+            float G = G_SchlicksmithGGX(dotNL ,dotNV , roughness);
+            float G_Vis = (G*dotVH)/(dotNH * dotNV);
+            float Fc = pow(1.0 - dotVH ,5.0);
+            LUT += float2((1.0 - Fc) * G_Vis,Fc * G_Vis);
+        }
+    }
+    return LUT / float(NumSamples);
+}
+
+
+float4 FragmentMain(VSOutput input ) :  SV_TARGET
+{
+
+    float2 UV = input.UV ;
+
+
+    float4 OutColor = float4(BRDF(UV.x,UV.y),0.0,1.0f);
+
+    return OutColor;
+}

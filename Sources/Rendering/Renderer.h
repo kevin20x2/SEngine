@@ -23,6 +23,7 @@
 #include "Components/ReflectionCaptureComponent.h"
 
 
+class SBRDFLUTRenderComponent;
 class SIrradianceCubeComponent;
 class FRenderTargetGroup;
 void OnRawWindowResize(GLFWwindow * Window, int Width, int Height);
@@ -94,6 +95,8 @@ protected:
     TSharedPtr <SReflectionCaptureComponent> ReflectionCapture;
 
 	TSharedPtr <SIrradianceCubeComponent> IrradianceCube;
+
+	TSharedPtr <SBRDFLUTRenderComponent> BRDFLUTRenderer;
 
 	TSharedPtr<SActor> Actor;
     // TEMP ENDK

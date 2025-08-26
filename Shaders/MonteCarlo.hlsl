@@ -1,8 +1,7 @@
 
-
 const float PI = 3.1415926f;
 
-float Hammersley(uint Index, uint NumSamples ,uint2 Random)
+float2 Hammersley(uint Index, uint NumSamples ,uint2 Random)
 {
     float E1 = frac((float)Index / NumSamples + float(Random.x &0xffff)/(1<<16));
     float E2 = float(reversebits(Index) ^ Random.y) * 2.3283064365386963e-10;
@@ -45,3 +44,13 @@ float3x3 GetTangentBasis( float3 TangentZ )
 	return float3x3( TangentX, TangentY, TangentZ );
 }
 
+
+float Random(float2 co)
+{
+  	float a = 12.9898;
+	float b = 78.233;
+	float c = 43758.5453;
+	float dt= dot(co.xy ,float2(a,b));
+	float sn= fmod(dt,3.14);
+	return frac(sin(sn) * c);
+}

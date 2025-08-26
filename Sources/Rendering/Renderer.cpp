@@ -19,6 +19,7 @@
 #include "RHI/RenderTargetGroup.h"
 #include "Systems/ShaderManager/ShaderManager.h"
 #include "RenderTargetCube.h"
+#include "Components/BRDFLUTRenderComponent.h"
 #include "Components/IrradianceCubeComponent.h"
 
 void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
@@ -47,12 +48,15 @@ void SRenderer::OnPostInit()
 	IrradianceCube->SetCubeRT(IrradianceCubeTex);
 	IrradianceCube->Init();
 
+	BRDFLUTRenderer = std::make_shared<SBRDFLUTRenderComponent>();
+	//BRDFLUTRenderer->Init();
+
 	auto Shader = SShaderManager::GetShaderFromName("test");
 	auto Material = TSharedPtr<SMaterialInterface>(new SMaterialInterface( Shader->AsShared() ) );
 	Material->Initialize(DescriptorPool->Pool,GetRenderPass());
 	Material->SetTexture(3,Texture);
 	FFbxMeshImporter Importer;
-	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/gy.fbx",Material.get());
+	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/Sphere.fbx",Material.get());
 
 
     Material->SetTextureCube(5,CubeRT->GetCubeTexture());
@@ -129,7 +133,7 @@ void SRenderer::Render()
 
 	auto Camera = GEngine->GetLocalPlayer()->GetPlayerController()->CameraManager->GetCamera();
 
-	IrradianceCube->GenerateIrradianceCubeMap();
+	//IrradianceCube->GenerateIrradianceCubeMap();
 
     auto CommandBuffer = CommandBuffers->Buffers[CurrentFrame];
 

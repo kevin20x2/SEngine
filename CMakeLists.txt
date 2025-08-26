@@ -173,6 +173,8 @@ add_executable(SEngine
         Sources/Components/ReflectionCaptureComponent.h
         Sources/Rendering/RenderingUtils.cpp
         Sources/Rendering/RenderingUtils.h
+        Sources/Components/BRDFLUTRenderComponent.cpp
+        Sources/Components/BRDFLUTRenderComponent.h
 
 )
 
