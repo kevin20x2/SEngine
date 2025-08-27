@@ -17,6 +17,7 @@ struct VSOutput
     [[vk::location(3)]] float4 WorldPos : TEXCOORD2;
 };
 
+
 VSOutput VertexMain(VSInput input)
 {
     VSOutput output = (VSOutput)0;
@@ -42,23 +43,69 @@ struct PSOutput
     float4 Mask : SV_TARGET1 ;
 };
 
+float3 PrefilterReflection(float3 R ,float roughness)
+{
+    const float MAX_REFLECTION_LOD = 9.0;
+    float lod = roughness * MAX_REFLECTION_LOD;
+
+    float lodf = floor(lod);
+    float lodc = ceil(lod);
+
+    return texCube.SampleLevel(samplerCube , R,lod).rgb;
+}
+
+
+float3 F_SchlickR(float cosTheta, float3 F0, float roughness)
+{
+	return F0 + (max((1.0 - roughness).xxx, F0) - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
+float3 Uncharted2Tonemap(float3 x)
+{
+	float A = 0.15;
+	float B = 0.50;
+	float C = 0.10;
+	float D = 0.20;
+	float E = 0.02;
+	float F = 0.30;
+	return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;
+}
 
 PSOutput FragmentMain(VSOutput input)
 {
     PSOutput output = (PSOutput)0;
-    float4 ao = texColor.Sample(samplerColor,float2(input.Uv.x,1.0f - input.Uv.y));
-    float3 ViewDir = normalize( ViewData.ViewPos - input.WorldPos.xyz);
-    float3 WorldNormal = normalize(input.Normal);
-    float NToL = max(0.0f , dot(WorldNormal , LightData.DirectionalLightDir));
-    float3 LambertDiffuse = pow(NToL * 0.5f + 0.5f,2.0f) * ao;
+    float4 ALBEDO = texColor.Sample(samplerColor,input.Uv);
+    float3 V= normalize( ViewData.ViewPos - input.WorldPos.xyz);
+    float3 N = normalize(input.Normal);
+    float3 R = reflect(-V,N);
 
-    float3 reflectDir = reflect(-ViewDir,WorldNormal);
-    float4 CubeColor = IrradianceCube.SampleLevel(samplerCube , reflectDir,2);
-    float3 BRDFLUTSample = BRDFLUT.Sample(samplerColor,float2(input.Uv));
+    float NToL = max(0.0f , dot(N , LightData.DirectionalLightDir));
+    float NToV = max(0.0f , dot(N, V));
 
-    float3 FinalColor =  CubeColor.rgb ;
+    float metallic = 0.5;
+    float roughness = 0.5;
 
-    output.Color = float4(CubeColor.rgb, 1.0f) ;
+    float3 F0 = float3(0.04,0.04,0.04);
+    F0 = lerp(F0,ALBEDO,metallic);
+
+    float3 LambertDiffuse = pow(NToL * 0.5f + 0.5f,2.0f) * ALBEDO;
+
+    float4 irradiance = IrradianceCube.Sample(samplerCube , N);
+    float3 reflection = PrefilterReflection(R, roughness).rgb;
+    float2 brdf = BRDFLUT.Sample(samplerColor,float2(NToV,roughness)).rg;
+
+    float3 F = F_SchlickR(NToV ,F0,roughness);
+
+    float3 Diffuse = irradiance * ALBEDO;
+    float3 Specular = reflection * (F * brdf.x + brdf.y);
+
+    float3 FinalColor =  Specular + Diffuse ;
+    FinalColor = Uncharted2Tonemap(FinalColor );
+    FinalColor = FinalColor * (1.0f  / Uncharted2Tonemap((11.2f).xxx));
+
+    FinalColor = pow(FinalColor, 1/2.2f);
+
+    output.Color = float4(FinalColor, 1.0f) ;
     output.Mask = float4(1,0,0,1);
     return output;
 }
