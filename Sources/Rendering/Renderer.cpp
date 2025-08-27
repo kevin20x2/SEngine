@@ -34,7 +34,7 @@ void SRenderer::OnPostInit()
     SEngineModuleBase::OnPostInit();
 
 	FCImgTextureLoader Loader;
-	auto Texture =  Loader.LoadTexture(FPath::GetApplicationDir() + "/Assets/Textures/cloth.png" );
+	auto Texture =FTexture2D::White() ;//  Loader.LoadTexture(FPath::GetApplicationDir() + "/Assets/Textures/cloth.png" );
 	FTextureCubeData  CubeTextureData ;
     Loader.LoadSingleCubeTextureData(FPath::GetApplicationDir() + "/Assets/Textures/canyon1.png", CubeTextureData);
 
@@ -51,21 +51,25 @@ void SRenderer::OnPostInit()
 	BRDFLUTRenderer = std::make_shared<SBRDFLUTRenderComponent>();
 	BRDFLUTRenderer->Init();
 
-	auto Shader = SShaderManager::GetShaderFromName("test");
+	auto Shader = SShaderManager::GetShaderFromName("PBSBase");
 	auto Material = TSharedPtr<SMaterialInterface>(new SMaterialInterface( Shader->AsShared() ) );
 	Material->Initialize(DescriptorPool->Pool,GetRenderPass());
-	Material->SetTexture(3,Texture);
 	FFbxMeshImporter Importer;
-	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/gy.fbx",Material.get());
+	Actor = Importer.LoadAsSingleActor(FPath::GetApplicationDir() +  "/Assets/Sphere.fbx",Material.get());
 
 
-    Material->SetTextureCube(5,CubeRT->GetCubeTexture());
+	Material->SetTexture("texColor",Texture);
+	Material->SetScalar("Roughness",0.1);
+	Material->SetScalar("Metallic",1.0);
+	Material->SetVector("Color",FVector4(1,1,1,1));
+    Material->SetTextureCube("texCube",CubeRT->GetCubeTexture());
 	Material->SetSampler("samplerCube",CubeRT->GetCubeTexture());
 	Material->SetTextureCube("IrradianceCube",IrradianceCubeTex->GetCubeTexture());
     Material->SetTexture("BRDFLUT", BRDFLUTRenderer->GetRenderTexture());
 
     ReflectionCapture->FilterCubeMap();
 	IrradianceCube->GenerateIrradianceCubeMap();
+    BRDFLUTRenderer->Render();
 }
 
 void SRenderer::OnInitialize()
@@ -113,6 +117,8 @@ void SRenderer::OnInitialize()
 	CreateSyncObjects();
 
 
+	FTexture2D::StaticInit();
+
 }
 
 void SRenderer::Render()
@@ -135,9 +141,9 @@ void SRenderer::Render()
 
 	//IrradianceCube->GenerateIrradianceCubeMap();
 
-    BRDFLUTRenderer->Render();
 
     auto CommandBuffer = CommandBuffers->Buffers[CurrentFrame];
+
 
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;

@@ -90,6 +90,45 @@ FTexture2D::~FTexture2D()
 	vkDestroyImageView(*GRHI->GetDevice(),ImageView,nullptr);
 }
 
+TSharedPtr <FTexture2D> GWhiteTexture;
+
+void FTexture2D::StaticInit()
+{
+	constexpr uint32 DefaultTextureSize = 4;
+	uint32 BufferSize = sizeof(uint32) * DefaultTextureSize * DefaultTextureSize;
+
+	TArray<uint8> Data (BufferSize);
+	Data.resize(BufferSize);
+
+	for(uint32 i = 0; i < DefaultTextureSize; i++)
+	{
+		for(uint32 j = 0; j < DefaultTextureSize; j++)
+		{
+			Data[4*(i * DefaultTextureSize + j) + 0] = 255;
+			Data[4*(i * DefaultTextureSize + j) + 1] = 255;
+			Data[4*(i * DefaultTextureSize + j) + 2] = 255;
+			Data[4*(i * DefaultTextureSize + j) + 3] = 255;
+		}
+	}
+
+
+	FTextureCreateParams Params =
+	{
+		.BufferSize = BufferSize,
+		.Height = DefaultTextureSize,
+		.Width = DefaultTextureSize,
+		.BufferPtr = Data.data(),
+	};
+
+	GWhiteTexture = FTexture2D::CreateTexture(Params);
+}
+
+
+TSharedPtr<FTexture2D> FTexture2D::White()
+{
+	return GWhiteTexture;
+}
+
 FSampler::FSampler()
 {
 	Initalize();

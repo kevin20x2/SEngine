@@ -27,6 +27,11 @@ public:
     virtual void OnSyncToCommandBuffer(VkCommandBuffer CommandBuffer)
     { }
 
+	virtual bool IsDirty() const
+    {
+    	return false;
+    }
+
 };
 
 
@@ -68,6 +73,16 @@ public:
 
     virtual void OnSyncToCommandBuffer(VkCommandBuffer CommandBuffer) override;
 
+	virtual bool IsDirty() const override
+	{
+		return bDirty;
+	}
+
+	void MarkDirty(bool InValue)
+	{
+		bDirty = InValue;
+	}
+
 protected:
 	void ParseShaderBindingInfo(FShaderVariableInfo * Info);
 
@@ -87,6 +102,9 @@ protected:
 	VkDescriptorBufferInfo BufferInfo ;
 	TArray <TSharedPtr <FUniformBuffer> > Buffers;
 	uint32 Size = 0 ;
+
+	bool bDirty = false;
+
 };
 
 class FMaterialParameters
@@ -107,6 +125,8 @@ public:
 	bool SetScalar(const FString & Name,float InValue);
 
     void OnSyncToCommandBuffer(VkCommandBuffer CommandBuffer);
+
+	bool ContainDirtyParameters();
 
 protected:
 	TArray <VkWriteDescriptorSet> GenerateWriteDescriptorSet(VkDescriptorSet DescriptorSet);

@@ -1,4 +1,6 @@
 
+const float PI = 3.1415926f;
+
 struct FViewData
 {
     float4x4 ViewProjection;

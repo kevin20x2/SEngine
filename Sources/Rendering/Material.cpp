@@ -58,13 +58,17 @@ SMaterialInterface::Initialize(VkDescriptorPool Pool, FRenderPass *RenderPass)
 	}
 }
 
-void SMaterialInterface::OnPreRecordCommandBuffer(FPrimitiveRenderData* InRenderData, uint32 CurrentFrame,
+void SMaterialInterface::OnPreRecordCommandBuffer(VkCommandBuffer CommandBuffer,FPrimitiveRenderData* InRenderData, uint32 CurrentFrame,
 	FPreRecordBufferContext& Context)
 {
 	if(bDirty)
 	{
 		CreatePipeline(Context.RenderPass);
 		bDirty = false;
+	}
+	if(MaterialParameters.ContainDirtyParameters())
+	{
+		MaterialParameters.OnSyncToCommandBuffer(CommandBuffer);
 	}
 	OnSetupPrimitiveData(InRenderData,CurrentFrame);
 }

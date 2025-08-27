@@ -30,6 +30,10 @@ public:
 	explicit FTexture2D();
 	virtual ~FTexture2D();
 
+	static void StaticInit();
+
+	static TSharedPtr <FTexture2D> White();
+
 public:
 	template <typename TextureType = FTexture2D>
 	static TSharedPtr <TextureType>

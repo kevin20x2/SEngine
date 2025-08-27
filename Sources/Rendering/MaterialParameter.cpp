@@ -112,6 +112,9 @@ bool FMaterialParameterUniformBuffer::SetVector(const FString& Name, const FVect
 	auto CurrentFrame = GEngine->GetRenderer()->GetFrameIndex();
 
 	memcpy( (void*)(HostBuffer.data() + Info.Offset),(void *)Data.data(),Info.Size);
+
+	MarkDirty(true);
+
     return true;
 }
 
@@ -152,6 +155,9 @@ bool FMaterialParameterUniformBuffer::SetInt(const FString &Name, int32 InValue)
     TArray <int32 > Data = {InValue};
 
     memcpy( HostBuffer.data() + Info.Offset,(void *)Data.data(),Info.Size);
+
+	MarkDirty(true);
+
     return true;
 }
 
@@ -162,15 +168,18 @@ bool FMaterialParameterUniformBuffer::SetScalar(const FString &Name, float InVal
 	const auto & Info =  VariableInfos[Name];
 	TArray<float> Data= {InValue};
 	memcpy(HostBuffer.data() + Info.Offset,(void *)Data.data(),Info.Size);
+	MarkDirty(true);
 	return true;
 }
 
 void FMaterialParameterUniformBuffer::OnSyncToCommandBuffer(VkCommandBuffer CommandBuffer)
 {
-
-    auto CurrentFrame = GEngine->GetRenderer()->GetFrameIndex();
-    FMaterialParameterBase::OnSyncToCommandBuffer(CommandBuffer);
-    Buffers[CurrentFrame]->UpdateData(CommandBuffer,HostBuffer.data());
+	for(uint32 FrameIdx = 0 ; FrameIdx < Buffers.size() ; ++FrameIdx)
+	{
+		FMaterialParameterBase::OnSyncToCommandBuffer(CommandBuffer);
+		Buffers[FrameIdx]->UpdateData(CommandBuffer,HostBuffer.data());
+	}
+	MarkDirty(false);
 }
 
 
@@ -203,7 +212,7 @@ FMaterialParameters::SetTexture(uint32 Binding, TSharedPtr<FTextureBase> InTextu
 {
 	auto ParamIter =  std::find_if(Parameters.begin(), Parameters.end(),
 					   [&] (TSharedPtr <FMaterialParameterBase> Param){
-		if(auto TexturePtr =  std::static_pointer_cast<FMaterialParameterTexture>(Param))
+		if(auto TexturePtr =  std::dynamic_pointer_cast<FMaterialParameterTexture>(Param))
 		{
 			return TexturePtr->BindingSlotIdx == Binding;
 		}
@@ -211,7 +220,7 @@ FMaterialParameters::SetTexture(uint32 Binding, TSharedPtr<FTextureBase> InTextu
 	});
 	if(ParamIter != Parameters.end())
 	{
-		if(auto TextureParam = std::static_pointer_cast<FMaterialParameterTexture>(*ParamIter))
+		if(auto TextureParam = std::dynamic_pointer_cast<FMaterialParameterTexture>(*ParamIter))
 		{
 			TextureParam->Texture = InTexture;
 		}
@@ -223,7 +232,7 @@ void FMaterialParameters::SetTexture(const FString& Name, TSharedPtr<FTextureBas
 
 	auto ParamIter =  std::find_if(Parameters.begin(), Parameters.end(),
 					   [&] (TSharedPtr <FMaterialParameterBase> Param){
-		if(auto TexturePtr =  std::static_pointer_cast<FMaterialParameterTexture>(Param))
+		if(auto TexturePtr =  std::dynamic_pointer_cast<FMaterialParameterTexture>(Param))
 		{
 			return TexturePtr->Name == Name;
 		}
@@ -232,7 +241,7 @@ void FMaterialParameters::SetTexture(const FString& Name, TSharedPtr<FTextureBas
 
 	if(ParamIter != Parameters.end())
 	{
-		if(auto TextureParam = std::static_pointer_cast<FMaterialParameterTexture>(*ParamIter))
+		if(auto TextureParam = std::dynamic_pointer_cast<FMaterialParameterTexture>(*ParamIter))
 		{
 			TextureParam->Texture = InTexture;
 		}
@@ -244,7 +253,7 @@ void FMaterialParameters::SetTextureSampler(const FString &Name, TSharedPtr<FTex
 
 	auto ParamIter =  std::find_if(Parameters.begin(), Parameters.end(),
 					   [&] (TSharedPtr <FMaterialParameterBase> Param){
-		if(auto Sampler =  std::static_pointer_cast<FMaterialParameterSampler>(Param))
+		if(auto Sampler =  std::dynamic_pointer_cast<FMaterialParameterSampler>(Param))
 		{
 			return Sampler->Name == Name;
 		}
@@ -253,7 +262,7 @@ void FMaterialParameters::SetTextureSampler(const FString &Name, TSharedPtr<FTex
 
 	if(ParamIter != Parameters.end())
 	{
-		if(auto Sampler = std::static_pointer_cast<FMaterialParameterSampler>(*ParamIter))
+		if(auto Sampler = std::dynamic_pointer_cast<FMaterialParameterSampler>(*ParamIter))
 		{
 			Sampler->Sampler->Sampler = InTexture->GetSampler();
 		}
@@ -266,7 +275,7 @@ bool FMaterialParameters::SetVector(const FString &Name, const FVector4 &Value)
 {
 	auto ParamIter =  std::find_if(Parameters.begin(), Parameters.end(),
 					   [&] (TSharedPtr <FMaterialParameterBase> Param){
-		if(auto Uniform =  std::static_pointer_cast<FMaterialParameterUniformBuffer>(Param))
+		if(auto Uniform =  std::dynamic_pointer_cast<FMaterialParameterUniformBuffer>(Param))
 		{
 			return Uniform->Contain(Name);
 		}
@@ -275,7 +284,7 @@ bool FMaterialParameters::SetVector(const FString &Name, const FVector4 &Value)
 
 	if(ParamIter != Parameters.end())
 	{
-		if(auto Uniform =  std::static_pointer_cast<FMaterialParameterUniformBuffer>(*ParamIter))
+		if(auto Uniform =  std::dynamic_pointer_cast<FMaterialParameterUniformBuffer>(*ParamIter))
 		{
 			Uniform->SetVector(Name, Value);
 			return true;
@@ -289,7 +298,7 @@ bool FMaterialParameters::SetInt(const FString &Name, int32 IntValue)
 
     auto ParamIter =  std::find_if(Parameters.begin(), Parameters.end(),
                                    [&] (TSharedPtr <FMaterialParameterBase> Param){
-                                       if(auto Uniform =  std::static_pointer_cast<FMaterialParameterUniformBuffer>(Param))
+                                       if(auto Uniform =  std::dynamic_pointer_cast<FMaterialParameterUniformBuffer>(Param))
                                        {
                                            return Uniform->Contain(Name);
                                        }
@@ -298,7 +307,7 @@ bool FMaterialParameters::SetInt(const FString &Name, int32 IntValue)
 
     if(ParamIter != Parameters.end())
     {
-        if(auto Uniform =  std::static_pointer_cast<FMaterialParameterUniformBuffer>(*ParamIter))
+        if(auto Uniform =  std::dynamic_pointer_cast<FMaterialParameterUniformBuffer>(*ParamIter))
         {
             Uniform->SetInt(Name, IntValue);
             return true;
@@ -311,7 +320,8 @@ bool FMaterialParameters::SetScalar(const FString &Name, float InValue)
 {
     auto ParamIter =  std::find_if(Parameters.begin(), Parameters.end(),
                                    [&] (TSharedPtr <FMaterialParameterBase> Param){
-                                       if(auto Uniform =  std::static_pointer_cast<FMaterialParameterUniformBuffer>(Param))
+                                       if(auto Uniform =
+                                       	std::dynamic_pointer_cast<FMaterialParameterUniformBuffer>(Param))
                                        {
                                            return Uniform->Contain(Name);
                                        }
@@ -321,7 +331,7 @@ bool FMaterialParameters::SetScalar(const FString &Name, float InValue)
     if(ParamIter != Parameters.end())
     {
         if(auto Uniform =
-        	std::static_pointer_cast<FMaterialParameterUniformBuffer>(*ParamIter))
+        	std::dynamic_pointer_cast<FMaterialParameterUniformBuffer>(*ParamIter))
         {
             Uniform->SetScalar(Name,InValue );
             return true;
@@ -336,4 +346,16 @@ void FMaterialParameters::OnSyncToCommandBuffer(VkCommandBuffer CommandBuffer)
     {
         Param->OnSyncToCommandBuffer(CommandBuffer);
     }
+}
+
+bool FMaterialParameters::ContainDirtyParameters()
+{
+	for(auto Param : Parameters)
+	{
+		if(Param->IsDirty())
+		{
+			return true;
+		}
+	}
+	return false;
 }

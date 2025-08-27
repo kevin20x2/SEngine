@@ -23,7 +23,7 @@ public:
 	{
 	}
 
-	virtual void OnPreRecordCommandBuffer(FPrimitiveRenderData * InRenderData,uint32 CurrentFrame,
+	virtual void OnPreRecordCommandBuffer(VkCommandBuffer CommandBuffer ,FPrimitiveRenderData * InRenderData,uint32 CurrentFrame,
 		FPreRecordBufferContext & Context
 		);
 	virtual void OnRecordCommandBuffer(VkCommandBuffer CommandBuffer,uint32 CurrentFrame);

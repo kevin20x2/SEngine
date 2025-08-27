@@ -28,7 +28,7 @@ void SPrimitiveComponent::OnPreRecordCommandBuffer(VkCommandBuffer CommandBuffer
 	RenderData->SyncData( CommandBuffer,CurrentFrame);
 	if(Material)
 	{
-		Material->OnPreRecordCommandBuffer(RenderData.get(),CurrentFrame,Context);
+		Material->OnPreRecordCommandBuffer(CommandBuffer,RenderData.get(),CurrentFrame,Context);
 	}
 }
 

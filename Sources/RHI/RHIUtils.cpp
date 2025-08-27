@@ -125,6 +125,11 @@ static TSharedPtr<FShaderVariableInfo> ParseSpvBlockVar(const SpvReflectBlockVar
 	TSharedPtr <FShaderVariableInfo> Result;
 	Result.reset(new FShaderVariableInfo());
 
+	if(Block->type_description->type_flags & SPV_REFLECT_TYPE_FLAG_FLOAT)
+	{
+		Result->Type = EShaderVariableType::Float;
+	}
+
 	if(Block->type_description->type_flags & SPV_REFLECT_TYPE_FLAG_STRUCT)
 	{
 		Result->Type = EShaderVariableType::Struct;
@@ -290,7 +295,7 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 				Binding.Binding.descriptorCount = 1;
 
 				Binding.TypeName = RefBinding.type_description->type_name != nullptr ? RefBinding.type_description->type_name : "" ;
-				if(Binding.TypeName == "Global")
+				if(Binding.TypeName == "Global" || Binding.TypeName == "MaterialBuffer")
 				{
 					Binding.BindingInfo  = ParseSpvBlockVar(&RefBinding.block);
 				}
