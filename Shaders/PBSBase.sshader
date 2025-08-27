@@ -143,8 +143,8 @@ PSOutput FragmentMain(VSOutput input)
     float NToL = max(0.0f , dot(N , LightData.DirectionalLightDir));
     float NToV = max(0.0f , dot(N, V));
 
-    float metallic = Roughness;
-    float roughness = Metallic;
+    float metallic = Metallic;
+    float roughness = Roughness;
 
     float3 F0 = float3(0.04,0.04,0.04);
     F0 = lerp(F0,ALBEDO,metallic);

@@ -59,7 +59,7 @@ void SRenderer::OnPostInit()
 
 
 	Material->SetTexture("texColor",Texture);
-	Material->SetScalar("Roughness",0.1);
+	Material->SetScalar("Roughness",0.5);
 	Material->SetScalar("Metallic",1.0);
 	Material->SetVector("Color",FVector4(1,1,1,1));
     Material->SetTextureCube("texCube",CubeRT->GetCubeTexture());
@@ -139,7 +139,6 @@ void SRenderer::Render()
 
 	auto Camera = GEngine->GetLocalPlayer()->GetPlayerController()->CameraManager->GetCamera();
 
-	//IrradianceCube->GenerateIrradianceCubeMap();
 
 
     auto CommandBuffer = CommandBuffers->Buffers[CurrentFrame];
@@ -155,7 +154,7 @@ void SRenderer::Render()
 	SceneView->UpdateViewData(Camera);
 	SceneView->SyncData(CommandBuffer,CurrentFrame);
 	LightData->SyncData(CommandBuffer,CurrentFrame);
-	//GEngine->GetGUIPort()->OnRecordGUIData();
+	GEngine->GetGUIPort()->OnRecordGUIData();
 
 
     PreRecordCommandBuffer(CommandBuffer,ImageIndex);
@@ -290,7 +289,7 @@ void SRenderer::RecordCommandBuffer(VkCommandBuffer CommandBuffer, uint32 ImageI
 	SwapChainRTG->BeginRenderTargetGroup(CommandBuffer,ImageIndex,FVector4(0,0,0,1));
 
 	PostProcessManager->BeginPostProcess(CurrentFrame,CommandBuffer,BaseRTG.get(),SwapChainRTG.get());
-	//GEngine->GetGUIPort()->OnRender(CommandBuffer);
+	GEngine->GetGUIPort()->OnRender(CommandBuffer);
 	SwapChainRTG->EndRenderTargetGroup(CommandBuffer);
 
 }

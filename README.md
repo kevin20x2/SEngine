@@ -1,35 +1,37 @@
 # SEngine
 
 目标： 
-1. Vulkan API 抽象
-2. 尽量不造轮子
-1. VertexBuffer binding
-2. 转3D
-3. Texture
-4. Load Model
-5. Camera
-6. sceneComponent 功能　
+* Vulkan API 抽象
+* 尽量不造轮子
+* VertexBuffer binding
+* 转3D
+* Texture
+ Load Model
+ Camera
+ sceneComponent 功能　
 
-0 .depthstencil buffer
-1. shader-> GenDescriptionLayout
-   -> GenVertexLayout
-6. Material -> PipelineObject
-0.ui
-1. hot reload shader
-2. MouseOperation code
-1. shader dynamic binding uniform buffer
+ .depthstencil buffer
+ shader-> GenDescriptionLayout
+ -> GenVertexLayout
+ Material -> PipelineObject
+ ui
+ hot reload shader
+ MouseOperation code
+ shader dynamic binding uniform buffer
 
-3. CubeMap Load 
+ CubeMap Load 
 
-TODO:
+ prefilter cubemap
+ TODO:
+ PBR
 
 Material GUI 
 
 
 RoadMap:
-4. prefilter cubemap 
+-1: use dxc to generate spirV
+0. Serialize
 1. shadow
-2. PBR
 3. gi
 4 . 海面渲染
 5. 雾
