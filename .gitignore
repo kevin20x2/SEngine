@@ -7,5 +7,6 @@ cmake-build-relwithdebinfo/**
 bin/Debug/SEngine.exe
 bin/Debug/SEngine.pdb
 *.pdb
-*.exe
-*.exe
+
+ThirdParty/dxcBuild/Debug/lib/** 
+
