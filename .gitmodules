@@ -31,3 +31,6 @@
 [submodule "ThirdParty/libpng"]
 	path = ThirdParty/libpng
 	url = https://github.com/pnggroup/libpng.git
+[submodule "ThirdParty/DirectXShaderCompiler"]
+	path = ThirdParty/DirectXShaderCompiler
+	url = https://github.com/microsoft/DirectXShaderCompiler.git
