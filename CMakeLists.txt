@@ -175,6 +175,8 @@ add_executable(SEngine
         Sources/Rendering/RenderingUtils.h
         Sources/Components/BRDFLUTRenderComponent.cpp
         Sources/Components/BRDFLUTRenderComponent.h
+        Sources/Platform/Platform.cpp
+        Sources/Platform/Platform.h
 
 )
 

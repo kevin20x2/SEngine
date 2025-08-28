@@ -49,10 +49,10 @@ void SShader::GenerateDescriptorSetLayout()
 
     auto &PixelInfos = PixelShaderProgram->GetDescriptorSetLayoutInfos();
 
-    if (VertexInfos.size() != PixelInfos.size())
+    /*if (VertexInfos.size() != PixelInfos.size())
     {
         return;
-    }
+    }*/
 
 
     VkDescriptorSetLayoutCreateInfo CreateInfo = {}; // = VertexInfos[i].CreateInfo;
@@ -63,39 +63,45 @@ void SShader::GenerateDescriptorSetLayout()
 
     TArray<VkDescriptorSetLayoutBinding> Bindings;
     TArray<VkDescriptorBindingFlags> BindingFlags;
-    for (uint32 i = 0; i < VertexInfos.size(); ++i)
+
+    int32 MaxCount = max(VertexInfos.size(), PixelInfos.size());
+
+    for (uint32 i = 0; i <MaxCount; ++i)
     {
 
         //CreateInfo.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT;
-        for (auto &Binding: VertexInfos[i].Bindings)
+        if( VertexInfos.size() > i)
         {
-            if (Bindings.FindByPredict([&](const VkDescriptorSetLayoutBinding &It)
+            for (auto &Binding: VertexInfos[i].Bindings)
             {
-                return It.binding == Binding.Binding.binding;
-            }) == Bindings.end())
-            {
-                Bindings.push_back(Binding.Binding);
-                BindingFlags.push_back(VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT);
+                if (Bindings.FindByPredict([&](const VkDescriptorSetLayoutBinding &It)
+                {
+                    return It.binding == Binding.Binding.binding;
+                }) == Bindings.end())
+                {
+                    Bindings.push_back(Binding.Binding);
+                    BindingFlags.push_back(VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT);
+                }
             }
         }
 
-        for (auto &Binding: PixelInfos[i].Bindings)
+        if(PixelInfos.size() > i)
         {
-            if (auto Iter = Bindings.FindByPredict([&](const VkDescriptorSetLayoutBinding &It)
+            for (auto &Binding: PixelInfos[i].Bindings)
             {
-                return It.binding == Binding.Binding.binding;
-            }); Iter == Bindings.end())
-            {
-                Bindings.push_back(Binding.Binding);
-                BindingFlags.push_back(VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT);
-            } else
-            {
-                Iter->stageFlags |= Binding.Binding.stageFlags;
+                if (auto Iter = Bindings.FindByPredict([&](const VkDescriptorSetLayoutBinding &It)
+                {
+                    return It.binding == Binding.Binding.binding;
+                }); Iter == Bindings.end())
+                {
+                    Bindings.push_back(Binding.Binding);
+                    BindingFlags.push_back(VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT);
+                } else
+                {
+                    Iter->stageFlags |= Binding.Binding.stageFlags;
+                }
             }
         }
-
-
-
     }
 
     BindingFlagCreateInfo.bindingCount = BindingFlags.size();
@@ -191,10 +197,10 @@ SShader::GenerateLayoutBindings()
     auto &VertexInfos = VertexShaderProgram->GetDescriptorSetLayoutInfos();
     auto &PixelInfos = PixelShaderProgram->GetDescriptorSetLayoutInfos();
 
-    if (VertexInfos.size() != PixelInfos.size())
+    /*if (VertexInfos.size() != PixelInfos.size())
     {
         return {};
-    }
+    }*/
 
     TArray<SShader::DescriptorSetLayoutBindingList> Results;
 
@@ -206,7 +212,15 @@ SShader::GenerateLayoutBindings()
             Bindings.push_back(Binding);
         }
 
-
+        Results.push_back(Bindings);
+    }
+    for(uint32 i = 0 ; i <PixelInfos.size(); ++ i)
+    {
+        TArray <FDescriptorSetLayoutBinding> Bindings;
+        for(auto & Binding : PixelInfos[i].Bindings)
+        {
+            Bindings.push_back(Binding);
+        }
         Results.push_back(Bindings);
     }
     return Results;

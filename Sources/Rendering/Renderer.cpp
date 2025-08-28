@@ -67,9 +67,11 @@ void SRenderer::OnPostInit()
 	Material->SetTextureCube("IrradianceCube",IrradianceCubeTex->GetCubeTexture());
     Material->SetTexture("BRDFLUT", BRDFLUTRenderer->GetRenderTexture());
 
+
     ReflectionCapture->FilterCubeMap();
 	IrradianceCube->GenerateIrradianceCubeMap();
     BRDFLUTRenderer->Render();
+
 }
 
 void SRenderer::OnInitialize()
@@ -138,6 +140,7 @@ void SRenderer::Render()
 
 
 	auto Camera = GEngine->GetLocalPlayer()->GetPlayerController()->CameraManager->GetCamera();
+
 
 
 

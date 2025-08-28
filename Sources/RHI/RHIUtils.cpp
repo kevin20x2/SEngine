@@ -17,6 +17,7 @@
 #include "spirv_reflect.h"
 #include "Core/Log.h"
 #include "Platform/Path.h"
+#include "Platform/Platform.h"
 #include "Rendering/Renderer.h"
 #include "Systems/ShaderManager/ShaderManager.h"
 
@@ -154,12 +155,118 @@ static TSharedPtr<FShaderVariableInfo> ParseSpvBlockVar(const SpvReflectBlockVar
 	return Result;
 }
 
+//.\ThirdParty\dxcBuild\Debug\bin\dxc.exe -spirv -T vs_6_0 -E VertexMain .\Shaders\PBSBase.sshader -Fo PBSBase_Vert.spirv
 VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, VkShaderStageFlagBits Stage
 												   ,TArray <FDescriptorSetLayoutInfo> & LayoutInfos,
 												   FVertexInputInfo & OutVertexInputInfo )
 {
 
 	std::vector <uint32_t> Spirv;
+	bool bUseDXC = true;
+	bool CompileResult = false;
+	if(bUseDXC)
+	{
+		 CompileResult = CompileShaderUseDXC(FilePath, Stage, Spirv);
+	}
+	else
+	{
+		CompileResult = CompileShaderUseGlslang(FilePath, Stage, Spirv);
+	}
+
+	if(!CompileResult)
+	{
+		auto ErrorShader = GEngine->GetModuleByClass<SShaderManager>()->GetShaderFromName("Error");
+		switch (Stage)
+		{
+			case VK_SHADER_STAGE_VERTEX_BIT:
+				return ErrorShader->GetVertexShader()->GetShaderModule();
+		break;
+			case VK_SHADER_STAGE_FRAGMENT_BIT:
+				return ErrorShader->GetPixelShader()->GetShaderModule();
+		break;
+			default:
+		break;
+		}
+		SLogE(TEXT("Compile ShaderFail ."));
+	}
+
+	{ // reflect
+		SpvReflectShaderModule ReflectShaderModule = {};
+		auto Result = spvReflectCreateShaderModule(Spirv.size() * sizeof(uint32), Spirv.data(), &ReflectShaderModule);
+		assert(Result == SPV_REFLECT_RESULT_SUCCESS);
+		//input
+
+		uint32 InputCount = 0;
+
+		Result = spvReflectEnumerateInputVariables(&ReflectShaderModule,&InputCount,nullptr);
+		assert(Result == SPV_REFLECT_RESULT_SUCCESS);
+		TArray <SpvReflectInterfaceVariable * > InputVars(InputCount);
+		Result = spvReflectEnumerateInputVariables(&ReflectShaderModule,&InputCount,InputVars.data());
+		if(ReflectShaderModule.shader_stage == SPV_REFLECT_SHADER_STAGE_VERTEX_BIT)
+		{
+			 OutVertexInputInfo =  GenerateVertexInputStateCreateInfo(InputVars);
+		}
+		// descriptor
+		uint32 DescriptorCount = 0;
+		Result = spvReflectEnumerateDescriptorSets(&ReflectShaderModule, &DescriptorCount, nullptr);
+		assert(Result == SPV_REFLECT_RESULT_SUCCESS);
+
+		TArray<SpvReflectDescriptorSet *> Sets(DescriptorCount);
+
+		Result = spvReflectEnumerateDescriptorSets(&ReflectShaderModule, &DescriptorCount, Sets.data());
+
+		LayoutInfos.resize(DescriptorCount);
+
+		for(uint32 i = 0; i < Sets.size(); ++ i )
+		{
+			const auto & ReflectSet =  *Sets[i];
+			auto & LayoutInfo = LayoutInfos[i];
+			LayoutInfo.Bindings.resize(ReflectSet.binding_count);
+			for(uint32 BindingIdx = 0 ; BindingIdx < ReflectSet.binding_count ; ++ BindingIdx )
+			{
+				const auto & RefBinding = *ReflectSet.bindings[BindingIdx];
+				auto & Binding = LayoutInfo.Bindings[BindingIdx];
+				Binding.Name = RefBinding.name;
+				Binding.Binding.binding = RefBinding.binding;
+				Binding.Binding.descriptorType = static_cast<VkDescriptorType>(RefBinding.descriptor_type);
+				Binding.Binding.descriptorCount = 1;
+
+				Binding.TypeName = RefBinding.type_description->type_name != nullptr ? RefBinding.type_description->type_name : "" ;
+				//if(Binding.TypeName == "Global" || Binding.TypeName == "MaterialBuffer")
+				if(RefBinding.descriptor_type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+				{
+					Binding.BindingInfo  = ParseSpvBlockVar(&RefBinding.block);
+				}
+
+				for(uint32 Dim = 0 ; Dim < RefBinding.array.dims_count ; ++ Dim)
+				{
+					Binding.Binding.descriptorCount += RefBinding.array.dims[Dim];
+				}
+				Binding.Binding.stageFlags = static_cast<VkShaderStageFlagBits>(ReflectShaderModule.shader_stage);
+			}
+			LayoutInfo.SetNumber = ReflectSet.set;
+		}
+		spvReflectDestroyShaderModule(&ReflectShaderModule);
+	}
+
+	VkShaderModule ShaderModule;
+	VkShaderModuleCreateInfo ModuleCreateInfo;
+	ModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	ModuleCreateInfo.flags = 0;
+	ModuleCreateInfo.codeSize = Spirv.size() * sizeof(uint32_t);
+	ModuleCreateInfo.pCode = Spirv.data();
+	ModuleCreateInfo.pNext = nullptr;
+
+
+	VK_CHECK( vkCreateShaderModule(*GRHI->GetDevice(), &ModuleCreateInfo, nullptr, &ShaderModule));
+
+	return ShaderModule;
+}
+
+bool FRHIUtils::CompileShaderUseGlslang(const FString &FilePath, VkShaderStageFlagBits Stage,
+	std::vector<uint32_t> &OutSpv)
+{
+
 	std::string InfoLog;
 
 	glslang::InitializeProcess();
@@ -247,82 +354,54 @@ VkShaderModule FRHIUtils::LoadHlslShaderByFilePath(const std::string& FilePath, 
 
 	spv::SpvBuildLogger Logger;
 
-	glslang::GlslangToSpv(*Intermediate, Spirv, &Logger);
+	glslang::GlslangToSpv(*Intermediate, OutSpv, &Logger);
 
 	InfoLog += Logger.getAllMessages() + "\n";
 
 	glslang::FinalizeProcess();
+	return true;
+}
 
-	{ // reflect
-		SpvReflectShaderModule ReflectShaderModule = {};
-		auto Result = spvReflectCreateShaderModule(Spirv.size() * sizeof(uint32), Spirv.data(), &ReflectShaderModule);
-		assert(Result == SPV_REFLECT_RESULT_SUCCESS);
-		//input
+bool FRHIUtils::CompileShaderUseDXC(const FString &FilePath, VkShaderStageFlagBits Stage, std::vector<uint32_t> &OutSpv)
+{
 
-		uint32 InputCount = 0;
+	FString DxcExePath = FPath::JoinPath(FPath::GetApplicationDir(),"ThirdParty/dxcBuild/Debug/bin/dxc.exe");
 
-		Result = spvReflectEnumerateInputVariables(&ReflectShaderModule,&InputCount,nullptr);
-		assert(Result == SPV_REFLECT_RESULT_SUCCESS);
-		TArray <SpvReflectInterfaceVariable * > InputVars(InputCount);
-		Result = spvReflectEnumerateInputVariables(&ReflectShaderModule,&InputCount,InputVars.data());
-		if(ReflectShaderModule.shader_stage == SPV_REFLECT_SHADER_STAGE_VERTEX_BIT)
+	FString ProfileOption = Stage == VK_SHADER_STAGE_VERTEX_BIT ? FString("vs_6_0") : FString("ps_6_0");
+	FString EntryPoint = Stage == VK_SHADER_STAGE_VERTEX_BIT ? FString("VertexMain") : FString("FragmentMain");
+	FString OutFilePath = FilePath + (Stage == VK_SHADER_STAGE_VERTEX_BIT ? ".vertex.spv" : ".fragment.spv");
+
+	FString CommandStr =
+		DxcExePath + " -spirv -T " + ProfileOption + " -E " + EntryPoint +" " +FilePath + " -Fo " + OutFilePath;
+
+	FString ResultInfo;
+	if(FPlatform::ExecuteCommand(CommandStr,ResultInfo))
+	{
+		std::ifstream ifs(OutFilePath,std::ios::binary | std::ios::ate);
+
+		if (!ifs.is_open())
 		{
-			 OutVertexInputInfo =  GenerateVertexInputStateCreateInfo(InputVars);
+			throw std::runtime_error("Binary File Not Exist");
+			return false;
 		}
-		// descriptor
-		uint32 DescriptorCount = 0;
-		Result = spvReflectEnumerateDescriptorSets(&ReflectShaderModule, &DescriptorCount, nullptr);
-		assert(Result == SPV_REFLECT_RESULT_SUCCESS);
 
-		TArray<SpvReflectDescriptorSet *> Sets(DescriptorCount);
+		std::streamsize size = ifs.tellg();
 
-		Result = spvReflectEnumerateDescriptorSets(&ReflectShaderModule, &DescriptorCount, Sets.data());
-
-		LayoutInfos.resize(DescriptorCount);
-
-		for(uint32 i = 0; i < Sets.size(); ++ i )
+		if(size % sizeof(uint32_t) != 0)
 		{
-			const auto & ReflectSet =  *Sets[i];
-			auto & LayoutInfo = LayoutInfos[i];
-			LayoutInfo.Bindings.resize(ReflectSet.binding_count);
-			for(uint32 BindingIdx = 0 ; BindingIdx < ReflectSet.binding_count ; ++ BindingIdx )
-			{
-				const auto & RefBinding = *ReflectSet.bindings[BindingIdx];
-				auto & Binding = LayoutInfo.Bindings[BindingIdx];
-				Binding.Name = RefBinding.name;
-				Binding.Binding.binding = RefBinding.binding;
-				Binding.Binding.descriptorType = static_cast<VkDescriptorType>(RefBinding.descriptor_type);
-				Binding.Binding.descriptorCount = 1;
-
-				Binding.TypeName = RefBinding.type_description->type_name != nullptr ? RefBinding.type_description->type_name : "" ;
-				if(Binding.TypeName == "Global" || Binding.TypeName == "MaterialBuffer")
-				{
-					Binding.BindingInfo  = ParseSpvBlockVar(&RefBinding.block);
-				}
-
-				for(uint32 Dim = 0 ; Dim < RefBinding.array.dims_count ; ++ Dim)
-				{
-					Binding.Binding.descriptorCount += RefBinding.array.dims[Dim];
-				}
-				Binding.Binding.stageFlags = static_cast<VkShaderStageFlagBits>(ReflectShaderModule.shader_stage);
-			}
-			LayoutInfo.SetNumber = ReflectSet.set;
+			throw std::runtime_error("Binary File Size Error");
+			return false;
 		}
-		spvReflectDestroyShaderModule(&ReflectShaderModule);
+		size_t NumElements = size / sizeof(uint32_t);
+		ifs.seekg(0,std::ios::beg);
+
+		OutSpv.resize(NumElements);
+
+		ifs.read(reinterpret_cast<char*>(OutSpv.data()),size);
+		return true;
 	}
+	return false;
 
-	VkShaderModule ShaderModule;
-	VkShaderModuleCreateInfo ModuleCreateInfo;
-	ModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-	ModuleCreateInfo.flags = 0;
-	ModuleCreateInfo.codeSize = Spirv.size() * sizeof(uint32_t);
-	ModuleCreateInfo.pCode = Spirv.data();
-	ModuleCreateInfo.pNext = nullptr;
-
-
-	VK_CHECK( vkCreateShaderModule(*GRHI->GetDevice(), &ModuleCreateInfo, nullptr, &ShaderModule));
-
-	return ShaderModule;
 }
 
 FString FRHIUtils::GetShaderEntryPointByShaderStage(VkShaderStageFlagBits Stage)

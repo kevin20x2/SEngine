@@ -1,5 +1,5 @@
 
-const float PI = 3.1415926f;
+#define PI 3.14159265358f
 
 struct FViewData
 {

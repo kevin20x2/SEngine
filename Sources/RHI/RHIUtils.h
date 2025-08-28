@@ -30,6 +30,11 @@ public:
 												   TArray <FDescriptorSetLayoutInfo> & Infos,
 												   FVertexInputInfo & OutVertexInputInfo
 												   );
+
+	static bool CompileShaderUseGlslang(const FString & FilePath,VkShaderStageFlagBits Stage ,std::vector <uint32_t> & OutSpv );
+
+	static bool CompileShaderUseDXC(const FString & FilePath , VkShaderStageFlagBits Stage ,std::vector <uint32_t> & OutSpv );
+
 	static FString GetShaderEntryPointByShaderStage(VkShaderStageFlagBits State);
 
 

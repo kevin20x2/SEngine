@@ -36,6 +36,8 @@ struct FDescriptorSetLayoutBinding
 	FString TypeName;
 
 	TSharedPtr<FShaderVariableInfo> BindingInfo;
+
+
 };
 
 struct FDescriptorSetLayoutInfo

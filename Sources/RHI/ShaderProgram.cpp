@@ -6,13 +6,19 @@
 
 #include "RHIUtils.h"
 #include "volk.h"
+#include "Core/Log.h"
 
 FVertexShaderProgram::FVertexShaderProgram(const char* FilePath)
 {
 	ShaderFilePath = FilePath;
     ShaderModule = FRHIUtils::LoadHlslShaderByFilePath(FilePath, VK_SHADER_STAGE_VERTEX_BIT,DescriptorSetLayoutInfos,VertexInputInfo);
 	EntryPointName = FRHIUtils::GetShaderEntryPointByShaderStage(VK_SHADER_STAGE_VERTEX_BIT);
+
+	SLogW("DescriptorLayoutInfos {}",DescriptorSetLayoutInfos.size() );
+
 }
+
+
 
 void FVertexShaderProgram::ReCompile()
 {
@@ -57,6 +63,7 @@ FPixelShaderProgram::FPixelShaderProgram(const char* FilePath)
 	FVertexInputInfo Invalid;
     ShaderModule = FRHIUtils::LoadHlslShaderByFilePath(FilePath,VK_SHADER_STAGE_FRAGMENT_BIT,DescriptorSetLayoutInfos,Invalid);
 	EntryPointName = FRHIUtils::GetShaderEntryPointByShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT);
+	SLogW("SetLayout Infos {}", DescriptorSetLayoutInfos.size());
 }
 FPixelShaderProgram::FPixelShaderProgram(const FString &FilePath) :
 	FPixelShaderProgram(FilePath.c_str())
