@@ -6,6 +6,7 @@
 #define IMGUIPORT_H
 #include <backends/imgui_impl_vulkan.h>
 
+#include "SWidgetBase.h"
 #include "CoreObjects/EngineModuleBase.h"
 #include "GLFW/glfw3.h"
 
@@ -23,9 +24,13 @@ public:
 
     void OnRender(VkCommandBuffer CommandBuffer);
 
+    void RegisterChildWidget(TSharedPtr <SWidgetBase> InWidget);
+
 protected:
 
     ImGui_ImplVulkanH_Window Window;
+
+    TArray <TSharedPtr <SWidgetBase> > ChildWidgets;
 
     bool show_demo_window = true;
     bool show_another_window = false;

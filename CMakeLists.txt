@@ -177,6 +177,12 @@ add_executable(SEngine
         Sources/Components/BRDFLUTRenderComponent.h
         Sources/Platform/Platform.cpp
         Sources/Platform/Platform.h
+        Sources/GUI/SWidgetBase.cpp
+        Sources/GUI/SWidgetBase.h
+        Sources/GUI/SMaterialEditor.cpp
+        Sources/GUI/SMaterialEditor.h
+        Sources/GUI/BaseWidgets/SCommonWidget.h
+        Sources/GUI/BaseWidgets/SCommonWidget.cpp
 
 )
 

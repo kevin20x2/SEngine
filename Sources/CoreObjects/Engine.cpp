@@ -35,6 +35,9 @@ void FEngine::Initialize()
 
     Input = SNew<SInput>(); Modules.Add(Input);
 
+    ImGUIPort = SNew<SImGUI>();
+    Modules.Add(ImGUIPort);
+
     Renderer = SNew<SRenderer>(); Modules.Add(Renderer);
 
     LocalPlayer = SNew<SLocalPlayer>();
@@ -45,8 +48,7 @@ void FEngine::Initialize()
     OnInitialize();
     OnPostInit();
 
-    ImGUIPort = SNew<SImGUI>();
-    Modules.Add(ImGUIPort);
+
     if(Window)
     {
         ImGUIPort->InitWindow(Window->GetHandle());

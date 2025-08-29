@@ -68,6 +68,11 @@ public:
 		return DescriptionSets;
 	}
 
+	const FMaterialParameters &GetMaterialParameters() const
+	{
+		return MaterialParameters;
+	}
+
 protected:
 	TSharedPtr <SShader> Shader;
 	TArray <VkDescriptorSet> DescriptionSets;

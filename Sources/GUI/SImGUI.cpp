@@ -110,6 +110,11 @@ void SImGUI::OnRender(VkCommandBuffer CommandBuffer)
     ImGui_ImplVulkan_RenderDrawData(draw_data , CommandBuffer);
 }
 
+void SImGUI::RegisterChildWidget(TSharedPtr<SWidgetBase> InWidget)
+{
+    ChildWidgets.Add(InWidget);
+}
+
 void SImGUI::OnRecordGUIData()
 {
     // Start the Dear ImGui frame
@@ -123,6 +128,13 @@ void SImGUI::OnRecordGUIData()
     // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
     //if (show_demo_window)
     //    ImGui::ShowDemoWindow(&show_demo_window);
+    for(auto Child : ChildWidgets)
+    {
+        if(Child)
+        {
+            Child->OnPaint();
+        }
+    }
 
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
     {

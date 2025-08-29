@@ -21,6 +21,7 @@
 #include "RenderTargetCube.h"
 #include "Components/BRDFLUTRenderComponent.h"
 #include "Components/IrradianceCubeComponent.h"
+#include "GUI/SMaterialEditor.h"
 
 void OnRawWindowResize(GLFWwindow* Window, int Width, int Height)
 {
@@ -67,6 +68,11 @@ void SRenderer::OnPostInit()
 	Material->SetTextureCube("IrradianceCube",IrradianceCubeTex->GetCubeTexture());
     Material->SetTexture("BRDFLUT", BRDFLUTRenderer->GetRenderTexture());
 
+
+	auto MaterialEditor = std::make_shared<SMaterialEditor>();
+	MaterialEditor->Initialize(Material.get());
+
+	GEngine->GetGUIPort()->RegisterChildWidget(MaterialEditor);
 
     ReflectionCapture->FilterCubeMap();
 	IrradianceCube->GenerateIrradianceCubeMap();

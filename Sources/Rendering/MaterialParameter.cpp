@@ -161,6 +161,14 @@ bool FMaterialParameterUniformBuffer::SetInt(const FString &Name, int32 InValue)
     return true;
 }
 
+bool FMaterialParameterUniformBuffer::GetScalar(const FString &Name, float &OutValue)
+{
+	if(!Contain(Name)) return false;
+	auto & Info = VariableInfos[Name];
+	OutValue = * (float * ) (HostBuffer.data()+Info.Offset);
+	return true;
+}
+
 bool FMaterialParameterUniformBuffer::SetScalar(const FString &Name, float InValue)
 {
 	if(!Contain(Name) ) return false;

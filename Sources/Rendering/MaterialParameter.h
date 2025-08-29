@@ -58,6 +58,15 @@ class FMaterialParameterUniformBuffer : public FMaterialParameterBase
 {
 public:
 
+	struct FVariableInfo
+	{
+		FString Name;
+		EShaderVariableType Type;
+		uint32 Size;
+		uint32 Offset;
+	};
+
+
 	FMaterialParameterUniformBuffer(SMaterialInterface * Material ,const FDescriptorSetLayoutBinding & Binding);
 
 	bool SetVector(const FString & Name, const FVector4 & Value ) ;
@@ -66,6 +75,8 @@ public:
 
 
     bool SetInt(const FString & Name, int32 InValue);
+
+	bool GetScalar(const FString & Name, float & OutValue);
 
 	bool SetScalar(const FString & Name,float InValue);
 
@@ -82,17 +93,14 @@ public:
 	{
 		bDirty = InValue;
 	}
+	const TMap <FString , FVariableInfo> & GetVariableInfos() const
+	{
+		return VariableInfos;
+	}
 
 protected:
 	void ParseShaderBindingInfo(FShaderVariableInfo * Info);
 
-	struct FVariableInfo
-	{
-		FString Name;
-		EShaderVariableType Type;
-		uint32 Size;
-		uint32 Offset;
-	};
 
 	TMap <FString,FVariableInfo > VariableInfos;
 
