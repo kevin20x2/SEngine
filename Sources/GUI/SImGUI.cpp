@@ -136,6 +136,7 @@ void SImGUI::OnRecordGUIData()
         }
     }
 
+    /*
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
     {
         static float f = 0.0f;
@@ -171,6 +172,7 @@ void SImGUI::OnRecordGUIData()
         ImGui::End();
     }
 
+    */
     // Rendering
     ImGui::Render();
     //const bool is_minimized = (draw_data->DisplaySize.x <= 0.0f || draw_data->DisplaySize.y <= 0.0f);

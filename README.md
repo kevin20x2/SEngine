@@ -22,14 +22,12 @@
  CubeMap Load 
 
  prefilter cubemap
- TODO:
+ -1: use dxc to generate spirV
  PBR
+ Material GUI
 
-Material GUI 
 
-
-RoadMap:
--1: use dxc to generate spirV
+TODO RoadMap:
 0. Serialize
 1. shadow
 3. gi

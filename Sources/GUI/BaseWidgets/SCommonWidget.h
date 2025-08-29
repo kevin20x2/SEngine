@@ -35,7 +35,7 @@ public:
     virtual void OnPaint() override;
 
     float MinValue = 0;
-    float MaxValue = 100;
+    float MaxValue = 1.0;
 
 };
 
